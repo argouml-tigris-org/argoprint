@@ -104,6 +104,14 @@ public class Main {
 	_parser.parse(settings.getTemplate());
     }
 
+    public void initializeSystem(Settings settings) 
+	throws SAXException, IOException{
+
+	_outputFile = settings.getOutputFile();
+	// TODO: set outputDir of interface
+	// ((UMLInterface)_dataSource).setOutputPath(settings.getOutputDir);
+	_parser.parse(settings.getTemplate());
+    }
     
     public void go()
 	throws FileNotFoundException, IOException, Exception {
