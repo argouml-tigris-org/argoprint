@@ -14,6 +14,7 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 import org.argouml.kernel.Project;
 import org.argouml.kernel.ProjectManager;
+import org.argouml.kernel.ProjectMember;
 
 import org.argouml.ui.ArgoDiagram;
 import org.argouml.ui.ProjectBrowser;
@@ -43,11 +44,12 @@ import java.lang.Class;
 import org.tigris.gef.base.*;
 import org.tigris.gef.persistence.*;
 
+import ru.novosoft.uml.model_management.MModel;
+
 
 /** 
  *
  */
-
 public class UMLInterface {
     public static final String separator = "/";
 
@@ -56,20 +58,41 @@ public class UMLInterface {
     
     private ModelFacade facade; 
 
-    //private Logger logg;
+    private Logger log;
 	
     ////////////////////////////////////////////////////////////////
     // constructors
     public UMLInterface() {
-	//Argo.log.info("GraphConstructor");
 	//super( "action.save-graphics", NO_ICON);
-	facade = ModelFacade.getFacade(); 
-	//logg = org.argouml.application.api.Notation.getLogger();
+	facade = ModelFacade.getFacade();
     }
 
+    ////////////////////////////////////////////////////////////////
+    // setters
+
+    /**
+     * Sets the logger (log) to logger
+     */
+    public void setLog(Logger logger){ log = logger; }
+    
+    /**
+     * Sets the projectBrowswer to browser
+     */
+    public void setProjectBrowser(ProjectBrowser browser){
+	projectBrowser = browser;
+    }
+    
+    /**
+     * Sets the project to proj
+     */
+    public void setProject(Project proj){ project = proj; }
 
     ////////////////////////////////////////////////////////////////
     // main methods
+    
+    /**
+     * Checks if ModelFacade has a method named method
+     */
     public boolean hasMethod(String method){
 	Class c = facade.getClass();
 	Method[] theMethods = c.getMethods();
@@ -81,47 +104,110 @@ public class UMLInterface {
 	}
 	return false;
     }
+    
+    /**
+     * Testing function used for testing during development 
+     */
+    public void testGetMember(){
+	Vector memberVector = project.getMembers();
+	int memberVectorSize = memberVector.size();
 
-
-    public boolean trySaveAllDiagrams( boolean overwrite, 
-				       ProjectBrowser pb, 
-				       Project p, 
-				       Logger log) {
+	Object model = project.getModel();
 	
-	//fundering: RemoveElement.. kanske dödar orginalet så att det e 
-	//därför det inte funkar andra gången!
+	if(facade.isAModel(model)){
+	    log.info("is a model");
+	} else {
+	    log.info("is not a model");
+	}	
+	
+	Collection elementCollection = facade.getOwnedElements(model);
+	Iterator elementIterator = elementCollection.iterator();
 
-	log.info("trySaveAllDiagrams");
-	//Object target;
+	while(elementIterator.hasNext()){
+	    Object element = elementIterator.next();
+	    if(facade.isAClass(element)){
+		log.info("class name: " + facade.getName(element));
+	    } else if(facade.isAActor(element)) {
+		log.info("actor name: " + facade.getName(element));
+	    } else if(facade.isAUseCase(element)) {
+		log.info("actor name: " + facade.getName(element));
+	    } else {
+		log.info("element name: " + facade.getName(element));
+	    }
+	}
+	
+	for(int i = 0; i < memberVectorSize; i++){
+	    log.info("member name " + ((ProjectMember) memberVector.elementAt(i)).getName()); 
+	}
+    }
+
+    /**
+     * Calls method named call in ModelFacade 
+     * returns Object, which is String, Collection
+     */
+    public Object caller(String call){
+	Object model = project.getModel();
+	Object args[] = new Object[1];
+	args[0] = model;
+ 	
+	    if(hasMethod(call)){
+	    Class c = facade.getClass();
+	    Method[] theMethods = c.getMethods();   
+	    
+	    for (int i = 0; i < theMethods.length; i++) {
+		if(call.equals(theMethods[i].getName())){
+		    try{
+			return theMethods[i].invoke(null, args);
+		    //break;
+		    }
+		    catch (IllegalAccessException ignore ){
+			//cat.error("got a FileNotFoundException", ignore);
+		    }
+		    catch ( IllegalArgumentException ignore ){
+			//cat.error("got a FileNotFoundException", ignore);
+		    }
+		    catch ( InvocationTargetException ignore ){
+			//cat.error("got a FileNotFoundException", ignore);
+		    }
+		    catch ( NullPointerException ignore ){
+			//cat.error("got a FileNotFoundException", ignore);
+		    }
+		    catch ( ExceptionInInitializerError ignore ){
+			//cat.error("got a FileNotFoundException", ignore);
+		    }
+		    
+		}
+	    
+	    }
+	}
+	return new String("Test");
+    }
+
+
+    public boolean trySaveAllDiagrams( boolean overwrite ) {
+	
+	log.info("trySaveAllDiagrams started");
+
 	Vector diagramVector =
-	    p.getDiagrams();
+	    project.getDiagrams();
 	
 	int diagramVectorSize = diagramVector.size();
 	
-	//while(!diagramVector.isEmpty()){
+	
 	for(int i = 0; i < diagramVectorSize; i++){
-	    //Object target = diagramVector.firstElement(); 
-	    //diagramVector.removeElementAt(0);
-	    
 	    Object target = diagramVector.elementAt(i); 
 	    
 	    if ( target instanceof Diagram ) {
 		String defaultName = ((Diagram) target).getName();
-		log.info("active diagram" + p.getActiveDiagram().getName());
-		p.setActiveDiagram((ArgoDiagram) target);
-		log.info("active diagram" + p.getActiveDiagram().getName());
+		log.info("active diagram" + project.getActiveDiagram().getName());
+		project.setActiveDiagram((ArgoDiagram) target);
+		log.info("active diagram" + project.getActiveDiagram().getName());
 
 		defaultName = Util.stripJunk(defaultName);
 
 		log.info("diagram name " + defaultName);
 
-		// FIX - It's probably worthwhile to abstract and factor
-		// this chooser and directory stuff. More file handling is
-		// coming, I'm sure.
-
-		
 		try {
-		    //JFileChooser chooser = null;
 		    File defFile = 
 			new File("/home/pum3/danielsson/" + 
 				 defaultName + "."
@@ -130,10 +216,6 @@ public class UMLInterface {
 		    log.info("diagram filename " + defaultName + "."
 			     + FileFilters.GIFFilter._suffix);
 
-		    //int retval = chooser.showSaveDialog( pb );
-		    //if ( retval == 0 ) {
-		    //File theFile = chooser.getSelectedFile();
-		    
 		    if (defFile != null) {
 			String path = defFile.getParent();
 			log.info("diagram path " + path); 
@@ -153,14 +235,13 @@ public class UMLInterface {
 			    path += separator;
 			}
 			
-    
-			pb.showStatus( "Writing " + path + name + "..." );
+    			projectBrowser.showStatus( "Writing " + path + name + "..." );
 			log.info( "Writing " + path + name + "..." );    
 
 			if ( defFile.exists() && !overwrite ) {
 			    String t = "Overwrite " + path + name;
 			    int response =
-				JOptionPane.showConfirmDialog(pb, t, t,
+				JOptionPane.showConfirmDialog(projectBrowser, t, t,
 							      JOptionPane.YES_NO_OPTION);
 			    if (response == JOptionPane.NO_OPTION) return false;
 			}
@@ -169,7 +250,7 @@ public class UMLInterface {
 			cmd.setStream(fo);
 			cmd.doIt();
 			fo.close();
-			pb.showStatus( "Wrote " + path + name );
+			projectBrowser.showStatus( "Wrote " + path + name );
 			log.info( "Wrote " + path + name + "..." );
 			//return true;
 		    }

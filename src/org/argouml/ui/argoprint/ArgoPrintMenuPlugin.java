@@ -33,6 +33,8 @@ import org.argouml.kernel.Project;
 import org.argouml.kernel.ProjectManager;
 import org.argouml.ui.ProjectBrowser;
 
+import org.argouml.model.ModelFacade;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.*;
@@ -68,15 +70,34 @@ public class ArgoPrintMenuPlugin extends UMLAction
 	
 	ProjectBrowser pb = ProjectBrowser.getInstance();
 	Project p =  ProjectManager.getManager().getCurrentProject();
+	umlIf.setLog(Argo.log);
+	umlIf.setProject(p);
+	umlIf.setProjectBrowser(pb);
 	
-	String query = new String("getAtes");
+	
+	String query = new String("getOwnedElements");
 	if(umlIf.hasMethod(query)){
 	    Argo.log.info("Method exists: " + query);
 	} else {
 	    Argo.log.info("Method does not exist: " + query);
 	}
 
-	umlIf.trySaveAllDiagrams(true, pb, p, Argo.log);
+	Object response = umlIf.caller(query);
+
+	if(response instanceof Collection){
+	    Iterator elementIterator = ((Collection) response).iterator();
+
+	    while(elementIterator.hasNext()){
+		Object element = elementIterator.next();
+		
+		Argo.log.info("element name: " + ModelFacade.getFacade().getName(element));
+		
+	    }
+	}
+	
+	//umlIf.testGetMember();
+
+	//umlIf.trySaveAllDiagrams(true);
         	
 	// This is where the ArgoPrint GUI frane is created and displayed.
         //
