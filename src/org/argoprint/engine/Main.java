@@ -25,9 +25,12 @@ public class Main {
 		// Initialize the CoR
 		Interpreter interpreterDefault = new InterpreterDefault(_dataSource);
 		Interpreter interpreterCall = new InterpreterCall(_dataSource);
+		Interpreter interpreterIterate = new InterpreterIterate(_dataSource);
 		_firstHandler = interpreterCall;
-		interpreterCall.setNextHandler(interpreterDefault);
+		interpreterCall.setNextHandler(interpreterIterate);
 		interpreterCall.setFirstHandler(interpreterCall);
+		interpreterIterate.setNextHandler(interpreterDefault);
+		interpreterIterate.setFirstHandler(interpreterCall);
 		interpreterDefault.setFirstHandler(interpreterCall);
 	}
 
