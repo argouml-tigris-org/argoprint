@@ -1,0 +1,29 @@
+<root>
+    <!-- Test tag for default. -->
+    <tok>
+        Tjohoj!!
+    </tok>
+
+    <!-- Test tag for Call. -->
+    <argoprint:call what="some_function()"/>
+
+    <!-- Test tag for Iterate. -->
+    <argoprint:iterate what="some_other_function()" iterator="it">
+        Hej
+    </argoprint:iterate>
+
+    <!-- Test tag for If. -->
+    <argoprint:if cond="false">
+        <argoprint:then>
+            Then.
+        </argoprint:then>
+        <argoprint:else>
+            Else.
+        </argoprint:else>
+    </argoprint:if>
+
+    <!-- Test tag for Bind. -->
+    <argoprint:bind what="img">
+        <argoprint:attr name="src">Hoj</argoprint:attr>
+    </argoprint:bind>
+</root>
