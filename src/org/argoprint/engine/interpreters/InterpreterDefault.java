@@ -1,4 +1,6 @@
 package org.argoprint.engine.interpreters;
+import java.util.Vector;
+
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.engine.Environment;
 import org.w3c.dom.Node;
@@ -18,11 +20,10 @@ public class InterpreterDefault extends Interpreter {
 	 */
 	protected void processTag(Node tagNode, Environment env) throws Exception {
 		NodeList children = tagNode.getChildNodes();
-		if (children != null) {
-			for (int i = 0; i < children.getLength(); i++){
-				_firstHandler.handleTag(children.item(i), env);
-			}
-		}
+		if (children.getLength() > 0) {
+			Vector childrenVector = getVector(children);
+			recurse(childrenVector, env);
+		}	
 	}
 
 	protected boolean canHandle(Node tagNode){
