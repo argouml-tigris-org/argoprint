@@ -206,7 +206,7 @@ public class UMLInterface
 	    Object args[] = new Object[1];
 	    args[0] = iteratorObject;
 
-	    if (call.endsWith(new String("()"))) {
+	    if (call.endsWith("()")) {
 		int callLength = call.length() - 2;
 	    
 		String callName = new String(call.substring(0, callLength));
@@ -236,7 +236,7 @@ public class UMLInterface
 	    }
 	}
 	//throw new Exception("Illegal method call");
-	return new String("Not a known method");
+	return "Not a known method";
     }
 
     
@@ -250,9 +250,10 @@ public class UMLInterface
 	Iterator iter = _classes.iterator();
 
 	while (iter.hasNext()) {
-	    Class c = iter.next().getClass();
+	    Object obj = iter.next();
+	    Class c = obj.getClass();
 
-	    if (call.endsWith(new String("()"))) {
+	    if (call.endsWith("()")) {
 
 		Method[] theMethods = c.getMethods();
 		int callLength = call.length() - 2;
@@ -260,27 +261,42 @@ public class UMLInterface
 		System.out.println("Class " + c + " with "
 				   + theMethods.length + " methods: ");
 
-		String callName = new String(call.substring(0, callLength - 1));
+		String callName = new String(call.substring(0, callLength));
 		for (int i = 0; i < theMethods.length; i++) {
 		    if (callName.equals(theMethods[i].getName())) {
 			try {
 			    System.out.println("Trying: " 
 					       + c + "." + callName + "()");
-			    return theMethods[i].invoke(null, null);
+			    return theMethods[i].invoke(obj, null);
 			}
 			catch (IllegalAccessException ignore ) {
+			    System.out.println("IllegalAccessException: "
+					       + ignore);
+			    ignore.printStackTrace();
 			}
 			catch (IllegalArgumentException ignore ) {
+			    System.out.println("IllegalArgumentException: "
+					       + ignore);
+			    ignore.printStackTrace();
 			}
 			catch (InvocationTargetException ignore ) {
+			    System.out.println("InvocationTargetException: "
+					       + ignore);
+			    ignore.printStackTrace();
 			}
 			catch (NullPointerException ignore ) {
+			    System.out.println("NullPointerException: "
+					       + ignore);
+			    ignore.printStackTrace();
 			}
 			catch (ExceptionInInitializerError ignore ) {
+			    System.out.println("ExceptionInInitializerError: "
+					       + ignore);
+			    ignore.printStackTrace();
 			}		   
 		    }	    
 		}
-	    } else if (call.endsWith(new String(")"))) {
+	    } else if (call.endsWith(")")) {
 
 		Method[] theMethods = c.getMethods();
 		int callLength = call.indexOf((int) '(') + 1;
@@ -291,9 +307,9 @@ public class UMLInterface
 		Object args[] = new Object[1];  
 		Object thisObject = null;
 
-		if (arg.equals(new String("model"))) {
+		if (arg.equals("model")) {
 		    args[0] = _project.getModel();
-		} else if (arg.equals(new String("project"))) {
+		} else if (arg.equals("project")) {
 		    thisObject = _project;
 		    args = null;
 		    c = _project.getClass();
@@ -321,7 +337,7 @@ public class UMLInterface
 	}
 
 	throw new Exception("Illegal method call: " + call);
-	//return new String("Illegal method call");
+	//return "Illegal method call";
     }
     
     /**
@@ -404,7 +420,7 @@ public class UMLInterface
 		_projectBrowser.showStatus( "Wrote " + path + name );
 		_log.info( "Wrote " + path + name + "..." );
 		//return true;
-		return new String(path + name);
+		return path + name;
 	    }
 	}
 	
