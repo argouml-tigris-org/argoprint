@@ -1,5 +1,5 @@
 //$Id$
-//Copyright (c) 2003, Mikael Albertsson, Mattias Danielsson, Per Engström, 
+//Copyright (c) 2003, 2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
 //All rights reserved.
@@ -44,6 +44,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import org.xml.sax.InputSource;
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xml.serialize.*;
 
@@ -111,17 +112,6 @@ public class Main {
     }
 
 
-    // TODO: change parameter to Settings when that class is finished
-    public void initializeSystem(String template, 
-				 String outputFile, 
-				 String outputDir) 
-	throws SAXException, IOException {
-	
-	_outputFile = outputFile;
-	// TODO: set outputDir of interface
-	_parser.parse(template);
-    }
-
     public void initializeSystem(Settings settings, Logger log) 
 	throws SAXException, IOException{
 
@@ -130,18 +120,9 @@ public class Main {
 	_outputFile = settings.getOutputFile();
 	// TODO: set outputDir of interface
 	// ((UMLInterface)_dataSource).setOutputPath(settings.getOutputDir);
-	_parser.parse(settings.getTemplate());
+	_parser.parse(new InputSource(settings.getTemplate()));
     }
 
-    public void initializeSystem(Settings settings) 
-	throws SAXException, IOException{
-
-	_outputFile = settings.getOutputFile();
-	// TODO: set outputDir of interface
-	// ((UMLInterface)_dataSource).setOutputPath(settings.getOutputDir);
-	_parser.parse(settings.getTemplate());
-    }
-    
     public void go()
 	throws FileNotFoundException, IOException, Exception {
 	Document document = _parser.getDocument();

@@ -1,5 +1,5 @@
 //$Id$
-//Copyright (c) 2003, Mikael Albertsson, Mattias Danielsson, Per Engström, 
+//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
 //All rights reserved.
@@ -57,9 +57,9 @@ public class Settings{
     private String _outputFile;
     
     /**
-     * The path to the template to be processed by Argoprint
+     * The the template to be processed by Argoprint
      */
-    private String _template;
+    private File _template;
     
     //private String _inputLang;
     //private String _model;
@@ -76,7 +76,7 @@ public class Settings{
 	throws Exception{
 	_outputDir = new String(dir);
 	_outputFile = new String(file);
-	_template = new String(template);
+	_template = new File(template);
 	
 	try{
 	    checkCorrectness();
@@ -90,30 +90,27 @@ public class Settings{
      * Function to check if member attributes, ie path-/filenames are valid.
      * throws Exceptions if incorrect values or r/w-rights is not correct.
      */
-    private void checkCorrectness() throws Exception{
-	try{
-	    File templateFile = new File(_template);
-	    
-	    if(!templateFile.exists()){
-		throw new Exception("Template file not found");
-	    }   
-	    if(!templateFile.canRead()){
-		throw new Exception("Can't read template file");
-	    }
+    private void checkCorrectness() throws Exception {
 
-	    File outputFile = new File(_outputFile);
-	    if(!outputFile.canWrite()){
-		throw new Exception("Can't write to output file");
-	    }
-
-	    File outputDir = new File(_outputDir);
-	    if(!outputDir.isDirectory()){
-		throw new Exception("Not a valid output directory");
-	    }
-	}catch(Exception e){
-	    throw e;
+	if(!_template.exists()){
+	    throw new Exception("Template file not found");
+	}   
+	if(!_template.canRead()){
+	    throw new Exception("Can't read template file");
 	}
-	
+
+	File outputFile = new File(_outputFile);
+	if (outputFile.exists()) {
+	    if (!outputFile.canWrite()) {
+		throw new Exception("Can't write to output file: "
+				    + outputFile);
+	    }
+	}
+
+	File outputDir = new File(_outputDir);
+	if(!outputDir.isDirectory()){
+	    throw new Exception("Not a valid output directory");
+	}
     } 
 
     /**
@@ -131,13 +128,6 @@ public class Settings{
     }
     
     /**
-     * Setter for the path template 
-     */
-    public void setTemplate(String template){
-	_template = new String(template);
-    }
-
-    /**
      * Getter for outputDir
      */
     public String getOutputDir(){
@@ -154,8 +144,14 @@ public class Settings{
     /**
      * Getter for template
      */
-    public String getTemplate(){
-	return _template;
+    public FileInputStream getTemplate() {
+	try {
+	    return new FileInputStream(_template);
+	}
+	catch (FileNotFoundException e) {
+	    throw new RuntimeException("File not found "
+				       + _template + " shouldn't happen!");
+	}
     }
 }
 
