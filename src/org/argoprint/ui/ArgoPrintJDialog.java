@@ -289,19 +289,19 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 //  	    JOptionPane.showMessageDialog( this, e.getMessage()); 
 //  	}
 	
-
-	Settings settings = new Settings(jTemplateTextField.getText(),
-					 jOutputFileTextField.getText(),
-					 jOutputDirTextField.getText());
-	
-	Main main = new Main();
 	try{
+	    Settings settings = new Settings(jTemplateTextField.getText(),
+					     jOutputFileTextField.getText(),
+					     jOutputDirTextField.getText());
+	
+	    Main main = new Main();
+	    //try{
 	    main.initializeSystem(settings, log);
 	    main.go();
 	}
 	catch(Exception e){
 	    JOptionPane.showMessageDialog( this, e.getMessage());   
-	    //e.printStackTrace();
+	    e.printStackTrace();
 	    return;
 	}
 	
