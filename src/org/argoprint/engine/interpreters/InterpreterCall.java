@@ -20,6 +20,8 @@ public class InterpreterCall extends Interpreter {
 	protected void processTag(Node tagNode, Environment env) throws Exception {
 		NamedNodeMap attributes = tagNode.getAttributes();
 		Object returnValue = callDataSource(attributes, env);
+        if (returnValue == null)
+            returnValue = new String("null");
 		Document document = tagNode.getOwnerDocument();
 		Node parentNode = tagNode.getParentNode();
 		Node fetchedData = document.createTextNode(returnValue.toString());
