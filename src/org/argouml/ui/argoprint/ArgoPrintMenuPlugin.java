@@ -28,6 +28,7 @@ import org.argouml.application.api.*;
 import org.argouml.uml.ui.*;
 
 import org.argoprint.uml_interface.UMLInterface;
+import org.argoprint.ui.*;
 
 import org.argouml.kernel.Project;
 import org.argouml.kernel.ProjectManager;
@@ -113,58 +114,21 @@ public class ArgoPrintMenuPlugin extends UMLAction
 		}
 	    }
 	}
-	
+	// This is where the ArgoPrint GUI frane is created and displayed
+	new ArgoPrintJDialog(new javax.swing.JFrame(), true).show();
+
 	//umlIf.testGetMember();
 
 	//umlIf.trySaveAllDiagrams(true);
-        	
-	// This is where the ArgoPrint GUI frane is created and displayed.
-        //
-        //
-        
-        //JFrame myFrame = new JFrame("My JFrame");
-    	//myFrame.setSize(400, 600);
-    	//myFrame.setLocation(300,200);
-    	//myFrame.getContentPane().add("Center", new JTextArea(10, 40));
-    	//myFrame.show();
-    	
-     	/* Commented out by danielsson for testing
-	JFrame myFrame = new JFrame("My Frame");
-    	myFrame.setSize(500, 600);
-    	
-    	// center the frame on teh screen
-    	Toolkit kit = myFrame.getToolkit();
-    	Dimension screenSize = kit.getScreenSize();
-    	int screenWidth = screenSize.width;
-    	int screenHeight = screenSize.height;
-    	Dimension windowSize = myFrame.getSize();
-    	int windowWidth = windowSize.width;
-    	int windowHeight = windowSize.height;
-    	int upperLeftX = (screenWidth - windowWidth)/2;
-    	int upperLeftY = (screenHeight - windowHeight)/2;
-    
-    	myFrame.setLocation(upperLeftX, upperLeftY);
-    	//myFrame.setLocation(300,200);
-    	myFrame.getContentPane().add("Center", new JTextArea(10, 40));
-    	myFrame.show();
-  	
-	*/
     }
 
     public void setModuleEnabled(boolean v) { }
     
     public boolean initializeModule() {
-        
-	
-
-
-	Argo.log.info ("+-----------------------------+");
+        Argo.log.info ("+-----------------------------+");
         Argo.log.info ("| ArgoPrint initialized       |");
         Argo.log.info ("+-----------------------------+");
-        
-	
-	
-	return true;
+   	return true;
     }
 
     public Object[] buildContext(JMenuItem a, String b) {
