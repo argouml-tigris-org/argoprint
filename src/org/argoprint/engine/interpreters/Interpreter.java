@@ -208,8 +208,7 @@ public abstract class Interpreter {
      * @param localName The name.
      * @return <tt>true</tt> if the name matches.
      */
-    protected static boolean isNodeNamed(Node node, 
-                                         String prefix, String localName) {
+    protected boolean isNodeNamed(Node node, String prefix, String localName) {
 	if ((node.getLocalName() == null) || node.getPrefix() == null) {
 	    return false;
 	} else {
@@ -224,7 +223,7 @@ public abstract class Interpreter {
      * @see #isNodeNamed(Node, String, String)
      * @return <tt>true</tt> if the name matches.
      */
-    protected static boolean isNodeNamed(Node node, String localName) {
+    protected boolean isNodeNamed(Node node, String localName) {
 	return isNodeNamed(node, PREFIX, localName);
     }
 	
@@ -240,42 +239,6 @@ public abstract class Interpreter {
         return (NodeList) set;
     }
 	
-
-    /**
-     * Return the child node with a given name.<p>
-     * 
-     * This returns the first found node with the name.
-     * 
-     * @param children where to search for the node.
-     * @param nodeName The name to search from.
-     * @return The found node (or <tt>null</tt> if not found).
-     */
-    protected static Node findNode(NodeList children, String nodeName) {
-        for (int i = 0; i < children.getLength(); i++) {
-            if (isNodeNamed(children.item(i), nodeName)) {
-        	return children.item(i);
-            }
-        }
-        return null;
-    }
-    
-    /**
-     * Get the children of a child node with a given name.<p>
-     * 
-     * This returns the children of the first found node with the name.
-     * 
-     * @param children Where to search for the node.
-     * @param nodeName The name to search from.
-     * @return The children of the found node (or <tt>null</tt> if not found).
-     */
-    protected static NodeList findList(NodeList children, String nodeName) {
-        Node node = findNode(children, nodeName);
-        if (node != null) {
-            return node.getChildNodes();
-        }
-        return null;
-    }
-
     /**
      * Continue the parsing for each of the specified nodes.
      * 
