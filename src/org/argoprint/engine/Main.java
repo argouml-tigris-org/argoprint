@@ -24,23 +24,24 @@ public class Main {
     private String _outputFile;
     private ArgoPrintDataSource _dataSource;
     private Logger _log;
-    
+
     public Main() {
+//    public Main(boolean initDataSource) {
 	_parser = new DOMParser(); 
 	_dataSource = new UMLInterface(); 
 	//_dataSource = new DataSourceStub();
 
-	
-	
+
+
 	// Initialize the CoR
 	Interpreter iDefault = new InterpreterDefault(_dataSource);
 	Interpreter iCall = new InterpreterCall(_dataSource);
 	Interpreter iIterate = new InterpreterIterate(_dataSource);
 	Interpreter iBind = new InterpreterBind(_dataSource);
 	Interpreter iIf = new InterpreterIf(_dataSource);
-	
+
 	_firstHandler = iCall;
-	
+
 	iCall.setNextHandler(iIterate);
 	iCall.setFirstHandler(_firstHandler);
 	iIterate.setNextHandler(iBind);
@@ -51,6 +52,35 @@ public class Main {
 	iIf.setFirstHandler(_firstHandler);
 	iDefault.setFirstHandler(_firstHandler);
     }
+
+    public Main(boolean initDataSource) {
+//    public Main(boolean initDataSource) {
+	_parser = new DOMParser(); 
+	_dataSource = new UMLInterface(); 
+	//_dataSource = new DataSourceStub();
+
+
+
+	// Initialize the CoR
+	Interpreter iDefault = new InterpreterDefault(_dataSource);
+	Interpreter iCall = new InterpreterCall(_dataSource);
+	Interpreter iIterate = new InterpreterIterate(_dataSource);
+	Interpreter iBind = new InterpreterBind(_dataSource);
+	Interpreter iIf = new InterpreterIf(_dataSource);
+
+	_firstHandler = iCall;
+
+	iCall.setNextHandler(iIterate);
+	iCall.setFirstHandler(_firstHandler);
+	iIterate.setNextHandler(iBind);
+	iIterate.setFirstHandler(_firstHandler);
+	iBind.setNextHandler(iIf);
+	iBind.setFirstHandler(_firstHandler);
+	iIf.setNextHandler(iDefault);
+	iIf.setFirstHandler(_firstHandler);
+	iDefault.setFirstHandler(_firstHandler);
+    }
+
 
     // TODO: change parameter to Settings when that class is finished
     public void initializeSystem(String template, 
