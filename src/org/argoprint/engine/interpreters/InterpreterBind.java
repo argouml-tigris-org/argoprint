@@ -84,9 +84,7 @@ public class InterpreterBind extends Interpreter {
                 i++;
             }
             else {
-                System.out.println("getLength before removal: " + bindChildren.getLength());
                 tagNode.removeChild(child);
-                System.out.println("getLength after removal: " + bindChildren.getLength());
                 
                 newElement.appendChild(child);
                 _firstHandler.handleTag(child, env);
