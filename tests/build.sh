@@ -1,24 +1,24 @@
-#!/bin/sh
+#!/usr/bin/bash
 
 # Set up the classpath variable to contain all the jar-files in the given
 # jar-dirs.
-jardirs=('/home/abbe/PUM/argouml/modules/argoprint/build' '/home/abbe/PUM/argouml/build');
+JARDIRS=('../build' '../../../build' '../../../tools/junit-3.8.1');
 
-for dir in ${jardirs[*]}; do
-    for file in `ls $dir/*.jar`; do
-        CLASSPATH=$CLASSPATH:$file;
+for DIR in ${JARDIRS[*]}; do
+    for FILE in `ls $DIR/*.jar`; do
+        CLASSPATH=$CLASSPATH:$FILE;
     done;
 done;
 
 export CLASSPATH;
 
-javafiles=`find . -name *.java`;
+JAVAFILES=(`find . -name *.java`);
 
-for file in ${javafiles[*]}; do
+for FILE in ${JAVAFILES[*]}; do
 
-    result=`javac $file 2>&1 | sed -e 's/\(^\.\/.\+\.java\):\([0-9]\+\):/[33:40m\1[0m:[32:40m\2[0m:/'`
-    if [ "$result" ]; then
-        echo "$result";
+    RESULT=`javac $FILE 2>&1 | sed -e 's/\(^\.\/.\+\.java\):\([0-9]\+\):/[33:40m\1[0m:[32:40m\2[0m:/'`
+    if [ "$RESULT" ]; then
+        echo "$RESULT";
     fi;
 
 done;

@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/usr/bin/bash
 
 # Set up the classpath variable to contain all the jar-files in the given
 # jar-dirs.
-jardirs=('../build' '../../../build');
+jardirs=('../build' '../../../build' '../../../tools/junit-3.8.1');
 
 for dir in ${jardirs[*]};
 do
