@@ -38,14 +38,16 @@ import org.argouml.model.ModelFacade;
 import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.*;
+import java.lang.*;
+
 import java.util.*;
 
 import javax.swing.*;
 
 
 /**
- *  @author Thierry Lach
- *  @since  0.9.4
+ *  @author Mattias Danielsson
+ *  @since  0.0.1
  */
 public class ArgoPrintMenuPlugin extends UMLAction
     implements PluggableMenu 
@@ -68,30 +70,51 @@ public class ArgoPrintMenuPlugin extends UMLAction
 	Argo.log.info("Starting ArgoPrint");
 	UMLInterface umlIf = new UMLInterface();
 	
+	//setting argopprint for current project
 	ProjectBrowser pb = ProjectBrowser.getInstance();
 	Project p =  ProjectManager.getManager().getCurrentProject();
 	umlIf.setLog(Argo.log);
 	umlIf.setProject(p);
 	umlIf.setProjectBrowser(pb);
 	
+	//testing "simulated" template
+	//String query = new String("getOwnedElements");
+	Object args[] = new Object[1];
 	
-	String query = new String("getOwnedElements");
-	if(umlIf.hasMethod(query)){
-	    Argo.log.info("Method exists: " + query);
-	} else {
-	    Argo.log.info("Method does not exist: " + query);
-	}
+	args[0] = p.getModel();
 
-	Object response = umlIf.caller(query);
-
+	Object response = umlIf.caller(new String("getOwnedElements"), args);
+	
+	//query = new String("isAClass");
+	
 	if(response instanceof Collection){
 	    Iterator elementIterator = ((Collection) response).iterator();
 
 	    while(elementIterator.hasNext()){
 		Object element = elementIterator.next();
+		args[0] = element;
+		Object response2 = 
+		    umlIf.caller(new String("isAClass"), args);
 		
-		Argo.log.info("element name: " + ModelFacade.getFacade().getName(element));
-		
+		if((response2 instanceof Boolean) && 
+		   (((Boolean)response2).booleanValue())){
+		    
+		    Argo.log.info("Class name: " + 
+				  ModelFacade.getFacade().getName(element));
+		    
+		    Object response3 = 
+			umlIf.caller(new String("getOperations"), args);
+		    
+		    if(response3 instanceof Collection){
+			Iterator operationIterator = 
+			    ((Collection) response3).iterator(); 
+			while(operationIterator.hasNext()){
+			    Object operation = operationIterator.next();
+			    Argo.log.info("operation name: " + 
+				  ModelFacade.getFacade().getName(operation));
+			}
+		    }
+		}
 	    }
 	}
 	

@@ -40,11 +40,12 @@ import java.awt.Rectangle;
 
 import java.lang.reflect.*;
 import java.lang.Class;
+import java.lang.Boolean;
 
 import org.tigris.gef.base.*;
 import org.tigris.gef.persistence.*;
 
-import ru.novosoft.uml.model_management.MModel;
+//import ru.novosoft.uml.model_management.MModel;
 
 
 /** 
@@ -130,14 +131,15 @@ public class UMLInterface {
 	    } else if(facade.isAActor(element)) {
 		log.info("actor name: " + facade.getName(element));
 	    } else if(facade.isAUseCase(element)) {
-		log.info("actor name: " + facade.getName(element));
+		log.info("usecase name: " + facade.getName(element));
 	    } else {
 		log.info("element name: " + facade.getName(element));
 	    }
 	}
 	
 	for(int i = 0; i < memberVectorSize; i++){
-	    log.info("member name " + ((ProjectMember) memberVector.elementAt(i)).getName()); 
+	    log.info("member name " + 
+		     ((ProjectMember) memberVector.elementAt(i)).getName()); 
 	}
     }
 
@@ -145,10 +147,10 @@ public class UMLInterface {
      * Calls method named call in ModelFacade 
      * returns Object, which is String, Collection
      */
-    public Object caller(String call){
-	Object model = project.getModel();
-	Object args[] = new Object[1];
-	args[0] = model;
+    public Object caller(String call, Object args[]){
+	//  Object model = project.getModel();
+//  	Object args[] = new Object[1];
+//  	args[0] = model;
  	
 	    if(hasMethod(call)){
 	    Class c = facade.getClass();
@@ -180,9 +182,48 @@ public class UMLInterface {
 	    
 	    }
 	}
-	return new String("Test");
+	return new String("Not a known method");
     }
 
+    
+    public Object booleanCaller(String call, Object args[]){
+	if(hasMethod(call)){
+
+	    Class c = facade.getClass();
+	    Method[] theMethods = c.getMethods();   
+	    
+	    for (int i = 0; i < theMethods.length; i++) {
+		if(call.equals(theMethods[i].getName())){
+		    try{
+			Object answer = theMethods[i].invoke(null, args);
+			return answer;
+			//break;
+		    }
+		    catch (IllegalAccessException ignore ){
+			//cat.error("got a FileNotFoundException", ignore);
+		    }
+		    catch ( IllegalArgumentException ignore ){
+			//cat.error("got a FileNotFoundException", ignore);
+		    }
+		    catch ( InvocationTargetException ignore ){
+			//cat.error("got a FileNotFoundException", ignore);
+		    }
+		    catch ( NullPointerException ignore ){
+			//cat.error("got a FileNotFoundException", ignore);
+		    }
+		    catch ( ExceptionInInitializerError ignore ){
+			//cat.error("got a FileNotFoundException", ignore);
+		    }
+		    
+		}
+		
+	    }
+	}
+
+	//should be throw exeption
+	return null;//false;
+	//return new String("Not a known method");
+    }
 
     public boolean trySaveAllDiagrams( boolean overwrite ) {
 	
@@ -192,16 +233,17 @@ public class UMLInterface {
 	    project.getDiagrams();
 	
 	int diagramVectorSize = diagramVector.size();
-	
-	
+		
 	for(int i = 0; i < diagramVectorSize; i++){
 	    Object target = diagramVector.elementAt(i); 
 	    
 	    if ( target instanceof Diagram ) {
 		String defaultName = ((Diagram) target).getName();
-		log.info("active diagram" + project.getActiveDiagram().getName());
+		log.info("active diagram" + 
+			 project.getActiveDiagram().getName());
 		project.setActiveDiagram((ArgoDiagram) target);
-		log.info("active diagram" + project.getActiveDiagram().getName());
+		log.info("active diagram" + 
+			 project.getActiveDiagram().getName());
 
 		defaultName = Util.stripJunk(defaultName);
 
@@ -241,7 +283,8 @@ public class UMLInterface {
 			if ( defFile.exists() && !overwrite ) {
 			    String t = "Overwrite " + path + name;
 			    int response =
-				JOptionPane.showConfirmDialog(projectBrowser, t, t,
+				JOptionPane.showConfirmDialog(projectBrowser,
+							      t, t,
 							      JOptionPane.YES_NO_OPTION);
 			    if (response == JOptionPane.NO_OPTION) return false;
 			}
