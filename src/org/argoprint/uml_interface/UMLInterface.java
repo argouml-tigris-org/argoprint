@@ -21,6 +21,8 @@ import org.argouml.kernel.ProjectMember;
 import org.argouml.ui.ArgoDiagram;
 import org.argouml.ui.ProjectBrowser;
 
+import org.argouml.uml.diagram.ui.*;
+
 import org.argouml.util.FileFilters;
 import org.argouml.util.SuffixFilter;
 import org.argouml.util.osdep.OsUtil;
@@ -52,6 +54,8 @@ import org.tigris.gef.persistence.*;
  * It primarily communicates with ModelFacade using java.lang.reflect.*
  * To save diagrams gef is called. //TODO: fix bug that causes only
  * the open diagram to be saved correctly.
+ *
+ * @author matda701, Mattias Danielsson
  */
 public class UMLInterface 
     implements ArgoPrintDataSource{
@@ -61,60 +65,65 @@ public class UMLInterface
      * The ArgoUML project that ArgoPrint is applied to. Must be
      * set prior to use by using the setProject(..) method
      */
-    private Project project;
+    private Project _project;
 
     /**
      * The ArgoUML projectbrowser that ArgoPrint is applied to. Must be
      * set prior to use by using the setProjectBrowser(..) method
      */
-    private ProjectBrowser projectBrowser;
+    private ProjectBrowser _projectBrowser;
     
     /**
      * A reference to the ModelFacade
      */
-    private ModelFacade facade; 
+    private ModelFacade _facade; 
 
     /**
-     * A reference to the ArgoUML Logger. (Uses 
+     * A reference to the ArgoUML Logger. (Uses log4java) 
      */
-    private Logger log;
+    private Logger _log;
 	
     /**
-     * The ArgoPrint output dir. Used when saving diagrams as pictures. Must be set prior to use.
+     * The ArgoPrint output dir. Used when saving diagrams as pictures. 
+     * Must be set prior to use.
      */
-    String outputPath;
+    String _outputPath;
 
     ////////////////////////////////////////////////////////////////
     // constructors
+    
+    /**
+     * Constructor
+     */
     public UMLInterface() {
 	//super( "action.save-graphics", NO_ICON);
-	facade = ModelFacade.getFacade();
+	_facade = ModelFacade.getFacade();
     }
 
     ////////////////////////////////////////////////////////////////
     // setters
 
     /**
-     * Sets the logger (log) to logger
+     * Sets the logger (_log) to logger
      */
-    public void setLog(Logger logger){ log = logger; }
+    public void setLog(Logger logger){ _log = logger; }
     
     /**
      * Sets the projectBrowswer to browser
      */
     public void setProjectBrowser(ProjectBrowser browser){
-	projectBrowser = browser;
+	_projectBrowser = browser;
     }
     
     /**
      * Sets the project to proj
      */
-    public void setProject(Project proj){ project = proj; }
+    public void setProject(Project proj){ _project = proj; }
 
     /**
      * Sets the outputPath to path
      */
-    public void setOutputPath(String path){ outputPath = new String(path); }
+    public void setOutputPath(String path){ _outputPath = new String(path); }
 
     ////////////////////////////////////////////////////////////////
     // main methods
@@ -123,7 +132,7 @@ public class UMLInterface
      * Checks if ModelFacade has a method named method. Depracated!
      */
     public boolean hasMethod(String method){
-	Class c = facade.getClass();
+	Class c = _facade.getClass();
 	Method[] theMethods = c.getMethods();
       
 	for (int i = 0; i < theMethods.length; i++) {
@@ -135,50 +144,14 @@ public class UMLInterface
     }
     
     /**
-     * Testing function used for testing during development 
-     */
-    public void testGetMember(){
-	Vector memberVector = project.getMembers();
-	int memberVectorSize = memberVector.size();
-
-	Object model = project.getModel();
-	
-	if(facade.isAModel(model)){
-	    log.info("is a model");
-	} else {
-	    log.info("is not a model");
-	}	
-	
-	Collection elementCollection = facade.getOwnedElements(model);
-	Iterator elementIterator = elementCollection.iterator();
-
-	while(elementIterator.hasNext()){
-	    Object element = elementIterator.next();
-	    if(facade.isAClass(element)){
-		log.info("class name: " + facade.getName(element));
-	    } else if(facade.isAActor(element)) {
-		log.info("actor name: " + facade.getName(element));
-	    } else if(facade.isAUseCase(element)) {
-		log.info("usecase name: " + facade.getName(element));
-	    } else {
-		log.info("element name: " + facade.getName(element));
-	    }
-	}
-	
-	for(int i = 0; i < memberVectorSize; i++){
-	    log.info("member name " + 
-		     ((ProjectMember) memberVector.elementAt(i)).getName()); 
-	}
-    }
-
-    /**
      * Calls method named call in ModelFacade 
      * returns Object, which often is String or Collection
+     * iteratorObject is the argument for the method 
      */
     public Object caller(String call, Object iteratorObject)
 	throws Exception{
 	
-	Class c = facade.getClass();
+	Class c = _facade.getClass();
 	Method[] theMethods = c.getMethods();   
 	
 	Object args[] = new Object[1];
@@ -188,43 +161,44 @@ public class UMLInterface
 	    int callLength = call.length()-2;
 	    
 	    String callName = new String(call.substring(0, callLength));
-	    //log.info(callName);
 	    for (int i = 0; i < theMethods.length; i++) {
 		
 		if(callName.equals(theMethods[i].getName())){
-		    //log.info("method hit " + callName);
 		    try{
-			Object obj = theMethods[i].invoke(null, args);
-			//log.info("object: " + obj.toString());
-			return obj; //theMethods[i].invoke(null, args);
-			//break;
+			return theMethods[i].invoke(null, args);
 		    }
 		    catch (IllegalAccessException e){
-			log.info("Crash" + e.getMessage());
+			_log.info("Crash" + e.getMessage());
 		    }
 		    catch (IllegalArgumentException e){
-			log.info("Crash" + e.getMessage());
+			_log.info("Crash" + e.getMessage());
 		    }
 		    catch (InvocationTargetException e){
-			log.info("Crash" + e.getMessage());
+			_log.info("Crash" + e.getMessage());
 		    }
 		    catch (NullPointerException e){
-			log.info("Crash" + e.getMessage());
+			_log.info("Crash" + e.getMessage());
 		    }
 		    catch (ExceptionInInitializerError e){
-			log.info("Crash" + e.getMessage());
+			_log.info("Crash" + e.getMessage());
 		    }		   
 		}	    
 	    }
 	}
-	 //should throw exception
-	return new String("Not a known method");
+	throw new Exception("Illegal method call");
+	//return new String("Not a known method");
     }
+
     
+    /**
+     * Calls method named call in ModelFacade. Used when argument is to
+     * be on of the default. ex. calledMethodName(model) and not an
+     * iteratorObject
+     */
     public Object caller(String call)
 	throws Exception{
 	
-	Class c = facade.getClass();
+	Class c = _facade.getClass();
 	Method[] theMethods = c.getMethods();
 
 	if(call.endsWith(new String("()"))){
@@ -250,20 +224,18 @@ public class UMLInterface
 		}	    
 	    }
 	} else if(call.endsWith(new String(")"))){
-	    
-	    
 	    int callLength = call.indexOf((int) '(') + 1;
+	    
 	    String callName = new String(call.substring(0, callLength - 1));
 	    String arg = 
 		new String(call.substring(callLength, call.length() - 1));
-	    //log.info("call name: " + callName + "call arg: " + arg);
 	    
 	    for (int i = 0; i < theMethods.length; i++) {
 		if(callName.equals(theMethods[i].getName())){
 		    try{
 			if(arg.equals(new String("model"))){		    
 			    Object args[] = new Object[1];
-			    args[0] = project.getModel(); 
+			    args[0] = _project.getModel(); 
 			    return theMethods[i].invoke(null, 
 							args);
 			}
@@ -283,17 +255,18 @@ public class UMLInterface
 	    
 	    return null;
 	}
-	return new String("Illegal method call");
+	throw new Exception("Illegal method call");
+	//return new String("Illegal method call");
     }
     
     /**
      * Calls method named call in ModelFacade 
      * returns boolean, caller(..) can be used instead but
-     * then Booolean.booleanValue() must be used 
+     * then Booolean.booleanValue() must be used. Depracated! 
      */
     public boolean booleanCaller(String call, Object args[]){
 	if(hasMethod(call)){
-	    Class c = facade.getClass();
+	    Class c = _facade.getClass();
 	    Method[] theMethods = c.getMethods();   
 	    
 	    for (int i = 0; i < theMethods.length; i++) {
@@ -327,16 +300,36 @@ public class UMLInterface
     }
 
     /**
+     * Returns all diagrams in the project. TODO: Figure out a clever
+     * way to invoke with caller.
+     */    
+    public Collection getAllDiagrams(){
+	return _project.getDiagrams();
+    }
+
+
+    /**
+     * Saves a diagram as gif in the directory specified by _outputPath.
+     * Returns a String with the path to the saved gif file. Not implemented
+     * yet... TODO: Solve same Bug as in trySaveAllDiagrams()
+     */
+    public String saveDiagram(UMLDiagram diagram){
+	//Todo: fix bug mentioned i trySaveAllDiagrams
+	//and implement function, in the same way but without the loop
+	return new String("Path/and/filename.gif");
+    }
+
+    /**
      * Tests saving of diagrams as gif-files.
      * TODO: Solve bug that causes only open diagram to
      * be saved. 
      */
     public boolean trySaveAllDiagrams( boolean overwrite ) {
 	
-	log.info("trySaveAllDiagrams started");
+	_log.info("trySaveAllDiagrams started");
 
 	Vector diagramVector =
-	    project.getDiagrams();
+	    _project.getDiagrams();
 	
 	int diagramVectorSize = diagramVector.size();
 		
@@ -345,15 +338,15 @@ public class UMLInterface
 	    
 	    if( target instanceof Diagram ) {
 		String defaultName = ((Diagram) target).getName();
-		log.info("active diagram" + 
-			 project.getActiveDiagram().getName());
-		project.setActiveDiagram((ArgoDiagram) target);
-		log.info("active diagram" + 
-			 project.getActiveDiagram().getName());
+		_log.info("active diagram" + 
+			  _project.getActiveDiagram().getName());
+		_project.setActiveDiagram((ArgoDiagram) target);
+		_log.info("active diagram" + 
+			_project.getActiveDiagram().getName());
 
 		defaultName = Util.stripJunk(defaultName);
 
-		log.info("diagram name " + defaultName);
+		_log.info("diagram name " + defaultName);
 
 		try {
 		    File defFile = 
@@ -361,18 +354,18 @@ public class UMLInterface
 				 defaultName + "."
 				 + FileFilters.GIFFilter._suffix);
 
-		    log.info("diagram filename " + defaultName + "."
+		    _log.info("diagram filename " + defaultName + "."
 			     + FileFilters.GIFFilter._suffix);
 
 		    if (defFile != null) {
 			String path = defFile.getParent();
-			log.info("diagram path " + path); 
+			_log.info("diagram path " + path); 
 
 			String name = defFile.getName();
-			log.info("diagram name " + name);
+			_log.info("diagram name " + name);
 
 			String extension = SuffixFilter.getExtension(defFile);
-			log.info("diagram ext " + extension);
+			_log.info("diagram ext " + extension);
      
 			CmdSaveGraphics cmd = null;
 			    
@@ -383,13 +376,13 @@ public class UMLInterface
 			    path += separator;
 			}
 			
-    			projectBrowser.showStatus( "Writing " + path + name + "..." );
-			log.info( "Writing " + path + name + "..." );    
+			_projectBrowser.showStatus( "Writing " + path + name + "..." );
+			_log.info( "Writing " + path + name + "..." );    
 
 			if ( defFile.exists() && !overwrite ) {
 			    String t = "Overwrite " + path + name;
 			    int response =
-				JOptionPane.showConfirmDialog(projectBrowser,
+				JOptionPane.showConfirmDialog(_projectBrowser,
 							      t, t,
 							      JOptionPane.YES_NO_OPTION);
 			    if (response == JOptionPane.NO_OPTION) return false;
@@ -399,8 +392,8 @@ public class UMLInterface
 			cmd.setStream(fo);
 			cmd.doIt();
 			fo.close();
-			projectBrowser.showStatus( "Wrote " + path + name );
-			log.info( "Wrote " + path + name + "..." );
+			_projectBrowser.showStatus( "Wrote " + path + name );
+			_log.info( "Wrote " + path + name + "..." );
 			//return true;
 		    }
 		    
