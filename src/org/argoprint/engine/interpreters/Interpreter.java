@@ -1,5 +1,6 @@
 package org.argoprint.engine.interpreters;
 
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.engine.*;
@@ -77,5 +78,31 @@ abstract public class Interpreter{
 		else {
 			return false;
 		}
-    } 
+    }
+    
+	/**
+	 * Uses the attributes what and iterator to call the data source and return the value.
+	 * 
+	 * @param attributes A NamedNodeMap of map of attributes that must contain at least the attribute what.
+	 * @param env The Environment in which to process the call.
+	 * @return The Object as returned from the data source.
+	 * @throws Exception
+	 */
+	protected Object callDataSource(NamedNodeMap attributes, Environment env) 
+		throws Exception {
+			Node whatAttribute = attributes.getNamedItem("what");
+			if (whatAttribute == null)
+				throw new BadTemplateException("This tag contains no what attribute.");
+			Object returnValue;
+			Node iteratorAttribute = attributes.getNamedItem("iterator");
+			if (iteratorAttribute == null)
+				returnValue = _dataSource.caller(whatAttribute.getNodeValue());
+			else {
+				if (!env.existsIterator(iteratorAttribute.getNodeValue()))
+					throw new BadTemplateException("Value of iterator attribute does not correspond to a valid iterator.");
+				ArgoPrintIterator iterator = env.getIterator(iteratorAttribute.getNodeValue());
+				returnValue = _dataSource.caller(whatAttribute.getNodeValue(), iterator.currentObject());
+			}
+			return returnValue;
+		}
 }
