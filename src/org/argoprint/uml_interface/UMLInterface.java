@@ -45,20 +45,35 @@ import java.lang.Boolean;
 import org.tigris.gef.base.*;
 import org.tigris.gef.persistence.*;
 
-//import ru.novosoft.uml.model_management.MModel;
-
-
 /** 
- *
+ * The class ArgoPrint uses to interface to the ArgoUML model.
+ * It primarily communicates with ModelFacade using java.lang.reflect.*
+ * To save diagrams gef is called. //TODO: fix bug that causes only
+ * the open diagram to be saved correctly.
  */
 public class UMLInterface {
     public static final String separator = "/";
 
+    /**
+     * The ArgoUML project that ArgoPrint is applied to. Must be
+     * set prior to use by using the setProject(..) method
+     */
     private Project project;
+
+    /**
+     * The ArgoUML projectbrowser that ArgoPrint is applied to. Must be
+     * set prior to use by using the setProjectBrowser(..) method
+     */
     private ProjectBrowser projectBrowser;
     
+    /**
+     * A reference to the ModelFacade
+     */
     private ModelFacade facade; 
 
+    /**
+     * A reference to the ArgoUML Logger. (Uses 
+     */
     private Logger log;
 	
     ////////////////////////////////////////////////////////////////
@@ -148,11 +163,7 @@ public class UMLInterface {
      * returns Object, which is String, Collection
      */
     public Object caller(String call, Object args[]){
-	//  Object model = project.getModel();
-//  	Object args[] = new Object[1];
-//  	args[0] = model;
- 	
-	    if(hasMethod(call)){
+	if(hasMethod(call)){
 	    Class c = facade.getClass();
 	    Method[] theMethods = c.getMethods();   
 	    
@@ -176,19 +187,17 @@ public class UMLInterface {
 		    }
 		    catch ( ExceptionInInitializerError ignore ){
 			//cat.error("got a FileNotFoundException", ignore);
-		    }
-		    
-		}
-	    
+		    }		   
+		}	    
 	    }
 	}
+	//should trow exception
 	return new String("Not a known method");
     }
 
     
-    public Object booleanCaller(String call, Object args[]){
+    public boolean booleanCaller(String call, Object args[]){
 	if(hasMethod(call)){
-
 	    Class c = facade.getClass();
 	    Method[] theMethods = c.getMethods();   
 	    
@@ -196,32 +205,29 @@ public class UMLInterface {
 		if(call.equals(theMethods[i].getName())){
 		    try{
 			Object answer = theMethods[i].invoke(null, args);
-			return answer;
+			return ((Boolean)answer).booleanValue();
 			//break;
 		    }
-		    catch (IllegalAccessException ignore ){
-			//cat.error("got a FileNotFoundException", ignore);
+		    catch(IllegalAccessException ignore ){
+			
 		    }
-		    catch ( IllegalArgumentException ignore ){
-			//cat.error("got a FileNotFoundException", ignore);
+		    catch(IllegalArgumentException ignore ){
+		       
 		    }
-		    catch ( InvocationTargetException ignore ){
-			//cat.error("got a FileNotFoundException", ignore);
+		    catch(InvocationTargetException ignore ){
+			
 		    }
-		    catch ( NullPointerException ignore ){
-			//cat.error("got a FileNotFoundException", ignore);
+		    catch(NullPointerException ignore ){
+			
 		    }
-		    catch ( ExceptionInInitializerError ignore ){
-			//cat.error("got a FileNotFoundException", ignore);
-		    }
-		    
-		}
-		
+		    catch(ExceptionInInitializerError ignore ){
+			
+		    }		    
+		}		
 	    }
 	}
-
 	//should be throw exeption
-	return null;//false;
+	return false;
 	//return new String("Not a known method");
     }
 
