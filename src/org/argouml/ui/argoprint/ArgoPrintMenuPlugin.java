@@ -56,7 +56,7 @@ public class ArgoPrintMenuPlugin extends UMLAction
      * This is not publicly creatable.
      */
     protected ArgoPrintMenuPlugin() {
-	super("Plugin menu test entry", false);
+	super("Plugin ArgoPrintMenu entry", false);
     }
 
     ////////////////////////////////////////////////////////////////
@@ -78,14 +78,10 @@ public class ArgoPrintMenuPlugin extends UMLAction
 	umlIf.setProjectBrowser(pb);
 	
 	//testing "simulated" template
-	//String query = new String("getOwnedElements");
 	Object args[] = new Object[1];
-	
 	args[0] = p.getModel();
-
-	Object response = umlIf.caller(new String("getOwnedElements"), args);
 	
-	//query = new String("isAClass");
+	Object response = umlIf.caller(new String("getOwnedElements"), args);
 	
 	if(response instanceof Collection){
 	    Iterator elementIterator = ((Collection) response).iterator();
