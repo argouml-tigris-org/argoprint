@@ -59,8 +59,6 @@ public class Main {
 	_dataSource = new UMLInterface(); 
 	//_dataSource = new DataSourceStub();
 
-
-
 	// Initialize the CoR
 	Interpreter iDefault = new InterpreterDefault(_dataSource);
 	Interpreter iCall = new InterpreterCall(_dataSource);
@@ -117,10 +115,12 @@ public class Main {
 	throws FileNotFoundException, IOException, Exception {
 	Document document = _parser.getDocument();
 	_firstHandler.handleTag(document, new Environment());
-		
 	FileOutputStream outputStream = new FileOutputStream(_outputFile);
-	XMLSerializer serializer = new XMLSerializer(outputStream, null);
-	// Currently only outputs the input document
+	OutputFormat outputFormat = new OutputFormat(document);
+	outputFormat.setIndent(4);
+	outputFormat.setPreserveSpace(false);
+	outputFormat.setLineWidth(80);
+	XMLSerializer serializer = new XMLSerializer(outputStream, outputFormat);
 	serializer.serialize(document);
     }
 }
