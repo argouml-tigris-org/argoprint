@@ -10,6 +10,11 @@ public class Environment{
 
     private Hashtable iteratorTable;
 
+    public Environment(){
+        instance = this;
+	iteratorTable = new Hashtable();
+    }
+
     public boolean existsIterator(String name){
 	return iteratorTable.containsKey(name);
     }
@@ -17,7 +22,8 @@ public class Environment{
     public boolean addIterator(String name, Iterator iterator){
 	if(iteratorTable.containsKey(name)){
 	    //Key collision occured. Perhaps solve this by calling rehash() ?
-	    //and calling addIterator recursively
+	    //and calling addIterator recursively, Or perhaps totally unneccesary
+	    //since add and get solves this automagically
 	    return false;
 	}
 	
