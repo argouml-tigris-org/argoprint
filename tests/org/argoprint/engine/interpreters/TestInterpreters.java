@@ -1,6 +1,5 @@
 package org.argoprint.engine.interpreters;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -9,12 +8,11 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.xerces.parsers.DOMParser;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 import org.argoprint.DataSourceStub;
+import org.argoprint.XmlTestUtil;
 import org.argoprint.engine.Environment;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -95,11 +93,8 @@ public class TestInterpreters extends TestCase {
         Node resultNode = nodes.item(collectPos);
 
         assertTrue(name + "-interpreter does not give expected result.",
-                   nodesEqual(compareNode, resultNode));
+                   XmlTestUtil.nodesEqual(compareNode, resultNode));
     }
-
-
-
 
     /*
      * Test cases.
@@ -140,7 +135,7 @@ public class TestInterpreters extends TestCase {
         defaultInterpreter.handleTag(paramNode, env);
 
         assertTrue("Default-interpreter does not give expected result.",
-                   nodesEqual(paramNode, compNode));
+                   XmlTestUtil.nodesEqual(paramNode, compNode));
     }
 
     public void testIterateIncorrectSortvalue() throws Exception {
@@ -243,7 +238,7 @@ public class TestInterpreters extends TestCase {
 
         // Parse the incorrect template.
         try {
-            parser.parse("org/argoprint/engine/interpreters/"
+            parser.parse("tests/org/argoprint/engine/interpreters/"
                     + incorrectTemplateName);
         } catch (org.xml.sax.SAXException e) {
             fail("Could not parse " + incorrectTemplateName + ": "
@@ -296,33 +291,6 @@ public class TestInterpreters extends TestCase {
                 defaultInterpreter);
     }
 
-
-    private boolean nodesEqual(Node left, Node right) throws IOException {
-        ByteArrayOutputStream lstream = new ByteArrayOutputStream();
-        ByteArrayOutputStream rstream = new ByteArrayOutputStream();
-        OutputFormat of = new OutputFormat();
-        of.setIndent(4);
-        of.setPreserveSpace(false);
-        of.setLineWidth(80);
-        (new XMLSerializer(lstream, of)).serialize((Element) left);
-        (new XMLSerializer(rstream, of)).serialize((Element) right);
-
-        String lstring = stripWs(lstream.toString());
-        String rstring = stripWs(rstream.toString());
-
-        return lstring.equals(rstring);
-    }
-
-    private String stripWs(String in) {
-        StringBuffer buf = new StringBuffer(in);
-        for (int i = buf.length() - 1; i >= 0; --i) {
-            char c = buf.charAt(i);
-            if (c == ' ' || c == '\n' || c == '\t') {
-                buf.deleteCharAt(i);
-            }
-        }
-        return buf.toString();
-    }
 
     private int findNode(NodeList nodes, String name, int start) {
         for (int i = start; i < nodes.getLength(); ++i) {

@@ -11,6 +11,7 @@ import org.apache.xerces.parsers.DOMParser;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.argoprint.DataSourceStub;
+import org.argoprint.XmlTestUtil;
 import org.argoprint.ui.Settings;
 import org.xml.sax.SAXException;
 
@@ -44,8 +45,8 @@ public class IntegrationTest extends TestCase {
         }
 
         assertEquals(name + "-test did not generate expected output.",
-                     fileToString(T_DIR + name + "Expected.xml"),
-                     fileToString(settings.getOutputFile()));
+                     XmlTestUtil.fileToString(T_DIR + name + "Expected.xml"),
+                     XmlTestUtil.fileToString(settings.getOutputFile()));
     }
 
     public void testCorrectBind() throws Exception {
@@ -195,46 +196,5 @@ public class IntegrationTest extends TestCase {
      */
     protected void setUp() throws Exception {
         main = new Main(new DataSourceStub());
-    }
-
-    /**
-     * Converts an XML file to a String (for comparison).
-     *
-     * @param filename The filename to read.
-     * @return The contents of the file as a String.
-     * @throws SAXException If the file is not correct XML.
-     * @throws IOException If we cannot open the file.
-     */
-    private String fileToString(String filename)
-    	throws SAXException, IOException {
-        OutputFormat of = new OutputFormat();
-        of.setIndent(4);
-        of.setPreserveSpace(false);
-        of.setLineWidth(80);
-
-        DOMParser rparser = new DOMParser();
-        rparser.parse(filename);
-        ByteArrayOutputStream rstream = new ByteArrayOutputStream();
-        (new XMLSerializer(rstream, of)).serialize(rparser.getDocument());
-
-        return stripWs(rstream.toString());
-    }
-
-    private String stripWs(String in) {
-        StringBuffer buf = new StringBuffer(in);
-
-        int pos;
-        while ((pos = buf.indexOf("&#xa;")) > -1) {
-            buf.replace(pos, pos + 5, "\n");
-        }
-
-        for (int i = buf.length() - 1; i >= 0; --i) {
-            char c = buf.charAt(i);
-            if (c == ' ' || c == '\n' || c == '\r' || c == '\t') {
-                buf.deleteCharAt(i);
-                continue;
-            }
-        }
-        return buf.toString();
     }
 }
