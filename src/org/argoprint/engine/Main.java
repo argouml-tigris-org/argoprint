@@ -85,11 +85,10 @@ public class Main {
 	iDefault.setFirstHandler(_firstHandler);
     }
 
-    public Main(boolean initDataSource) {
+    public Main(ArgoPrintDataSource source) {
 //    public Main(boolean initDataSource) {
-	_parser = new DOMParser(); 
-	_dataSource = new UMLInterface(); 
-	//_dataSource = new DataSourceStub();
+	_parser = new DOMParser();
+        _dataSource = source;
 
 	// Initialize the CoR
 	Interpreter iDefault = new InterpreterDefault(_dataSource);
@@ -122,7 +121,7 @@ public class Main {
 	// TODO: set outputDir of interface
 	_parser.parse(template);
     }
-    
+
     public void initializeSystem(Settings settings, Logger log) 
 	throws SAXException, IOException{
 
