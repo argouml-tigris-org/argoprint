@@ -8,29 +8,47 @@ import java.util.*;
 class Environment{
     Environment instance;
 
-    private HashTableet iteratorTable;
+    private Hashtable iteratorTable;
 
-    public boolean iteratorExists(String name){
-	//TODO: fix "naming" of a iterator
-
-	Iterator iter = iteratorTable.iterator();
-	while(iter.hasNext()){
-	    //if(name.equals(((Iterator) (iter.next())).getName())){
-		return true;
-		//}
-	} 
-	return false;
+    public boolean existsIterator(String name){
+	return iteratorTable.containsKey(name);
     }
+    
     public boolean addIterator(String name, Iterator iterator){
-	return false;
+	if(iteratorTable.containsKey(name)){
+	    //Key collision occured. Perhaps solve this by calling rehash() ?
+	    //and calling addIterator recursively
+	    return false;
+	}
+	
+	try{
+	    iteratorTable.put(name, iterator);
+	}
+	catch(Exception e){
+	    //this means name or iterator is null
+	    return false;
+	}
+	
+	return true;
     }
 
     public boolean removeIterator(String name){	
-	return false;
+	try{
+	    Iterator iter = (Iterator)iteratorTable.remove(name);
+	    if(iter == null) { return false; }
+	} 
+	catch(Exception e){
+	}
+	return true;
     }
 
     public Iterator getIterator(String name){	
-	return null;
+	try{
+	    return (Iterator)iteratorTable.get(name);
+	}
+	catch(Exception e){
+	    return null;
+	}
     }
 
     
