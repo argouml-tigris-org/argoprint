@@ -9,4 +9,4 @@ Specification-Version: 0.9.4
 Specification-Vendor: University of California
 Implementation-Vendor: University of California
 Implementation-Version: 0.9.4
-Implementation-Title: ArgoUML Plugin Menu Tester
+Implementation-Title: ArgoPrint

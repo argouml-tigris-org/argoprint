@@ -45,6 +45,7 @@
         <classpath>
             <fileset dir="${argo.build.dir}">
                 <include name="argouml.jar" />
+                <include name="argouml-model.jar" />
                 <include name="nsuml.jar" />
                 <include name="ocl-argo.jar" />
                 <include name="antlrall.jar" />
@@ -90,8 +91,8 @@
       <sysproperty key="checkstyle.header.file" value="tools/checkstyle/java.header"/>
       <classpath>
         <fileset dir="${argo.tools.dir}/checkstyle-3.0">
-	  <include name="*.jar"/>
-	</fileset>
+          <include name="*.jar"/>
+        </fileset>
         <pathelement location="${argo.tools.dir}/ant-1.4.1/lib/xerces-1.2.3.jar"/>
       </classpath>
       <arg value="-c"/>

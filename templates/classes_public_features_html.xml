@@ -1,4 +1,4 @@
-<HTML>
+<HTML xmlns:ap="hej:hopp">
   <HEAD>
     <TITLE>The <ap:call what="getName(project)"/> project</TITLE>
   </HEAD>
@@ -6,7 +6,7 @@
     <H1>The <ap:call what="getName(project)"/> project</H1>
     <H2>Classes</H2>
     This is a list of all classes and their members and methods.
-    <ap:iterate what="getAllClasses()"
+    <ap:iterate what="getAllClasses(model)"
                 iteratorname="theclass"
 	        sortvalue="getName()">
       <H3>Class <ap:call what="getName()" iterator="theclass"/></H3>

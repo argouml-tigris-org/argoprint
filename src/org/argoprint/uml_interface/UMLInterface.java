@@ -37,16 +37,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.UnsupportedCallException;
 import org.argouml.kernel.Project;
 import org.argouml.kernel.ProjectManager;
+import org.argouml.model.CommonBehaviorFactory;
+import org.argouml.model.CoreFactory;
+import org.argouml.model.CoreHelper;
+import org.argouml.model.DataTypesFactory;
+import org.argouml.model.Facade;
 import org.argouml.model.Model;
+import org.argouml.model.ModelManagementFactory;
+import org.argouml.model.UmlFactory;
+import org.argouml.model.UseCasesFactory;
 import org.argouml.ui.ProjectBrowser;
 import org.argouml.uml.diagram.ui.UMLDiagram;
 import org.argouml.util.FileFilters;
@@ -72,24 +81,24 @@ public class UMLInterface
      * The ArgoUML project that ArgoPrint is applied to. Must be
      * set prior to use by using the setProject(..) method
      */
-    private Project _project;
+    private Project project;
 
     /**
      * The ArgoUML projectbrowser that ArgoPrint is applied to. Must be
      * set prior to use by using the setProjectBrowser(..) method
      */
-    private ProjectBrowser _projectBrowser;
+    private ProjectBrowser projectBrowser;
     
     /**
      * Classes to search for methods.
      */
-    private List _classes; 
+    private Map classes; 
 
     /**
      * The ArgoPrint output dir. Used when saving diagrams as pictures. 
      * Must be set prior to use.
      */
-    String _outputDir;
+    private String outputDir;
 
     ////////////////////////////////////////////////////////////////
     // constructors
@@ -98,15 +107,17 @@ public class UMLInterface
      * Constructor
      */
     public UMLInterface() {
-	//super( "action.save-graphics", NO_ICON);
-	_classes = new ArrayList();
-	_classes.add(Model.getFacade());
-	_classes.add(Model.getUmlFactory());
-	_classes.add(Model.getCoreHelper());
-	_classes.add(Model.getDataTypesFactory());
-	_classes.add(Model.getCoreFactory());
-	_classes.add(Model.getCommonBehaviorFactory());
-	_classes.add(Model.getUseCasesFactory());
+	classes = new HashMap();
+	classes.put(Facade.class, Model.getFacade());
+	classes.put(UmlFactory.class, Model.getUmlFactory());
+	classes.put(CoreHelper.class, Model.getCoreHelper());
+	classes.put(DataTypesFactory.class, Model.getDataTypesFactory());
+	classes.put(CoreFactory.class, Model.getCoreFactory());
+	classes.put(CommonBehaviorFactory.class,
+	            Model.getCommonBehaviorFactory());
+	classes.put(UseCasesFactory.class, Model.getUseCasesFactory());
+	classes.put(ModelManagementFactory.class,
+	            Model.getModelManagementFactory());
 	// TODO: Add all of them.
     }
 
@@ -115,8 +126,8 @@ public class UMLInterface
      * individual setters.
      */
     public void initialize() {
-	_projectBrowser = ProjectBrowser.getInstance();
-	_project = ProjectManager.getManager().getCurrentProject();
+	projectBrowser = ProjectBrowser.getInstance();
+	project = ProjectManager.getManager().getCurrentProject();
     }
 
     ////////////////////////////////////////////////////////////////
@@ -128,7 +139,7 @@ public class UMLInterface
      * @param browser The browser.
      */
     public void setProjectBrowser(ProjectBrowser browser) {
-	_projectBrowser = browser;
+	projectBrowser = browser;
     }
     
     /**
@@ -137,7 +148,7 @@ public class UMLInterface
      * @param proj The project.
      */
     public void setProject(Project proj) { 
-        _project = proj; 
+        project = proj; 
     }
 
     /**
@@ -146,7 +157,7 @@ public class UMLInterface
      * @param dir The path.
      */
     public void setOutputDir(String dir) { 
-        _outputDir = dir; 
+        outputDir = dir; 
     }
 
     ////////////////////////////////////////////////////////////////
@@ -162,10 +173,10 @@ public class UMLInterface
     public Object caller(String call, Object iteratorObject) {
 	//_log.info("Arg call: " + call + " Arg: " + 
 	//	  _classes.getName(iteratorObject)); 
-	Iterator iter = _classes.iterator();
+	Iterator iter = classes.entrySet().iterator();
 	while (iter.hasNext()) {
-	    
-	    Class c = (iter.next()).getClass();
+	    Map.Entry entry = (Entry) iter.next();
+	    Class c = (Class) entry.getKey();
 	    Method[] theMethods = c.getMethods();   
 	
 	    Object args[] = new Object[1];
@@ -179,7 +190,7 @@ public class UMLInterface
 		
 		    if (callName.equals(theMethods[i].getName())) {
 			try {
-			    return theMethods[i].invoke(null, args);
+			    return theMethods[i].invoke(entry.getValue(), args);
 			}
 			catch (IllegalAccessException e) {
 			    LOG.info("Crash" + e.getMessage());
@@ -206,8 +217,10 @@ public class UMLInterface
 
     
     /**
+     * @see org.argoprint.ArgoPrintDataSource#caller(java.lang.String)
+     *
      * Calls method named call Model subsystem. Used when argument is to
-     * be on of the default. ex. calledMethodName(model) and not an
+     * be one of the default. ex. calledMethodName(model) and not an
      * iteratorObject.
      * 
      * @param call The string to call.
@@ -216,11 +229,10 @@ public class UMLInterface
      */
     public Object caller(String call) throws UnsupportedCallException {
 	
-	Iterator iter = _classes.iterator();
-
+	Iterator iter = classes.entrySet().iterator();
 	while (iter.hasNext()) {
-	    Object obj = iter.next();
-	    Class c = obj.getClass();
+	    Map.Entry entry = (Entry) iter.next();
+	    Class c = (Class) entry.getKey();
 
 	    if (call.endsWith("()")) {
 
@@ -236,7 +248,7 @@ public class UMLInterface
 			try {
 			    System.out.println("Trying: " 
 					       + c + "." + callName + "()");
-			    return theMethods[i].invoke(obj, null);
+			    return theMethods[i].invoke(entry.getValue(), null);
 			}
 			catch (IllegalAccessException ignore ) {
 			    System.out.println("IllegalAccessException: "
@@ -277,11 +289,12 @@ public class UMLInterface
 		Object thisObject = null;
 
 		if (arg.equals("model")) {
-		    args[0] = _project.getModel();
+		    args[0] = project.getModel();
+		    thisObject = entry.getValue();
 		} else if (arg.equals("project")) {
-		    thisObject = _project;
+		    thisObject = project;
 		    args = null;
-		    c = _project.getClass();
+		    c = project.getClass();
 		    int vectorLen = c.getMethods().length;
 		    theMethods = new Method[vectorLen];
 		    theMethods = c.getMethods();
@@ -332,18 +345,18 @@ public class UMLInterface
 
 	if (diagram != null) {
 	    String defaultName = ((Diagram) diagram).getName();
-	    LOG.info("active diagram" + 
-		      _project.getActiveDiagram().getName());
-	    _project.setActiveDiagram(diagram);
-	    LOG.info("active diagram" + 
-		      _project.getActiveDiagram().getName());
+	    LOG.info("active diagram"
+	             + project.getActiveDiagram().getName());
+	    project.setActiveDiagram(diagram);
+	    LOG.info("active diagram"
+	             + project.getActiveDiagram().getName());
 	    
 	    defaultName = Util.stripJunk(defaultName);
 	    
 	    LOG.info("diagram name " + defaultName);
 	    
 	    File defFile = 
-		new File(_outputDir 
+		new File(outputDir 
 			 + defaultName + "."
 			 + FileFilters.GIF_FILTER.getSuffix());
 		
@@ -369,14 +382,14 @@ public class UMLInterface
 		    path += "/";
 		}
 			
-		_projectBrowser.showStatus( "Writing " + path + name + "..." );
+		projectBrowser.showStatus( "Writing " + path + name + "..." );
 		LOG.info( "Writing " + path + name + "..." );    
 
 		FileOutputStream fo = new FileOutputStream( defFile );
 		cmd.setStream(fo);
 		cmd.doIt();
 		fo.close();
-		_projectBrowser.showStatus( "Wrote " + path + name );
+		projectBrowser.showStatus( "Wrote " + path + name );
 		LOG.info( "Wrote " + path + name + "..." );
 		//return true;
 		return path + name;

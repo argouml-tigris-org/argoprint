@@ -1,4 +1,5 @@
 // $Id$
+//Copyright (c) 2005 Linus Tolke
 //Copyright (c) 2003, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
@@ -30,36 +31,40 @@
 //ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
 //THE POSSIBILITY OF SUCH DAMAGE.
 
-
-
-
 package org.argouml.ui.argoprint;
 
 import java.awt.event.ActionEvent;
-import java.util.Vector;
 
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 
-import org.argoprint.ui.ArgoPrintJDialog;
-import org.argouml.application.api.PluggableMenu;
-import org.argouml.uml.ui.UMLAction;
-
 import org.apache.log4j.Logger;
+import org.argoprint.ui.ArgoPrintJDialog;
+import org.argouml.moduleloader.ModuleInterface;
+import org.argouml.ui.ProjectBrowser;
+import org.argouml.ui.cmd.GenericArgoMenuBar;
+import org.argouml.uml.ui.UMLAction;
 
 
 /**
- *  @author Mattias Danielsson
- *  @since  0.0.1
+ * @author Mattias Danielsson
+ * @since  0.0.1
  */
 public class ArgoPrintMenuPlugin extends UMLAction
-    implements PluggableMenu {
+    implements ModuleInterface {
     private static final Logger LOG = 
         Logger.getLogger(ArgoPrintMenuPlugin.class);
+
+    private JMenuItem menuItem;
+
     /**
-     * This is not publicly creatable.
+     * The constructor.
      */
-    protected ArgoPrintMenuPlugin() {
+    public ArgoPrintMenuPlugin() {
 	super("Plugin ArgoPrintMenu entry", false);
+	
+        menuItem = new JMenuItem("ArgoPrint");
+	menuItem.addActionListener(this);
     }
 
     ////////////////////////////////////////////////////////////////
@@ -75,98 +80,61 @@ public class ArgoPrintMenuPlugin extends UMLAction
 
 	// This is where the ArgoPrint GUI frame is created and displayed
 	ArgoPrintJDialog argoPrintDialog = 
-	    new ArgoPrintJDialog(new javax.swing.JFrame());
+	    new ArgoPrintJDialog(new JFrame());
 	LOG.info("Setting Gui Log");
 	LOG.info("Showing ArgoPrint Dialog");
 	argoPrintDialog.show();
     }
 
-    /**
-     * @see org.argouml.application.api.ArgoModule#setModuleEnabled(boolean)
-     */
-    public void setModuleEnabled(boolean v) { }
-    
-    /**
-     * @see org.argouml.application.api.ArgoModule#initializeModule()
-     */
-    public boolean initializeModule() {
-        LOG.info ("ArgoPrint initialized");
-   	return true;
-    }
 
     /**
-     * @see org.argouml.application.api.PluggableMenu#buildContext(javax.swing.JMenuItem, java.lang.String)
+     * @see org.argouml.moduleloader.ModuleInterface#enable()
      */
-    public Object[] buildContext(JMenuItem a, String b) {
-        return new Object[] {
-	    a, b
-	};
-    }
-
-    /**
-     * @see org.argouml.application.api.Pluggable#inContext(java.lang.Object[])
-     */
-    public boolean inContext(Object[] o) {
-        if (o.length < 2) return false;
-       
-	if ((o[0] instanceof JMenuItem) && ("Tools".equals(o[1]))) {
-	    return true;
+    public boolean enable() throws Exception {
+	try {
+	    // Register into the Tools menu.
+	    GenericArgoMenuBar menubar =
+		(GenericArgoMenuBar) ProjectBrowser.getInstance().getJMenuBar();
+	    menubar.getTools().add(menuItem);
+	} catch (Throwable e) {
+	    LOG.debug("Some problem when adding the module.", e);
+	    disable();
+	    return false;
 	}
-        return false;
+	return true;
     }
-    
-    /**
-     * @see org.argouml.application.api.ArgoModule#isModuleEnabled()
-     */
-    public boolean isModuleEnabled() { return true; }
-    
-    /**
-     * @see org.argouml.application.api.ArgoModule#getModulePopUpActions(java.util.Vector, java.lang.Object)
-     */
-    public Vector getModulePopUpActions(Vector v, Object o) { return null; }
-    
-    /**
-     * @see org.argouml.application.api.ArgoModule#shutdownModule()
-     */
-    public boolean shutdownModule() { return true; }
 
     /**
-     * @see org.argouml.application.api.ArgoModule#getModuleName()
+     * @see org.argouml.moduleloader.ModuleInterface#disable()
      */
-    public String getModuleName() { return "ArgoPrintMenuPlugin"; }
+    public boolean disable() {
+	GenericArgoMenuBar menubar =
+	    (GenericArgoMenuBar) ProjectBrowser.getInstance().getJMenuBar();
+	menubar.getTools().remove(menuItem);
+	return true;
+    }
 
     /**
-     * @see org.argouml.application.api.ArgoModule#getModuleDescription()
+     * @see org.argouml.moduleloader.ModuleInterface#getName()
      */
-    public String getModuleDescription() { return "Menu Item for ArgoPrint"; }
-    
-    /**
-     * @see org.argouml.application.api.ArgoModule#getModuleAuthor()
-     */
-    public String getModuleAuthor() { return "Mattias Danielsson"; }
-    
-    /**
-     * @see org.argouml.application.api.ArgoModule#getModuleVersion()
-     */
-    public String getModuleVersion() { return "0.0.1"; }
-    
-    /**
-     * @see org.argouml.application.api.ArgoModule#getModuleKey()
-     */
-    public String getModuleKey() { return "module.argoprint.menu.plugins"; }
-
+    public String getName() {
+        return "ArgoPrint";
+    }
 
     /**
-     * @see org.argouml.application.api.PluggableMenu#getMenuItem(java.lang.Object[])
+     * @see org.argouml.moduleloader.ModuleInterface#getInfo(int)
      */
-    public JMenuItem getMenuItem(Object [] context) {
-        if (!inContext(context)) {
-	    return null;
-	}
-
-        JMenuItem _menuItem = new JMenuItem("ArgoPrint");
-	_menuItem.addActionListener(this);
-        return _menuItem;
+    public String getInfo(int type) {
+        switch (type) {
+        case DESCRIPTION:
+            return "This module is a report generator.";
+        case AUTHOR:
+            return "Mattias Danielsson";
+        case VERSION:
+            return "0.0.1";    
+        default:
+            return null;
+        }
     }
 }
 

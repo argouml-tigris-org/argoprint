@@ -1,4 +1,5 @@
 //$Id$
+// Copyright (c) 2005, Linus Tolke
 //Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
@@ -31,20 +32,27 @@
 //THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.argoprint.engine;
-import org.argoprint.ArgoPrintDataSource;
-import org.argoprint.UnsupportedCallException;
-import org.argoprint.engine.interpreters.*;
-
-import org.argoprint.ui.Settings;
-import org.argoprint.uml_interface.*;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
+
 import org.apache.xerces.parsers.DOMParser;
-import org.apache.xml.serialize.*;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
+import org.argoprint.ArgoPrintDataSource;
+import org.argoprint.UnsupportedCallException;
+import org.argoprint.engine.interpreters.BadTemplateException;
+import org.argoprint.engine.interpreters.Interpreter;
+import org.argoprint.engine.interpreters.InterpreterBind;
+import org.argoprint.engine.interpreters.InterpreterCall;
+import org.argoprint.engine.interpreters.InterpreterDefault;
+import org.argoprint.engine.interpreters.InterpreterIf;
+import org.argoprint.engine.interpreters.InterpreterIterate;
+import org.argoprint.ui.Settings;
+import org.argoprint.uml_interface.UMLInterface;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * The main processor for ArgoPrint.
