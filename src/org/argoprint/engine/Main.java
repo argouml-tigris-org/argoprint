@@ -1,35 +1,34 @@
-//$Id$
-// Copyright (c) 2005, Linus Tolke
-//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
-//Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
-//Mattias Sidebäck.
-//All rights reserved.
+// $Id$
+// Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström,
+// Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson,
+// Mattias Sidebäck.
+// All rights reserved.
 //
-//Redistribution and use in source and binary forms, with or without 
-//modification, are permitted provided that the following conditions are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
 //
-//* Redistributions of source code must retain the above copyright notice, 
-//  this list of conditions and the following disclaimer.
-// 
-//* Redistributions in binary form must reproduce the above copyright 
-//  notice, this list of conditions and the following disclaimer in the 
-//  documentation and/or other materials provided with the distribution.
+// * Redistributions of source code must retain the above copyright notice,
+//   this list of conditions and the following disclaimer.
 //
-//* Neither the name of the University of Linköping nor the names of its 
-//  contributors may be used to endorse or promote products derived from 
-//  this software without specific prior written permission. 
+// * Redistributions in binary form must reproduce the above copyright
+//   notice, this list of conditions and the following disclaimer in the
+//   documentation and/or other materials provided with the distribution.
 //
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-//AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-//IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-//ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-//LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-//CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-//SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-//INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-//CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-//ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
-//THE POSSIBILITY OF SUCH DAMAGE.
+// * Neither the name of the University of Linköping nor the names of its
+//   contributors may be used to endorse or promote products derived from
+//   this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.argoprint.engine;
 
@@ -60,10 +59,10 @@ import org.xml.sax.SAXException;
 public class Main {
     private Interpreter firstHandler;
     private DOMParser parser;
-    // TODO: remove 
+    // TODO: remove
     private String outputFile;
     private ArgoPrintDataSource dataSource;
-    
+
     /**
      * Constructor with a dummy data source.
      */
@@ -73,7 +72,7 @@ public class Main {
 
     /**
      * Constructor with a given data source.
-     * 
+     *
      * @param source The data source.
      */
     public Main(ArgoPrintDataSource source) {
@@ -83,14 +82,14 @@ public class Main {
 	Interpreter iCall = new InterpreterCall(dataSource);
 	firstHandler = iCall;
 	iCall.setFirstHandler(firstHandler);
-	    
+
 	Interpreter iDefault =
 	    new InterpreterDefault(dataSource, firstHandler);
 	Interpreter iIterate =
 	    new InterpreterIterate(dataSource, firstHandler);
 	Interpreter iBind = new InterpreterBind(dataSource, firstHandler);
 	Interpreter iIf = new InterpreterIf(dataSource, firstHandler);
-    
+
 	iCall.setNextHandler(iIterate);
     	iIterate.setNextHandler(iBind);
     	iBind.setNextHandler(iIf);
@@ -99,13 +98,13 @@ public class Main {
 
     /**
      * Initializes ArgoPrint.
-     * 
+     *
      * @param settings The settings.
      * @throws SAXException If we cannot parse the template.
-     * @throws IOException If something goes wrong while reading or writing 
+     * @throws IOException If something goes wrong while reading or writing
      *         the files.
      */
-    public void initializeSystem(Settings settings) 
+    public void initializeSystem(Settings settings)
 	throws SAXException, IOException {
 
 	dataSource.initialize();
@@ -117,8 +116,8 @@ public class Main {
 
     /**
      * Does the actual work.
-     * 
-     * @throws IOException If sometihing goes wrong while reading or writing 
+     *
+     * @throws IOException If sometihing goes wrong while reading or writing
      *         the files.
      * @throws BadTemplateException if the input file is incorrect.
      * @throws UnsupportedCallException if the data source calls are incorrect.
@@ -137,5 +136,3 @@ public class Main {
 	serializer.serialize(document);
     }
 }
-
- 
