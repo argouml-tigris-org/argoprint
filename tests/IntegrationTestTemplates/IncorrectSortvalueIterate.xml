@@ -1,4 +1,4 @@
-<root>
+<root xmlns:ap="http://argoprint.tigris.org/2003">
     <ap:iterate what="getCollection()" iteratorname="it" sortvalue="thisMethodDoesNotExist">
         <ap:call what="toString()" iterator="it"/>
     </ap:iterate>

@@ -1,4 +1,4 @@
-<root>
+<root xmlns:ap="http://argoprint.tigris.org/2003">
     <ap:bind>
         <ap:attr name="src">
             Hoj

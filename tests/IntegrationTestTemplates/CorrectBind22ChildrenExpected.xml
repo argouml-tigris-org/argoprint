@@ -1,4 +1,4 @@
-<root>
+<root xmlns:ap="http://argoprint.tigris.org/2003">
     <img q="HojReturn value of getString() in DataSourceStub."
     w="HojReturn value of getString() in DataSourceStub."
     e="HojReturn value of getString() in DataSourceStub."

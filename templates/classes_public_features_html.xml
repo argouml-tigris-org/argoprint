@@ -1,4 +1,4 @@
-<HTML xmlns:ap="hej:hopp">
+<HTML xmlns:ap="http://argoprint.tigris.org/2003">
   <HEAD>
     <TITLE>The <ap:call what="getName(project)"/> project</TITLE>
   </HEAD>

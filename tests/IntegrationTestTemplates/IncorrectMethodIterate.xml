@@ -1,4 +1,4 @@
-<root>
+<root xmlns:ap="http://argoprint.tigris.org/2003">
     <ap:iterate what="nonexistantMethod()" iteratorname="it">
         Tjo.
     </ap:iterate>

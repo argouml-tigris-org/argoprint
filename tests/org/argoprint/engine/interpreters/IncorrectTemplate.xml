@@ -1,4 +1,4 @@
-<root>
+<root xmlns:ap="http://argoprint.tigris.org/2003">
     <collect_call>
         <ap:call what="ThisMethodDoesNotExist()"/>
     </collect_call>
