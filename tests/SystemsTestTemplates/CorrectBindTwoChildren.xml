@@ -1,9 +1,0 @@
-<root>
-    <ap:bind name="img">
-        <ap:attr name="src">
-            Hoj
-            <ap:call what="getString()"/>
-        </ap:attr>
-        image
-    </ap:bind>
-</root>

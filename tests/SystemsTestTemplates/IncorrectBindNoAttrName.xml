@@ -1,8 +1,0 @@
-<root>
-    <ap:bind name="img">
-        <ap:attr>
-            Hoj
-        </ap:attr>
-        image
-    </ap:bind>
-</root>
