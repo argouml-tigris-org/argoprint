@@ -6,6 +6,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.apache.log4j.ConsoleAppender;
+
 public class TestEngine extends TestCase {
 
     private Main _main = null;
@@ -14,22 +16,22 @@ public class TestEngine extends TestCase {
     /** Specifies the test suite.
      */
     public static Test suite() {
-        
+        return null;
     }
 
     /** Tests the Main.initializeSystem()-method.
      *  @See org.argoprint.Engine.Main#initializeSystem()
      */
-    public void testInitializeSystem() {
+    public void testInitializeSystem() throws Exception {
         Settings s = new Settings();
-        s.setDir("/tmp/");
+        s.setOutputDir("/tmp/");
         s.setTemplate("TestEngine.xml");
-        s.setFile("/tmp/EngineTestResult");
-        assertTrue(_main.initializeSystem(s));
+        s.setOutputFile("/tmp/EngineTestResult");
+        _main.initializeSystem(s);
     }
 
     public void testGoWithoutInitialize() {
-        boolean caugth_exception = false;
+        boolean caught_exception = false;
         try {
             _main.go();
         } catch (Exception e) {
@@ -44,9 +46,9 @@ public class TestEngine extends TestCase {
 
     /** @See junit.framework.TestCase#setUp()
      */
-    protected void setUp() {
+    protected void setUp() throws Exception {
         super.setUp();
-        _main = Main();
+        _main = new Main(false);
         assertNotNull("Could not create a Main object.", _main);
     }
 }
