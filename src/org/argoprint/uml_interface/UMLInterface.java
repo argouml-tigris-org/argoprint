@@ -34,21 +34,16 @@ package org.argoprint.uml_interface;
 
 import org.argoprint.*;
 
-import java.awt.event.ActionEvent;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 import org.argouml.kernel.Project;
 import org.argouml.kernel.ProjectManager;
-import org.argouml.kernel.ProjectMember;
 
 import org.argouml.ui.ArgoDiagram;
 import org.argouml.ui.ProjectBrowser;
@@ -57,29 +52,21 @@ import org.argouml.uml.diagram.ui.*;
 
 import org.argouml.util.FileFilters;
 import org.argouml.util.SuffixFilter;
-import org.argouml.util.osdep.OsUtil;
 
 import org.argouml.model.ModelFacade;
 import org.argouml.model.uml.UmlFactory;
 import org.argouml.model.uml.foundation.core.CoreHelper;
 import org.argouml.application.api.*;
 
-import org.tigris.gef.base.CmdSaveEPS;
 import org.tigris.gef.base.CmdSaveGIF;
 import org.tigris.gef.base.CmdSaveGraphics;
-import org.tigris.gef.base.CmdSavePS;
-import org.tigris.gef.base.CmdSaveSVG;
 import org.tigris.gef.base.Diagram;
 import org.tigris.gef.util.Util;
 
 import java.util.*;
 import java.io.*;
-import java.awt.Rectangle;
 
 import java.lang.reflect.*;
-import java.lang.Class;
-
-import java.lang.Boolean;
 
 import org.tigris.gef.base.*;
 import org.tigris.gef.persistence.*;
@@ -93,7 +80,7 @@ import org.tigris.gef.persistence.*;
  * @author matda701, Mattias Danielsson
  */
 public class UMLInterface 
-    implements ArgoPrintDataSource{
+    implements ArgoPrintDataSource {
     public static final String separator = "/";
 
     /**
@@ -148,7 +135,7 @@ public class UMLInterface
      * Initializes fields prior to usage. Can be used instead of the 
      * individual setters.
      */
-    public void initialize(Logger log){
+    public void initialize(Logger log) {
 	_log = log;
 	_projectBrowser = ProjectBrowser.getInstance();
 	_project = ProjectManager.getManager().getCurrentProject();
@@ -160,24 +147,24 @@ public class UMLInterface
     /**
      * Sets the logger (_log) to logger
      */
-    public void setLog(Logger logger){ _log = logger; }
+    public void setLog(Logger logger) { _log = logger; }
     
     /**
      * Sets the projectBrowswer to browser
      */
-    public void setProjectBrowser(ProjectBrowser browser){
+    public void setProjectBrowser(ProjectBrowser browser) {
 	_projectBrowser = browser;
     }
     
     /**
      * Sets the project to proj
      */
-    public void setProject(Project proj){ _project = proj; }
+    public void setProject(Project proj) { _project = proj; }
 
     /**
      * Sets the outputPath to path
      */
-    public void setOutputDir(String dir){ _outputDir = new String(dir); }
+    public void setOutputDir(String dir) { _outputDir = new String(dir); }
 
     ////////////////////////////////////////////////////////////////
     // main methods
@@ -185,7 +172,7 @@ public class UMLInterface
     /**
      * Checks if ModelFacade has a method named method. Depracated!
      */
-    public boolean hasMethod(String method){
+    public boolean hasMethod(String method) {
 	Iterator iter = _classes.iterator();
 
 	while (iter.hasNext()) {
@@ -193,7 +180,7 @@ public class UMLInterface
 	    Method[] theMethods = c.getMethods();
       
 	    for (int i = 0; i < theMethods.length; i++) {
-		if(method.equals(theMethods[i].getName())){
+		if (method.equals(theMethods[i].getName())) {
 		    return true;
 		}
 	    }
@@ -207,7 +194,7 @@ public class UMLInterface
      * iteratorObject is the argument for the method 
      */
     public Object caller(String call, Object iteratorObject)
-	throws Exception{
+	throws Exception {
 	//_log.info("Arg call: " + call + " Arg: " + 
 	//	  _classes.getName(iteratorObject)); 
 	Iterator iter = _classes.iterator();
@@ -219,29 +206,29 @@ public class UMLInterface
 	    Object args[] = new Object[1];
 	    args[0] = iteratorObject;
 
-	    if(call.endsWith(new String("()"))){
-		int callLength = call.length()-2;
+	    if (call.endsWith(new String("()"))) {
+		int callLength = call.length() - 2;
 	    
 		String callName = new String(call.substring(0, callLength));
 		for (int i = 0; i < theMethods.length; i++) {
 		
-		    if(callName.equals(theMethods[i].getName())){
-			try{
+		    if (callName.equals(theMethods[i].getName())) {
+			try {
 			    return theMethods[i].invoke(null, args);
 			}
-			catch (IllegalAccessException e){
+			catch (IllegalAccessException e) {
 			    _log.info("Crash" + e.getMessage());
 			}
-			catch (IllegalArgumentException e){
+			catch (IllegalArgumentException e) {
 			    _log.info("Crash" + e.getMessage());
 			}
-			catch (InvocationTargetException e){
+			catch (InvocationTargetException e) {
 			    _log.info("Crash" + e.getMessage());
 			}
-			catch (NullPointerException e){
+			catch (NullPointerException e) {
 			    _log.info("Crash" + e.getMessage());
 			}
-			catch (ExceptionInInitializerError e){
+			catch (ExceptionInInitializerError e) {
 			    _log.info("Crash" + e.getMessage());
 			}		   
 		    }	    
@@ -265,35 +252,35 @@ public class UMLInterface
 	while (iter.hasNext()) {
 	    Class c = iter.next().getClass();
 
-	    if(call.endsWith(new String("()"))){
+	    if (call.endsWith(new String("()"))) {
 
 		Method[] theMethods = c.getMethods();
-		int callLength = call.length()-2;
+		int callLength = call.length() - 2;
 
 		System.out.println("Class " + c + " with "
 				   + theMethods.length + " methods: ");
 
 		String callName = new String(call.substring(0, callLength - 1));
 		for (int i = 0; i < theMethods.length; i++) {
-		    if(callName.equals(theMethods[i].getName())){
-			try{
+		    if (callName.equals(theMethods[i].getName())) {
+			try {
 			    System.out.println("Trying: " 
 					       + c + "." + callName + "()");
 			    return theMethods[i].invoke(null, null);
 			}
-			catch (IllegalAccessException ignore ){
+			catch (IllegalAccessException ignore ) {
 			}
-			catch (IllegalArgumentException ignore ){
+			catch (IllegalArgumentException ignore ) {
 			}
-			catch (InvocationTargetException ignore ){
+			catch (InvocationTargetException ignore ) {
 			}
-			catch (NullPointerException ignore ){
+			catch (NullPointerException ignore ) {
 			}
-			catch (ExceptionInInitializerError ignore ){
+			catch (ExceptionInInitializerError ignore ) {
 			}		   
 		    }	    
 		}
-	    } else if(call.endsWith(new String(")"))){
+	    } else if (call.endsWith(new String(")"))) {
 
 		Method[] theMethods = c.getMethods();
 		int callLength = call.indexOf((int) '(') + 1;
@@ -304,9 +291,9 @@ public class UMLInterface
 		Object args[] = new Object[1];  
 		Object thisObject = null;
 
-		if(arg.equals(new String("model"))){
+		if (arg.equals(new String("model"))) {
 		    args[0] = _project.getModel();
-		} else if(arg.equals(new String("project"))){
+		} else if (arg.equals(new String("project"))) {
 		    thisObject = _project;
 		    args = null;
 		    c = _project.getClass();
@@ -316,14 +303,14 @@ public class UMLInterface
 		}
  
 		for (int i = 0; i < theMethods.length; i++) {
-		    if(callName.equals(theMethods[i].getName())){
-			try{	
+		    if (callName.equals(theMethods[i].getName())) {
+			try {	
 			    //_log.info("Call hit: " + arg + " " + callName);
 			    //Object args[] = new Object[1];
 			    //args[0] = _project.getModel(); 
 			    return theMethods[i].invoke(thisObject, 
 							args);
-			}catch(Exception e){
+			} catch (Exception e) {
 			    throw e;
 			}
 		    }	    
@@ -342,7 +329,7 @@ public class UMLInterface
      * way to invoke with caller. Solved by using reflections on Project
      * Therefor not needed.
      */    
-    public Collection getAllDiagrams(){
+    public Collection getAllDiagrams() {
 	return _project.getDiagrams();
     }
 
@@ -354,10 +341,10 @@ public class UMLInterface
      * better control for overwrite of old files. 
      */
     public String saveDiagram(UMLDiagram diagram) 
-	throws Exception{
+	throws Exception {
 	//Todo: fix bug mentioned i trySaveAllDiagrams
 
-	if( diagram instanceof Diagram ) {
+	if ( diagram instanceof Diagram ) {
 	    String defaultName = ((Diagram) diagram).getName();
 	    _log.info("active diagram" + 
 		      _project.getActiveDiagram().getName());
@@ -369,67 +356,56 @@ public class UMLInterface
 	    
 	    _log.info("diagram name " + defaultName);
 	    
-	    try {
-		File defFile = 
-		    new File(_outputDir + 
-			     defaultName + "."
-			     + FileFilters.GIFFilter._suffix);
+	    File defFile = 
+		new File(_outputDir 
+			 + defaultName + "."
+			 + FileFilters.GIFFilter._suffix);
 		
-		_log.info("diagram filename " + defaultName + "."
-			  + FileFilters.GIFFilter._suffix);
-		
-		if (defFile != null) {
-		    String path = defFile.getParent();
-		    _log.info("diagram path " + path); 
+	    _log.info("diagram filename " + defaultName + "."
+		      + FileFilters.GIFFilter._suffix);
+
+	    if (defFile != null) {
+		String path = defFile.getParent();
+		_log.info("diagram path " + path); 
 		    
-		    String name = defFile.getName();
-		    _log.info("diagram name " + name);
+		String name = defFile.getName();
+		_log.info("diagram name " + name);
 		    
-		    String extension = SuffixFilter.getExtension(defFile);
-		    _log.info("diagram ext " + extension);
+		String extension = SuffixFilter.getExtension(defFile);
+		_log.info("diagram ext " + extension);
 		    
-		    CmdSaveGraphics cmd = null;
+		CmdSaveGraphics cmd = null;
 			
-		    cmd = new CmdSaveGIF();
+		cmd = new CmdSaveGIF();
 			    
 
-		    if ( !path.endsWith( separator ) ) {
-			path += separator;
-		    }
+		if ( !path.endsWith( separator ) ) {
+		    path += separator;
+		}
 			
-		    _projectBrowser.showStatus( "Writing " + path + name + "..." );
-		    _log.info( "Writing " + path + name + "..." );    
+		_projectBrowser.showStatus( "Writing " + path + name + "..." );
+		_log.info( "Writing " + path + name + "..." );    
 
-		    if ( defFile.exists() ) {
-			String t = "Overwrite " + path + name;
-			int response =
-			    JOptionPane.showConfirmDialog(_projectBrowser,
-							  t, t,
-							  JOptionPane.YES_NO_OPTION);
-			if (response == JOptionPane.NO_OPTION){ 
-			    throw new Exception("Cannot overwrite file");
-			}
+		if ( defFile.exists() ) {
+		    String t = "Overwrite " + path + name;
+		    int response =
+			JOptionPane.showConfirmDialog(_projectBrowser,
+						      t, t,
+						      JOptionPane.YES_NO_OPTION);
+		    if (response == JOptionPane.NO_OPTION) { 
+			throw new Exception("Cannot overwrite file");
 		    }
+		}
 		    
-		    FileOutputStream fo = new FileOutputStream( defFile );
-		    cmd.setStream(fo);
-		    cmd.doIt();
-		    fo.close();
-		    _projectBrowser.showStatus( "Wrote " + path + name );
-		    _log.info( "Wrote " + path + name + "..." );
-		    //return true;
-		    return new String(path + name);
-		}
-		
+		FileOutputStream fo = new FileOutputStream( defFile );
+		cmd.setStream(fo);
+		cmd.doIt();
+		fo.close();
+		_projectBrowser.showStatus( "Wrote " + path + name );
+		_log.info( "Wrote " + path + name + "..." );
+		//return true;
+		return new String(path + name);
 	    }
-	    catch ( FileNotFoundException ignore )
-		{
-		    throw ignore;
-		}
-	    catch ( IOException ignore )
-		{
-		    throw ignore;
-		}
 	}
 	
 	throw new Exception("Not a valid diagram");
@@ -449,10 +425,10 @@ public class UMLInterface
 	
 	int diagramVectorSize = diagramVector.size();
 		
-	for(int i = 0; i < diagramVectorSize; i++){
+	for (int i = 0; i < diagramVectorSize; i++) {
 	    Object target = diagramVector.elementAt(i); 
 	    
-	    if( target instanceof Diagram ) {
+	    if ( target instanceof Diagram ) {
 		String defaultName = ((Diagram) target).getName();
 		_log.info("active diagram" + 
 			  _project.getActiveDiagram().getName());
@@ -514,14 +490,12 @@ public class UMLInterface
 		    }
 		    
 		}
-		catch ( FileNotFoundException ignore )
-		    {
-			//cat.error("got a FileNotFoundException", ignore);
-		    }
-		catch ( IOException ignore )
-		    {
-			//cat.error("got an IOException", ignore);
-		    }
+		catch ( FileNotFoundException ignore ) {
+		    //cat.error("got a FileNotFoundException", ignore);
+		}
+		catch ( IOException ignore ) {
+		    //cat.error("got an IOException", ignore);
+		}
 		
 		//diagramVector.removeElementAt(0);
 	    }
@@ -529,7 +503,7 @@ public class UMLInterface
 	    //return false;
 	}
 	return true;
-    }/*end of method save all diags */
+    } /*end of method save all diags */
    
 } /* end class UMLInteface */
 

@@ -1,5 +1,5 @@
-// $Id:
-//Copyright (c) 2003, Mikael Albertsson, Mattias Danielsson, Per Engström, 
+//$Id$
+//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
 //All rights reserved.
@@ -38,9 +38,9 @@ package org.argoprint;
  * An interface that should be implemented by a class that acts as a data 
  * source for ArgoPrint.
  */
-public abstract interface ArgoPrintDataSource{
-    abstract public Object caller(String call, Object iteratorObject) 
+public abstract interface ArgoPrintDataSource {
+    public abstract Object caller(String call, Object iteratorObject) 
 	throws Exception;
     
-    abstract public Object caller(String call) throws Exception;
+    public abstract Object caller(String call) throws Exception;
 }

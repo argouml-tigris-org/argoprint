@@ -34,7 +34,6 @@ package org.argoprint.ui;
 
 
 import java.io.*;
-import java.lang.*;
 
 /**
  * Stores and manipulates settings when ArgoPrint is running.
@@ -43,7 +42,7 @@ import java.lang.*;
  *
  * @author matda701, Mattias Danielsson
  */
-public class Settings{
+public class Settings {
     
     /**
      * The directory where files (diagrams) created by ArgoPrint
@@ -67,20 +66,20 @@ public class Settings{
     /**
      * Constructor.
      */
-    public Settings(){}
+    public Settings() { }
 
     /**
      * Constructor. Sets attributes to corresponding argument.
      */
     public Settings(String template, String file, String dir) 
-	throws Exception{
+	throws Exception {
 	_outputDir = new String(dir);
 	_outputFile = new String(file);
 	_template = new File(template);
 	
-	try{
+	try {
 	    checkCorrectness();
-	} catch(Exception e){
+	} catch (Exception e) {
 	    throw e;
 	}
     } 
@@ -92,10 +91,10 @@ public class Settings{
      */
     private void checkCorrectness() throws Exception {
 
-	if(!_template.exists()){
+	if (!_template.exists()) {
 	    throw new Exception("Template file not found");
 	}   
-	if(!_template.canRead()){
+	if (!_template.canRead()) {
 	    throw new Exception("Can't read template file");
 	}
 
@@ -108,7 +107,7 @@ public class Settings{
 	}
 
 	File outputDir = new File(_outputDir);
-	if(!outputDir.isDirectory()){
+	if (!outputDir.isDirectory()) {
 	    throw new Exception("Not a valid output directory");
 	}
     } 
@@ -116,28 +115,28 @@ public class Settings{
     /**
      * Setter for outputDir
      */
-    public void setOutputDir(String dir){
+    public void setOutputDir(String dir) {
 	_outputDir = new String(dir);
     }
 
     /**
      * Setter for outputFile
      */
-    public void setOutputFile(String file){
+    public void setOutputFile(String file) {
 	_outputFile = new String(file);
     }
     
     /**
      * Getter for outputDir
      */
-    public String getOutputDir(){
+    public String getOutputDir() {
 	return _outputDir;
     }
 
     /**
      * Getter for outputFile
      */
-    public String getOutputFile(){
+    public String getOutputFile() {
 	return _outputFile;
     }
 

@@ -1,5 +1,5 @@
 //$Id$
-//Copyright (c) 2003, 2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
+//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
 //All rights reserved.
@@ -47,8 +47,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xml.serialize.*;
-
-import org.argoprint.DataSourceStub;
 
 public class Main {
     private Interpreter _firstHandler;
@@ -113,9 +111,9 @@ public class Main {
 
 
     public void initializeSystem(Settings settings, Logger log) 
-	throws SAXException, IOException{
+	throws SAXException, IOException {
 
-	((UMLInterface)_dataSource).initialize(log);
+	((UMLInterface) _dataSource).initialize(log);
 	_log = log;
 	_outputFile = settings.getOutputFile();
 	// TODO: set outputDir of interface
@@ -132,7 +130,8 @@ public class Main {
 	outputFormat.setIndent(4);
 	outputFormat.setPreserveSpace(false);
 	outputFormat.setLineWidth(80);
-	XMLSerializer serializer = new XMLSerializer(outputStream, outputFormat);
+	XMLSerializer serializer =
+	    new XMLSerializer(outputStream, outputFormat);
 	serializer.serialize(document);
     }
 }
