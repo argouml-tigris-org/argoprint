@@ -25,7 +25,7 @@ public class InterpreterIterate extends Interpreter {
 		NamedNodeMap attributes = tagNode.getAttributes();
 		
 		// Get the collection
-		Object callReturnValue = callDataSource(attributes, env);
+		Object callReturnValue = callDataSource("what", attributes, env);
 		if (!(callReturnValue instanceof Collection))
 			throw new Exception("The object returned from the call to the data source is not a collection.");
 		Collection iterateCollection = (Collection) callReturnValue;
@@ -44,10 +44,6 @@ public class InterpreterIterate extends Interpreter {
 		NodeList children = tagNode.getChildNodes();
 		Node newNode;
 
-		// First detach the children from the iterate tag
-		for (int i = 0; i < children.getLength(); i++) 
-			tagNode.removeChild(children.item(i));
-		
 		// For every object in the iterator, clone every child, attach it to the parent and recurse
 		while (iterator.hasNext()) {
 			iterator.next();

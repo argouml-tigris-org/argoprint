@@ -33,7 +33,7 @@ public class InterpreterBind extends Interpreter {
 		NodeList bindChildren = tagNode.getChildNodes();
 		for (int i = 0; i < bindChildren.getLength();) {
             Node child = bindChildren.item(i);
-			if (isNodeNamed(child, "argoprint", "attr")) {
+			if (isNodeNamed(child, PREFIX, "attr")) {
 				attributes = child.getAttributes();
 				attr = attributes.getNamedItem("name");
                 if (attr == null)
@@ -65,10 +65,5 @@ public class InterpreterBind extends Interpreter {
         parentNode.replaceChild(newElement, tagNode);
     }
 	
-	private boolean isNodeNamed(Node node, String prefix, String localName) {
-        if ((node.getLocalName() == null) || node.getPrefix() == null)
-            return false;
-        else
-		    return (node.getLocalName().equals(localName) && node.getPrefix().equals(prefix));
-	}
+
 }

@@ -17,9 +17,11 @@ public class InterpreterDefault extends Interpreter {
 	 * @param env
 	 */
 	protected void processTag(Node tagNode, Environment env) throws Exception {
+		//handleChildren(tagNode, env);
 		NodeList children = tagNode.getChildNodes();
 		if (children != null) {
 			// recurse on all children except text nodes
+			// TODO: this causes unnecessary handleTags
 			for (int i = 0; i < children.getLength(); i++){
 				if (children.item(i).getNodeType() != Node.TEXT_NODE)
 					if (_firstHandler == null)

@@ -1,7 +1,7 @@
 package org.argoprint.engine.interpreters;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
+import java.util.Vector;
+import org.w3c.dom.*;
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.engine.*;
 
@@ -9,6 +9,7 @@ import org.argoprint.engine.*;
  * Superclass for the interpreters.
  */
 abstract public class Interpreter{
+	protected static final String PREFIX = "ap";
     private String _tagName;
     private Interpreter _nextHandler;
     protected Interpreter _firstHandler;
@@ -72,7 +73,7 @@ abstract public class Interpreter{
 	 * @return
 	 */
 	protected boolean canHandle(Node tagNode){
-	    	if (tagNode.getNodeType() == Node.ELEMENT_NODE && tagNode.getLocalName().equals(_tagName) && tagNode.getPrefix().equals("argoprint")) {
+	    	if (tagNode.getNodeType() == Node.ELEMENT_NODE && tagNode.getLocalName().equals(_tagName) && tagNode.getPrefix().equals(PREFIX)) {
     		return true;
 		}
 		else {
@@ -83,26 +84,43 @@ abstract public class Interpreter{
 	/**
 	 * Uses the attributes what and iterator to call the data source and return the value.
 	 * 
+	 * @param callAttr The name of the attribute containing the call.
 	 * @param attributes A NamedNodeMap of map of attributes that must contain at least the attribute what.
 	 * @param env The Environment in which to process the call.
 	 * @return The Object as returned from the data source.
 	 * @throws Exception
 	 */
-	protected Object callDataSource(NamedNodeMap attributes, Environment env) 
+	protected Object callDataSource(String callAttr, NamedNodeMap attributes, Environment env) 
 		throws Exception {
-			Node whatAttribute = attributes.getNamedItem("what");
-			if (whatAttribute == null)
-				throw new BadTemplateException("This tag contains no what attribute.");
+			Node callAttrNode = attributes.getNamedItem(callAttr);
+			if (callAttrNode == null)
+				throw new BadTemplateException(_tagName + " tag contains no " + callAttr +" attribute.");
 			Object returnValue;
 			Node iteratorAttribute = attributes.getNamedItem("iterator");
 			if (iteratorAttribute == null)
-				returnValue = _dataSource.caller(whatAttribute.getNodeValue());
+				returnValue = _dataSource.caller(callAttrNode.getNodeValue());
 			else {
 				if (!env.existsIterator(iteratorAttribute.getNodeValue()))
-					throw new BadTemplateException("Value of iterator attribute does not correspond to a valid iterator.");
+					throw new BadTemplateException("Value of iterator in " + _tagName + " tag does not correspond to a valid iterator.");
 				ArgoPrintIterator iterator = env.getIterator(iteratorAttribute.getNodeValue());
-				returnValue = _dataSource.caller(whatAttribute.getNodeValue(), iterator.currentObject());
+				returnValue = _dataSource.caller(callAttrNode.getNodeValue(), iterator.currentObject());
 			}
 			return returnValue;
 		}
+		
+	protected boolean isNodeNamed(Node node, String prefix, String localName) {
+		if ((node.getLocalName() == null) || node.getPrefix() == null)
+			return false;
+		else
+			return (node.getLocalName().equals(localName) && node.getPrefix().equals(prefix));
+	}
+	
+	protected void handleChildren(Node node, Environment env) throws Exception {
+		NodeList childrenNodeList = node.getChildNodes();
+		Vector children = new Vector(childrenNodeList.getLength());
+		for (int i = 0; i < children.size(); i++) 
+			children.add(childrenNodeList.item(i));
+		for (int i = 0; i < children.size(); i++)
+			_firstHandler.handleTag((Node)children.get(i), env);
+	}
 }
