@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title></title>
+<link rel="stylesheet" type="text/css" href="../content.css">
+</head>
+<body>
+<div class="body">
+<h2>Extending</h2>
+<p>
+ArgoPrint has been designed and developed to allow for easy extension of functionality in two dimensions: extending the template language and adding more data sources. This text is a guide for developers on how this is accomplished. First of all you might want to familiarize your self with <a href ="../architecture/ad.html">this chapter</a> describing ArgoPrint's architecture.   
+</p>
+<h3>Extending the template language</h3>
+<p>
+The template is first parsed using <a href="../glossary/index.html">Xerces</a> into an internal tree representation using the <a href="../glossary/index.html">DOM</a> interface. The tree is then traversed and modified using the design pattern <a href="../glossary/index.html">chain of responsibility</a> with a slight modification to allow for recursion. Each link in the chain handles one specific template language element. 
+</p>
+<p>
+To extend the template language to include another element all you need to do is add another link in the chain of responsibility. The links in the chain are class instances extending the abstract class <a href="../api/classorg_1_1argoprint_1_1engine_1_1interpreters_1_1Interpreter.html">Interpreter</a>. The advantage of using the chain of responsibility is that it provides a loose coupling between the different Interpreters so the addition of one link is transparent to the others. 
+</p>
+<p>
+The only thing that needs to be done to add another template language element then is to create a new class that extends the Interpreter class. The only methods that need to be implemented are the constructor and the <a javadoc-link>processTag</a> methods. The processTag method receives the DOM Node corresponding to the element it shall process and utilizing the methods provided by the DOM interface and calls to the data source it modifies the DOM tree to achieve the desired effect.
+</p>
+<p>
+This is a piece of code that demonstrates how to add a rather useless language construct called exclude that will remove everything within &lt;ap:exclude&gt; elements in the template: 
+</p>
+<div class="fragment">
+<pre>public class InterpreterExclude extends Interpreter {
+
+  public InterpreterCall(ArgoPrintDataSource dataSource) {
+    super("exclude", dataSource);
+  }
+
+  protected void processTag(Node tagNode, Environment env) {
+    Node parent = tagNode.getParent();
+    parent.removeChild(tagNode);
+  }	
+}
+</pre></div>
+</p>
+<p>The last thing that needs to be done is to add this link to the chain. This is done in the <a href="../api/classorg_1_1argoprint_1_1engine_1_1Main.html">Main</a> class where the chain is initialized. You may have noticed that the processTag method has an <a href="../api/classorg_1_1argoprint_1_1engine_1_1Environment.html">Environment</a> parameter. This is used to facilitate the notion of an execution environment and could be extended to allow variable and/or function declarations in the template language.</p>
+
+<h3>Adding another data source</h3>
+<p>The template contains calls to the data sources, when processing these calls ArgoPrint just forwards the call in the form of strings to the data source and expects either a java.util.Collection or java.lang.String in return. The collections are used to facilitate the iterate-construct and the strings are included in the output document. This way ArgoPrint is completely decoupled from the mechanism that retrieves the data. 
+</p>
+<p>
+To implement an interface to a data source all you need to do is implement the <a href="../api/interfaceorg_1_1argoprint_1_1ArgoPrintDataSource.html">ArgoPrintDataSource</a> interface. This interface declares two methods that ArgoPrint uses to extract data from the source: one where the input is just a string and one where the input is one string and one object. The latter is used when iterating over a collection of objects. Once you have created a class implementing these methods you need to modify Main to create an instance of the class and add it to the pool of available data sources. 
+</p>
+</div>
+</body>
+</html>

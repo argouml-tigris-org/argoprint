@@ -1,0 +1,731 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Standard Edition 7.0.1">
+<meta name="TEMPLATEBASE" content="Dynamic HTML Standard Edition">
+<meta name="LASTUPDATED" content="12/02/03 20:49:37">
+<link rel="StyleSheet" href="standard.css" type="text/css" media="screen">
+<title> 6 Architecture Description  </title>
+</head>
+
+<body background="images/backgrnd.gif">
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="arkitekturspec_toc.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="arkitekturspec_designmetod.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="arkitekturspec_aterkopplingtillkrav.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="arkitekturspec_idx.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p><img src="images/wwplogo.gif" width="122" height="63" alt="Put your logo here!"></p>
+<hr align="left">
+
+<blockquote>
+<h2 class="Heading1">
+  <a name="1001366"> </a>	6	 Architecture Description
+</h2>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004766"> </a>This chapter provides the architectural design. It has been developed using the first steps of the method described in chapter 5. After an introductory overview, all the modules of the system are described in detail. The language used to define templates is also described, even though the final definition of this is placed in the design specification.<br>
+</div>
+<h3 class="Heading2">
+  <a name="1004773"> </a>	6.1	 Overview and layering
+</h3>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004774"> </a>In an architecture, one can often identify different layers. For ArgoPrint, the modules have been distributed over three layers called user interface layer, algorithm layer and data layer.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005193"> </a>As seen on the next page, the system has been divided into eight different entities. Each module, which consists of executable code and as seen in the notation description below is denoted by an oval, is responsible for certain tasks and is described together with the pure data entities in more detail in chapter 6.2.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005528"> </a><br clear="all" /><table align="left"><tr><td><img src="images/notation.gif" height="439" width="642" align="left" border="0" hspace="0" vspace="0">
+</td></tr></table><br clear="all"><br>
+</div>
+<div style="color: #000000;  font-style: italic; font-weight: normal; margin-bottom: 16pt; margin-left: 150pt; margin-right: 14pt; margin-top: 6pt; text-align: center; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005544"> </a>Figure 2:&#160; Notation description<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005329"> </a><br clear="all" /><table align="left"><tr><td><img src="images/description.gif" height="640" width="642" align="left" border="0" hspace="0" vspace="0">
+</td></tr></table><br clear="all"><br>
+</div>
+<div style="color: #000000;  font-style: italic; font-weight: normal; margin-bottom: 16pt; margin-left: 150pt; margin-right: 14pt; margin-top: 6pt; text-align: center; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004841"> </a>Figure 3:&#160; Layers and modules.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005337"> </a>As seen above, the Model module is considered data when it comes to layering. This is done because no ArgoPrint specific functionality is placed here and Model is used by ArgoPrint like a database, even though methods in Model are invoked.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004845"> </a>Since the template and all output files are considered data and not user interactions, the user interface layer is defined as the GUI module only. This gives the natural definition of the data layer as the system entities Template, Files, Document and also Model.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004844"> </a>The work horse of the system is the set of modules containing Engine, Interface and the XML-parser and together they define the algorithm layer.<br>
+</div>
+<h3 class="Heading2">
+  <a name="1004833"> </a>	6.2	 Module and Architecture Entity Description
+</h3>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004767"> </a>Here a more detailed description of each module and important entity of the architecture is provided. For every module, information about it's behavior and the interfaces to other modules is given. <br>
+</div>
+<h4 class="Heading3">
+  <a name="1005651"> </a>	6.2.1	 Notation
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005652"> </a>The following notation is used to make the user understand the module functionalities quickly.
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption><a name="1004883"> </a><div class="TableTitle">Table 1:&#160; Notation of a module description.</div></caption>
+  <tr>
+    <td><a name="1004863"> </a><div class="CellBody">Name</div></td>
+    <td><a name="1004865"> </a><div class="CellBody">The name of the module.</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004867"> </a><div class="CellBody">Layer</div></td>
+    <td><a name="1004869"> </a><div class="CellBody">The layer in which the module is placed.</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004871"> </a><div class="CellBody">Input data</div></td>
+    <td><a name="1004873"> </a><div class="CellBody">What the module will be given as input.</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004875"> </a><div class="CellBody">Output data</div></td>
+    <td><a name="1004877"> </a><div class="CellBody">What the module will deliver as output.</div></td>
+  </tr>
+</table>
+
+
+
+<br>
+</div>
+<h4 class="Heading3">
+  <a name="1004886"> </a>	6.2.2	 GUI
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption><a name="1005380"> </a><div class="TableTitle">Table 2:&#160; GUI description</div></caption>
+  <tr>
+    <td><a name="1005360"> </a><div class="CellBody">Name</div></td>
+    <td><a name="1005362"> </a><div class="CellBody">GUI</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005364"> </a><div class="CellBody">Layer</div></td>
+    <td><a name="1005366"> </a><div class="CellBody">User interface layer</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005368"> </a><div class="CellBody">Input data</div></td>
+    <td><a name="1005370"> </a><div class="CellBody">The interactions of the user</div><a name="1005371"> </a><div class="CellBody">Messages from the algorithm layer to the user</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005373"> </a><div class="CellBody">Output data</div></td>
+    <td><a name="1005375"> </a><div class="CellBody">Settings of, and calls to ArgoPrint</div></td>
+  </tr>
+</table>
+
+
+
+
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005376"> </a>The Graphical User Interface consists of a simple plug-in to the ArgoUML menu. From this menu, the user is able to open the ArgoPrint document generation window which will contain text boxes in which the user can set different variables, needed to generate a document.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004975"> </a>Methods invoked in the main class of the algorithm layer are listed below. They are used to set up variables needed for the output generation and to start the actual generation.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 3pt; margin-left: 155pt; margin-right: 0pt; margin-top: 3pt; text-align: left; text-decoration: none; text-indent: -19pt; text-transform: none; vertical-align: baseline">
+<a name="1004976"> </a>	 boolean InitializeSystem(Settings)<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 3pt; margin-left: 155pt; margin-right: 0pt; margin-top: 3pt; text-align: left; text-decoration: none; text-indent: -19pt; text-transform: none; vertical-align: baseline">
+<a name="1004977"> </a>	 boolean Go()<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005041"> </a>ArgoPrint can also be invoked using the command line of the operating system. This feature is described in the requirements specification as detailed as considered necessary before the more detailed design, the design specification.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1004890"> </a>	6.2.3	 Model
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption><a name="1005384"> </a><div class="TableTitle">Table 3:&#160; Model description</div></caption>
+  <tr>
+    <td><a name="1004984"> </a><div class="CellBody">Name</div></td>
+    <td><a name="1004986"> </a><div class="CellBody">Model</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004988"> </a><div class="CellBody">Layer</div></td>
+    <td><a name="1004990"> </a><div class="CellBody">Data layer</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004992"> </a><div class="CellBody">Input data</div></td>
+    <td><a name="1004994"> </a><div class="CellBody">Calls through the ModelFacade class</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004996"> </a><div class="CellBody">Output data</div></td>
+    <td><a name="1004998"> </a><div class="CellBody">Internal representation of data in the model</div></td>
+  </tr>
+</table>
+
+
+
+
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005635"> </a>The Model module, which actually is the ArgoUML model itself, consists of an object hierarchy, to which calls can be made through a class called ModelFacade. This works as follows.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005013"> </a>Every object can be asked if it has a certain method or data member. When the answer is positive, the method can be invoked and the return value can be handled. If the answer is negative, no invocation will be made.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1005008"> </a>	6.2.4	 XML-parser
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption><a name="1005388"> </a><div class="TableTitle">Table 4:&#160; XML-parser description</div></caption>
+  <tr>
+    <td><a name="1005017"> </a><div class="CellBody">Name</div></td>
+    <td><a name="1005019"> </a><div class="CellBody">XML-parser</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005021"> </a><div class="CellBody">Layer</div></td>
+    <td><a name="1005023"> </a><div class="CellBody">Algorithm layer</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005025"> </a><div class="CellBody">Input data</div></td>
+    <td><a name="1005027"> </a><div class="CellBody">Template written in XML</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005029"> </a><div class="CellBody">Output data</div></td>
+    <td><a name="1005031"> </a><div class="CellBody">Tree structure of Java objects</div></td>
+  </tr>
+</table>
+
+
+
+
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004894"> </a>This module is the free XML-parser Xerces which will be invoked using the following methods.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 3pt; margin-left: 155pt; margin-right: 0pt; margin-top: 3pt; text-align: left; text-decoration: none; text-indent: -19pt; text-transform: none; vertical-align: baseline">
+<a name="1005043"> </a>	 DOMParser DOMParser()<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 3pt; margin-left: 155pt; margin-right: 0pt; margin-top: 3pt; text-align: left; text-decoration: none; text-indent: -19pt; text-transform: none; vertical-align: baseline">
+<a name="1005047"> </a>	 parse(String xmlFile)<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 3pt; margin-left: 155pt; margin-right: 0pt; margin-top: 3pt; text-align: left; text-decoration: none; text-indent: -19pt; text-transform: none; vertical-align: baseline">
+<a name="1005048"> </a>	 Document getDocument()<br>
+</div>
+<h4 class="Heading3">
+  <a name="1005037"> </a>	6.2.5	 Engine
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption><a name="1005392"> </a><div class="TableTitle">Table 5:&#160; Engine description</div></caption>
+  <tr>
+    <td><a name="1005060"> </a><div class="CellBody">Name</div></td>
+    <td><a name="1005062"> </a><div class="CellBody">Engine</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005064"> </a><div class="CellBody">Layer</div></td>
+    <td><a name="1005066"> </a><div class="CellBody">Algorithm layer</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005068"> </a><div class="CellBody">Input data</div></td>
+    <td><a name="1005070"> </a><div class="CellBody">Tree structure of Java objects</div><a name="1005081"> </a><div class="CellBody">Strings from Interface</div><a name="1005082"> </a><div class="CellBody">User interactions from GUI</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005072"> </a><div class="CellBody">Output data</div></td>
+    <td><a name="1005074"> </a><div class="CellBody">Generated document</div><a name="1005083"> </a><div class="CellBody">Calls to Interface</div></td>
+  </tr>
+</table>
+
+
+
+
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004896"> </a>Engine's main task is to traverse the Java object tree (DOM tree) obtained from XML-parser and to generate output data. The general idea of how this works is the following. Everything in the template, which is now represented in the Java object tree, that's not recognized as ArgoPrint formatting tags is considered output text and is passed to the output document. Some of the special tags will call Model through Interface and output text is generated dynamically. See chapter 6.3 for more information on this and the template language.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1005080"> </a>	6.2.6	 UMLInterface
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption><a name="1005396"> </a><div class="TableTitle">Table 6:&#160; Interface description</div></caption>
+  <tr>
+    <td><a name="1005091"> </a><div class="CellBody">Name</div></td>
+    <td><a name="1005093"> </a><div class="CellBody">UMLInterface</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005095"> </a><div class="CellBody">Layer</div></td>
+    <td><a name="1005097"> </a><div class="CellBody">Algorithm layer</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005099"> </a><div class="CellBody">Input data</div></td>
+    <td><a name="1005101"> </a><div class="CellBody">Calls from Engine</div><a name="1005112"> </a><div class="CellBody">Data from Model</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005103"> </a><div class="CellBody">Output data</div></td>
+    <td><a name="1005105"> </a><div class="CellBody">Calls to Model (ArgoUML specific)</div><a name="1005113"> </a><div class="CellBody">Strings to Engine</div><a name="1005115"> </a><div class="CellBody">Files from the ArgoUML model to disk</div></td>
+  </tr>
+</table>
+
+
+
+
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004898"> </a>This is the only part of ArgoPrint that's specific for the ArgoUML model, hence, this is the module to build from when implementing support for other data sources than this model. One other imaginable data source is an SQL database and this would have a similar interface module as the ArgoUML model connected to it.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005114"> </a>The main task of this module is to translate the general template call to a ArgoUML specific call and also to handle iterations over objects in the model.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005399"> </a>A goal when designing this module is that it should have as little knowledge of ArgoUML models as possible. This is for two reasons: It is unnecessarily complicated for knowledge about models to exist both in ArgoUML and ArgoPrint and any changes made to the ArgoUML model would have to be reflected in ArgoPrint as well. The idea is instead that the author of the template should have some knowledge of the ArgoUML model and that the Interface translates information from the template in a standardized way into calls to ModelFacade.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005534"> </a>This module will also take care of iterations over objects in the model, and let Engine call one object at a time among a whole set of objects. Sorting the objects before handling them one by one will also be possible.<br>
+</div>
+<h5 class="Heading4">
+  <a name="1005537"> </a>	6.2.6.1	 ModelFacade
+</h5>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005432"> </a>Currently the internal representation of an UML-model in ArgoUML is going through a change. The current model, NS UML (Novasoft), is no longer supported. ArgoUML will probably change model to a JMI compliant model instead. When the model is changed ArgoPrint, and other modules depending on the model, interface problems would cause the modules to need reprogramming. To make the change of model transparent to the modules, ArgoUML has been equipped with a generalized model interface, ModelFacade, which contains recognisers, getters and setters for most UML-objects. For a more complete reference of what to find in ModelFacade the reader should consult the class documentation which is available as JavaDocs at the official website of ArgoUML (argouml.tigris.org).<br>
+</div>
+<h4 class="Heading3">
+  <a name="1005111"> </a>	6.2.7	 Files
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004887"> </a>If a call is made in the template such that the corresponding method in the ArgoUML model would return a file, for example a picture, only the file name will be sent from Interface to Engine. This is done because the output document is supposed to be text only. It may however contain file name, and therefore the file itself must be copied out from the ArgoUML model to a directory of the user's choice. Note that this file extraction is performed by Interface and not Engine, which handles text output.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1004888"> </a>	6.2.8	 Document
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004899"> </a>Document is the output file in which Engine writes all text. The contents of this file depend on Template and the ArgoUML model.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1004900"> </a>	6.2.9	 Template
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004857"> </a>Template is an XML document that may contain ArgoPrint tags. If no ArgoPrint tags are included, the output file (Document) will be the same as Template. The ArgoPrint tags can be used as stated in chapter 6.3, but for a more detailed description of the usage of them, the reader should consult the design specification, where a complete language definition of the ArgoPrint template language is provided.<br>
+</div>
+<h3 class="Heading2">
+  <a name="1005248"> </a>	6.3	 ArgoPrint template language
+</h3>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005204"> </a>The language in which to write the document template is XML and includes functionality as follows. Under each specific code construction explanation, an example is given to depict the main looks of the language for the reader.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1005548"> </a>	6.3.1	 Notation
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005551"> </a>Below, every ArgoPrint specific xml tag is described.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005552"> </a>Where for example &lt;if&gt; is mentioned, what's really meant is &lt;ap:if&gt;. Abbreviations like this are used to make reading of the text easier.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005553"> </a>After the definition of each tag, a textual explanation for the tag is given. After all tags have been defined, an example is provided which will depict the usage of the language to the reader. <br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005580"> </a>Notice that since all system variables are set through the GUI, no special ArgoPrint tag is needed to begin the template.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1005207"> </a>	6.3.2	 If-Then-Else
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005561"> </a>To let the user specify filtering of data based on conditions, the if-then-else tag &lt;if&gt; is introduced. This looks as follows:<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005562"> </a>&lt;ap:if cond="calledMethod()"&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005563"> </a>     &lt;ap:then&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005564"> </a>     &lt;/ap:then&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005565"> </a>     &lt;ap:else&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005566"> </a>     &lt;/ap:else&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005567"> </a>&lt;/ap:if&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005568"> </a>&lt;if&gt; will handle the code between &lt;then&gt; and &lt;/then&gt; if the condition given in the attribute cond is true. Otherwise, the code between &lt;else&gt; and &lt;/else&gt; is handled. The method calledMethod() should return a Boolean.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1005227"> </a>	6.3.3	 Bind
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005585"> </a>To let the user create tags and bind data to its attributes, the tag &lt;bind&gt; is defined as follows:<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005586"> </a>&lt;ap:bind name="tag_name"&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005587"> </a>     &lt;ap:attr name="attribute_name"&gt;<br>     attribute_value<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005588"> </a>     &lt;/ap:attr&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005589"> </a>&lt;/ap:bind&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005581"> </a>&lt;bind&gt; constructs a tag named tag_name with all attributes (can be many!) given between &lt;bind&gt; and &lt;/bind&gt;. attribute_value is either a string or something that is evaluated to a string. A good way of using &lt;bind&gt; is together with the tag &lt;call&gt; which fetches data from a data source. <br>
+</div>
+<h4 class="Heading3">
+  <a name="1005602"> </a>	6.3.4	 Call
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005597"> </a>&lt;call&gt; is introduced to let the template author fetch data from a data source. It is defined as follows:<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005598"> </a>&lt;ap:call what="calledMethod()" iterator="iteratorName"/&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005595"> </a>The result of &lt;call&gt; is always a Object but will render an exception unless it is a String and calledMethod() should be a valid call. In the ArgoPrint case, a call to the ArgoUML model.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1005593"> </a>	6.3.5	 Iterate
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005605"> </a>The tag &lt;iterate&gt; is introduced to let the user iterate over objects and sort them. Definition is as follows:<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005606"> </a>&lt;ap:iterate what="calledMethod()" iterator="it_name" iteratorname="name" sortvalue="StringFunction()"&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005607"> </a>&lt;/ap:iterate&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005603"> </a>Every object in the Collection returned by the call "what" to the data source will be bound as iterator named name and the code between &lt;iterate&gt; and &lt;/iterate&gt; will be handled one time for each of them. If the calledMethod() returns an Object the iterator tag will construct a Collection containing that single Object. If the iterator is nested the iterator attribute can be used to specify the argument for the calledMethod(). If the sortvalue attribute is included, the objects to iterate over will be sorted in alphabetical order according to the String returned by the given method.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1005742"> </a>	6.3.6	 methodCalled()
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005743"> </a>Currently it is possible to call functions in the ModelFacade class. This is mostly done by specifying the method name with parentheses in the what attribute and the argument for the function in the iterator attribute. There are also some default arguments which are called by using the method name and the argument inside the parentheses.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005746"> </a>Ex:<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 3pt; margin-left: 155pt; margin-right: 0pt; margin-top: 3pt; text-align: left; text-decoration: none; text-indent: -19pt; text-transform: none; vertical-align: baseline">
+<a name="1005747"> </a>	 &lt;ap:justanexample what="getName()" iterator="classes"&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005763"> </a>Will call the getName method in ModelFacade using the current object iterator classes as argument. Will evaluate to:<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005957"> </a>ModelFacade.getName(classes.currentObject())<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 3pt; margin-left: 155pt; margin-right: 0pt; margin-top: 3pt; text-align: left; text-decoration: none; text-indent: -19pt; text-transform: none; vertical-align: baseline">
+<a name="1005754"> </a>	 &lt;ap:justanexample what="getOwnedElements(model)"&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005764"> </a>Will call getOwnedElements using the model as argument. Useful for initially getting hold of the objects in the model.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 3pt; margin-left: 155pt; margin-right: 0pt; margin-top: 3pt; text-align: left; text-decoration: none; text-indent: -19pt; text-transform: none; vertical-align: baseline">
+<a name="1005758"> </a>	 &lt;ap:justanexample what="getName(project)"&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005766"> </a>Can be used to call functions in the Project class. Will evaluate to: <br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005769"> </a>thisProject.getName(). <br>
+</div>
+<h4 class="Heading3">
+  <a name="1005594"> </a>	6.3.7	 Depicting example
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005903"> </a>This example template assumes that the interface that connects ArgoPrint to ArgoUML is installed and available. It produces an HTML document, listing classes in a project and their methods.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005904"> </a>&lt;html&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005905"> </a>&lt;head&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005906"> </a>  &lt;title&gt;&lt;ap:call what=&quot;getName(project)&quot;/&gt;&lt;/title&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005907"> </a>&lt;/head&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005908"> </a>&lt;body&gt; <br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005909"> </a>  &lt;h1&gt;Contents of <br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005910"> </a>    &lt;ap:call what=&quot;getName(project)&quot;/&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005911"> </a>  &lt;/h1&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005912"> </a>  &lt;h3&gt;Classes&lt;/h3&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005913"> </a>  &lt;p&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005914"> </a>    &lt;ap:iterate what=&quot;getOwnedElements(model)&quot; <br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005915"> </a>                    iteratorname=&quot;object&quot; <br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005916"> </a>                    sortvalue=&quot;getName()&quot;&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005917"> </a>      &lt;ap:if cond=&quot;isAClass()&quot; iterator=&quot;object&quot;&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005918"> </a>        &lt;ap:then&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005919"> </a>          &lt;ap:bind name=&quot;a&quot;&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005920"> </a>             &lt;ap:attr name=&quot;href&quot;&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005921"> </a>              #&lt;ap:call what=&quot;getName()&quot;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005922"> </a>                        iterator=&quot;object&quot;/&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005923"> </a>             &lt;/ap:attr&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005924"> </a>              &lt;ap:call what=&quot;getName()&quot; <br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005925"> </a>                       iterator=&quot;object&quot;/&gt;&lt;br/&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005926"> </a>          &lt;/ap:bind&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005927"> </a>        &lt;/ap:then&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005928"> </a>      &lt;/ap:if&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005929"> </a>    &lt;/ap:iterate&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005930"> </a>  &lt;/p&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005931"> </a><br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005932"> </a>  &lt;p&gt;Class details&lt;/p&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005933"> </a>    &lt;ap:iterate what=&quot;getOwnedElements(model)&quot;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005934"> </a>                iteratorname=&quot;object&quot; <br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005935"> </a>                sortvalue=&quot;getName()&quot; &gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005936"> </a>      &lt;ap:if cond=&quot;isAClass()&quot; iterator=&quot;object&quot;&gt; <br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005937"> </a>        &lt;ap:then&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005938"> </a>          &lt;ap:bind name=&quot;a&quot;&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005939"> </a>             &lt;ap:attr name=&quot;name&quot;&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005940"> </a>                &lt;ap:call what=&quot;getName()&quot;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005941"> </a>                         iterator=&quot;object&quot;/&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005942"> </a>             &lt;/ap:attr&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005943"> </a>             &lt;h3&gt;&lt;ap:call what=&quot;getName()&quot; <br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005944"> </a>                          iterator=&quot;object&quot;/&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005945"> </a>             &lt;/h3&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005946"> </a>          &lt;/ap:bind&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005947"> </a>          &lt;h5&gt;Methods&lt;/h5&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005948"> </a>          &lt;ap:iterate what=&quot;getOperations()&quot;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1006019"> </a>                      iterator=&quot;object&quot;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005950"> </a>                      iteratorname=&quot;method&quot;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005951"> </a>                      sortvalue=&quot;getName()&quot;&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005952"> </a>            &lt;ap:if cond=&quot;isAOperation()&quot; iterator=&quot;method&quot;&gt; <br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005953"> </a>              &lt;ap:then&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005954"> </a>                &lt;p&gt;&lt;ap:call what=&quot;getName()&quot;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005877"> </a>                    iterator=&quot;method&quot;/&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005878"> </a>                &lt;/p&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005881"> </a>              &lt;/ap:then&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1006022"> </a>            &lt;/ap:if&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005811"> </a>          &lt;/ap:iterate&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005884"> </a>        &lt;/ap:then&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005813"> </a>      &lt;/ap:if&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005887"> </a>    &lt;/ap:iterate&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005815"> </a>  &lt;/body&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 0pt; margin-left: 158pt; margin-right: 0pt; margin-top: 0pt; text-align: left; text-decoration: none; text-indent: -22pt; text-transform: none; vertical-align: baseline">
+<a name="1005724"> </a>&lt;/html&gt;<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005613"> </a>For a more detailed example walkthrough with figures showing DOM-trees for all xml snippets, see the design specification.<br>
+</div>
+<h3 class="Heading2">
+  <a name="1005226"> </a>	6.4	 Reflections on properties
+</h3>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005153"> </a>The architecture of ArgoPrint relates to the properties in chapter 4.3 as follows.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1005147"> </a>	6.4.1	 Testability
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005161"> </a>The modules of ArgoPrint have different tasks and can be tested outside the complete system.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: bold; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005175"> </a>Model<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005166"> </a>Model is already finished but tests are still necessary in order to learn exactly how it can be invoked. The invocation of Model can be done directly to the module and no other parts of the system have to be implemented for this.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: bold; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005170"> </a>Interface<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005180"> </a>Interface is a rather complex module but it can still be tested outside its' environment. Since Model is already finished, one can even let Interface invoke this and simply call Interface with what a model invocation looks like in the template, and then look at the result which should be ordinary strings.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: bold; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005171"> </a>Engine<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005181"> </a>Tests for Engine are not very hard to construct either. One can assume a certain string is sent from Interface when making an invocation and since the XML-parser doesn't have to be implemented, Engine could traverse a Java object tree, and generate an output document. This is not testing entirely outside the environment of the module but the XML-parser is already finished so it shouldn't be very complicated to get it to work properly.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: bold; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005172"> </a>XML-parser<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005182"> </a>XML-parser is easily tested by just letting it parse an XML file and look at the object structure generated. Worth mentioning is that even though ArgoPrint will contain an existing XML-parser, testing must be performed. If it turns out the parser can't be made to pass the tests it can be exchanged for another one. Since the chosen parser implements a standardized interface, this procedure is not very complicated. See chapter 4.4 about design decisions concerning the parser.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: bold; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005173"> </a>GUI<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005183"> </a>GUI can be tested by letting it call dummy methods instead of methods in Engine.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: bold; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005174"> </a>External data files<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005184"> </a>All the external data files such as templates, generated documents and other data files are not a source of errors. The templates should follow the language specification and the data files are just extracted from the ArgoUML model. Errors in the generated document most likely originate in errors in Engine.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1005158"> </a>	6.4.2	 Code reusability
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005159"> </a>A lot of the modules have to be written from scratch but the system also contains much reused code in the XML-parser. <br>
+</div>
+<h4 class="Heading3">
+  <a name="1005162"> </a>	6.4.3	 Extendability
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005160"> </a>The main factor to give ArgoPrint this feature is the idea that only the Interface module is ArgoUML model dependent. By developing similar modules for other data sources one can extend the system in the future.<br>
+</div>
+<h4 class="Heading3">
+  <a name="1005163"> </a>	6.4.4	 General solution
+</h4>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005148"> </a>ArgoPrint does not define the format of the output data other than that it is XML. This gives the Document Author free hands concerning output.<br>
+</div>
+</blockquote>
+
+<hr>
+
+<table align="right" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td align="right"><font size="1">
+    <a href="http://www.webworks.com"><img src="images/webworks.gif" width="150" height="20" border="0"></a><br>
+    Quadralay Corporation<br>
+    http://www.webworks.com<br>
+    Voice: (512) 719-3399<br>
+    Fax: (512) 719-3606<br>
+    <a href="mailto:sales@webworks.com">sales@webworks.com</a><br>
+    </font></td>
+  </tr>
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="arkitekturspec_toc.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="arkitekturspec_designmetod.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="arkitekturspec_aterkopplingtillkrav.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="arkitekturspec_idx.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

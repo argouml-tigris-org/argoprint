@@ -1,0 +1,247 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Standard Edition 7.0.1">
+<meta name="TEMPLATEBASE" content="Dynamic HTML Standard Edition">
+<meta name="LASTUPDATED" content="12/02/03 20:49:38">
+<link rel="StyleSheet" href="standard.css" type="text/css" media="screen">
+<title> 7 Reflections on Requirements  </title>
+</head>
+
+<body background="images/backgrnd.gif">
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="arkitekturspec_toc.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="arkitekturspec_arkitekturbeskrivning.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="arkitekturspec_referenser.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="arkitekturspec_idx.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p><img src="images/wwplogo.gif" width="122" height="63" alt="Put your logo here!"></p>
+<hr align="left">
+
+<blockquote>
+<h2 class="Heading1">
+  <a name="1001366"> </a>	7	 Reflections on Requirements
+</h2>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004766"> </a>In the following tables, All requirements specified in the requirements specification are listed with reference to where they can be found in the architecture. This gives the reader a direct connection between desired functionality and the corresponding architectural design solution. For a more detailed description of each requirement, see the requirements specification.<br>
+</div>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005051"> </a>Notice that the choice of design method enables design for requirements of level extra at a later stage.<br>
+</div>
+<h3 class="Heading2">
+  <a name="1005056"> </a>	7.1	 Functional requirements
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption></caption>
+  <tr bgcolor="#CCCCCC">
+    <th><a name="1004786"> </a><div class="CellHeading">Req.</div></th>
+    <th><a name="1004788"> </a><div class="CellHeading">Description</div></th>
+    <th><a name="1004790"> </a><div class="CellHeading">Level</div></th>
+    <th><a name="1004792"> </a><div class="CellHeading">Status</div></th>
+    <th><a name="1004794"> </a><div class="CellHeading">Important chapters</div></th>
+  </tr>
+  <tr>
+    <td><a name="1004796"> </a><div class="CellBody">F-1.1</div></td>
+    <td><a name="1004798"> </a><div class="CellBody">XML output</div></td>
+    <td><a name="1004800"> </a><div class="CellBody">Basic</div></td>
+    <td><a name="1004802"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004804"> </a><div class="CellBody">4.3.4, 6.4.4</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004806"> </a><div class="CellBody">F-1.2</div></td>
+    <td><a name="1004808"> </a><div class="CellBody">DocBook generator</div></td>
+    <td><a name="1004810"> </a><div class="CellBody">Normal</div></td>
+    <td><a name="1004812"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004814"> </a><div class="CellBody">4.3.4, 6.4.4</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004816"> </a><div class="CellBody">F-1.3</div></td>
+    <td><a name="1004818"> </a><div class="CellBody">HTML generator</div></td>
+    <td><a name="1004820"> </a><div class="CellBody">Extra</div></td>
+    <td><a name="1004822"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004824"> </a><div class="CellBody">4.3.4, 6.4.4</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004826"> </a><div class="CellBody">F-2.1</div></td>
+    <td><a name="1004828"> </a><div class="CellBody">Excangeable templates</div></td>
+    <td><a name="1004830"> </a><div class="CellBody">Basic</div></td>
+    <td><a name="1004832"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004834"> </a><div class="CellBody">6.2.1</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004836"> </a><div class="CellBody">F-2.2</div></td>
+    <td><a name="1004838"> </a><div class="CellBody">Execute all correct templates</div></td>
+    <td><a name="1004840"> </a><div class="CellBody">Normal</div></td>
+    <td><a name="1004842"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004844"> </a><div class="CellBody">6.4.4</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004846"> </a><div class="CellBody">F-2.3</div></td>
+    <td><a name="1004848"> </a><div class="CellBody">Command line loading of ArgoPrint</div></td>
+    <td><a name="1004850"> </a><div class="CellBody">Extra</div></td>
+    <td><a name="1004852"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004854"> </a><div class="CellBody">-</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004856"> </a><div class="CellBody">F-3.1</div></td>
+    <td><a name="1004858"> </a><div class="CellBody">Iterate over UML-objects</div></td>
+    <td><a name="1004860"> </a><div class="CellBody">Normal</div></td>
+    <td><a name="1004862"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004864"> </a><div class="CellBody">6.2.5</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004866"> </a><div class="CellBody">F-3.2</div></td>
+    <td><a name="1004868"> </a><div class="CellBody">Filter UML-objects</div></td>
+    <td><a name="1004870"> </a><div class="CellBody">Normal</div></td>
+    <td><a name="1004872"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004874"> </a><div class="CellBody">6.3.2</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004876"> </a><div class="CellBody">F-3.3</div></td>
+    <td><a name="1004878"> </a><div class="CellBody">Sort UML-objects</div></td>
+    <td><a name="1004880"> </a><div class="CellBody">Normal</div></td>
+    <td><a name="1004882"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004884"> </a><div class="CellBody">6.2.5</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004886"> </a><div class="CellBody">F-4.1</div></td>
+    <td><a name="1004888"> </a><div class="CellBody">Generate correct templates</div></td>
+    <td><a name="1004890"> </a><div class="CellBody">Extra</div></td>
+    <td><a name="1004892"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004894"> </a><div class="CellBody">-</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004896"> </a><div class="CellBody">F-4.2</div></td>
+    <td><a name="1004898"> </a><div class="CellBody">Model view template editing</div></td>
+    <td><a name="1004900"> </a><div class="CellBody">Extra</div></td>
+    <td><a name="1004902"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004904"> </a><div class="CellBody">-</div></td>
+  </tr>
+</table>
+
+
+
+
+</h3>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1005060"> </a><br>
+</div>
+<h3 class="Heading2">
+  <a name="1005057"> </a>	7.2	 Non-functional requirements
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption></caption>
+  <tr bgcolor="#CCCCCC">
+    <th><a name="1004960"> </a><div class="CellHeading">Req.</div></th>
+    <th><a name="1004962"> </a><div class="CellHeading">Description</div></th>
+    <th><a name="1004964"> </a><div class="CellHeading">Level</div></th>
+    <th><a name="1004966"> </a><div class="CellHeading">Status</div></th>
+    <th><a name="1004968"> </a><div class="CellHeading">Important chapters</div></th>
+  </tr>
+  <tr>
+    <td><a name="1004970"> </a><div class="CellBody">N-1.1</div></td>
+    <td><a name="1004972"> </a><div class="CellBody">Template language</div></td>
+    <td><a name="1004974"> </a><div class="CellBody">Basic</div></td>
+    <td><a name="1004976"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004978"> </a><div class="CellBody">6.3</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004980"> </a><div class="CellBody">N-1.2</div></td>
+    <td><a name="1004982"> </a><div class="CellBody">Template in XML</div></td>
+    <td><a name="1004984"> </a><div class="CellBody">Normal</div></td>
+    <td><a name="1004986"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004988"> </a><div class="CellBody">6.3</div></td>
+  </tr>
+  <tr>
+    <td><a name="1004990"> </a><div class="CellBody">N-1.3</div></td>
+    <td><a name="1004992"> </a><div class="CellBody">Connectable with other tools</div></td>
+    <td><a name="1004994"> </a><div class="CellBody">Normal</div></td>
+    <td><a name="1004996"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1004998"> </a><div class="CellBody">6.2.5, 6.4.3</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005000"> </a><div class="CellBody">N-2.1</div></td>
+    <td><a name="1005002"> </a><div class="CellBody">Module in ArgoUML</div></td>
+    <td><a name="1005004"> </a><div class="CellBody">Normal</div></td>
+    <td><a name="1005006"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1005008"> </a><div class="CellBody">Entire document</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005010"> </a><div class="CellBody">N-2.2</div></td>
+    <td><a name="1005012"> </a><div class="CellBody">Java version</div></td>
+    <td><a name="1005014"> </a><div class="CellBody">Basic</div></td>
+    <td><a name="1005016"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1005018"> </a><div class="CellBody">4.2.1</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005020"> </a><div class="CellBody">N-2.3</div></td>
+    <td><a name="1005022"> </a><div class="CellBody">Code standard</div></td>
+    <td><a name="1005024"> </a><div class="CellBody">Normal</div></td>
+    <td><a name="1005026"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1005028"> </a><div class="CellBody">Doesn't affect the architecture</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005030"> </a><div class="CellBody">N-3.1</div></td>
+    <td><a name="1005032"> </a><div class="CellBody">BSD license</div></td>
+    <td><a name="1005034"> </a><div class="CellBody">Basic</div></td>
+    <td><a name="1005036"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1005038"> </a><div class="CellBody">Doesn't affect the architecture</div></td>
+  </tr>
+  <tr>
+    <td><a name="1005040"> </a><div class="CellBody">N-4.1</div></td>
+    <td><a name="1005042"> </a><div class="CellBody">Visual aids</div></td>
+    <td><a name="1005044"> </a><div class="CellBody">Extra</div></td>
+    <td><a name="1005046"> </a><div class="CellBody">Active</div></td>
+    <td><a name="1005048"> </a><div class="CellBody">-</div></td>
+  </tr>
+</table>
+
+
+
+
+</h3>
+<div style="color: #000000;  font-style: normal; font-weight: normal; margin-bottom: 6pt; margin-left: 136pt; margin-right: 0pt; margin-top: 6pt; text-align: left; text-decoration: none; text-indent: 0pt; text-transform: none; vertical-align: baseline">
+<a name="1004768"> </a><br>
+</div>
+</blockquote>
+
+<hr>
+
+<table align="right" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td align="right"><font size="1">
+    <a href="http://www.webworks.com"><img src="images/webworks.gif" width="150" height="20" border="0"></a><br>
+    Quadralay Corporation<br>
+    http://www.webworks.com<br>
+    Voice: (512) 719-3399<br>
+    Fax: (512) 719-3606<br>
+    <a href="mailto:sales@webworks.com">sales@webworks.com</a><br>
+    </font></td>
+  </tr>
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="arkitekturspec_toc.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="arkitekturspec_arkitekturbeskrivning.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="arkitekturspec_referenser.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="arkitekturspec_idx.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

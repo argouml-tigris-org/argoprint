@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title></title>
+<link rel="stylesheet" type="text/css" href="../content.css">
+</head>
+<body>
+<div class="body">
+<h2>Introduction</h2>
+<p>
+First of all, ArgoPrint is a module for <a href="../glossary/index.html">ArgoUML</a>, which is an open source UML modelling tool. The goal of ArgoPrint is to provide a way of automatically generating documents based on data from the UML model created in ArgoUML. This list provides a summary of the basic ideas behind ArgoPrint:
+
+<ul>
+<li>Uses a <a href="../architecture/tl.html">template language</a> in XML to specify what information to extract.</li>
+<li>Whenever the UML model is changed, the documentation can be automatically regenerated to keep the documentation up to date.</li>
+<li>The template enables the user to create an output document in any XML format.</li>
+<li>Can easily be extended to extract data from tools other than ArgoUML, for example tools for requirements or testing. ArgoPrint will then be able to merge data from these different tools into the same output document. This enables ArgoPrint to be used for system wide documentation.</li>
+</ul>
+
+<p>Perhaps the best way to show what it does is through a small template example:</p>
+<div class="fragment">
+<pre>&lt;html&gt;
+  &lt;head&gt;&lt;title&gt;ArgoPrint demonstration&lt;/title&gt;&lt;/head&gt;
+  &lt;body&gt;
+    &lt;p&gt;Project name: &lt;ap:call what="getName(project)"/&gt;&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</pre></div>
+<p>What ArgoPrint does when processing the template is that all elements that do not have the prefix ap (short for ArgoPrint) will pass right through to the output. The ap elements on the other hand contain processing instructions that extract data from ArgoUML and/or perform common language constructs such as loops and conditions based on the extracted data (see <a href="../architecture/tl.html">this section</a> in the architecture description). The ap elements will then be replaced and the extracted data will be inserted in their place. The resulting output when the above template is processed is an HTML document displaying the name of an ArgoUML project.</p>
+
+<p>An important thing to note is that this allows for the creation of arbitrary XML output formats where the template contains all the static information and the rest is extracted from ArgoUML. When connecting ArgoPrint to other tools it will be an even more powerful tool for eliminating the need for manual updating and merging of data from various sources.
+</p>
+</div>
+</body>
+</html>
