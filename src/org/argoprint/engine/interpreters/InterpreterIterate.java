@@ -117,7 +117,9 @@ public class InterpreterIterate extends Interpreter {
 		while (iterator.hasNext()) {
 			object = iterator.next();
 			returned = _dataSource.caller(sortvalue, object);
-			if (!(returned instanceof String))
+			if (returned == null)
+				returned = "null";
+			else if (!(returned instanceof String))
 				throw new Exception("The sortvalue function did not return a String.");
 			sortedMap.put(returned, object);
 		}
