@@ -231,52 +231,78 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 	Object args[] = new Object[1];
 	args[0] = p.getModel();
 	
-	Object response = umlIf.caller(new String("getOwnedElements"), args);
-	
-	if(response instanceof Collection){
-	    //Iterator elementIterator = ((Collection) response).iterator();
-	    ArgoPrintIterator iter =
-		new ArgoPrintIterator(((Collection) response).iterator());
-	    env.addIterator(new String("element"), iter);
-	    
-	    //while(elementIterator.hasNext()){
-	    while(iter.hasNext()){
-	    
-		//Object element = elementIterator.next();
-		Object element = iter.next();
-		args[0] = element;
-		Object response2 = 
-		    umlIf.caller(new String("isAClass"), args);
+	try{
+	    log.info("Test simulated template");
+	    Object response = 
+		umlIf.caller(new String("getOwnedElements(model)"));
+	   
+	    //log.info(response.toString());
+
+	    if(response instanceof Collection){
+		//log.info("Collection!");
+		//Iterator elementIterator = ((Collection) response).iterator();
+		ArgoPrintIterator iter =
+		    new ArgoPrintIterator(((Collection) response).iterator());
 		
-		if((response2 instanceof Boolean) && 
-		   (((Boolean)response2).booleanValue())){
+		//log.info("Iterator created");
+		env.addIterator(new String("element"), iter);
+		//log.info("Iterator added");
+		//while(elementIterator.hasNext()){
+		
+		while(iter.hasNext()){
+		    //log.info("iter elem has next");
+		    //Object element = elementIterator.next();
+		    Object element = iter.next();
+		    args[0] = element;
 		    
-		    log.info("Class name: " + 
-			     ModelFacade.getFacade().getName(element));
+		    //log.info("element name: " + 
+		    //	     ModelFacade.getFacade().getName(element));
+
+		    Object response2 = 
+			umlIf.caller(new String("isAClass()"), element);
+		   
+		    //log.info(response2.toString());
 		    
-		    Object response3 = 
-			umlIf.caller(new String("getOperations"), args);
 		    
-		    if(response3 instanceof Collection){
-			iter = 
-			    new ArgoPrintIterator(((Collection) 
-						   response3).iterator());
-			//Iterator operationIterator = 
-			//((Collection) response3).iterator(); 
-			env.addIterator(new String("operation"), iter);
-			while(iter.hasNext()){
-			    //while(operationIterator.hasNext()){
-			    //Object operation = operationIterator.next();
-			    Object operation = iter.next();
-			    log.info("operation name: " + 
-				     ModelFacade.getFacade().getName(operation));
+		    
+		    if((response2 instanceof Boolean) && 
+		       (((Boolean)response2).booleanValue())){
+			
+			log.info("Class name: " + 
+				 ModelFacade.getFacade().getName(element));
+			
+			Object response3 = 
+			    umlIf.caller(new String("getOperations()"), element);
+			
+			if(response3 instanceof Collection){
+			    iter = 
+				new ArgoPrintIterator(((Collection) 
+						       response3).iterator());
+			    //Iterator operationIterator = 
+			    //((Collection) response3).iterator(); 
+			    env.addIterator(new String("operation"), iter);
+			    while(iter.hasNext()){
+				//while(operationIterator.hasNext()){
+				//Object operation = operationIterator.next();
+				Object operation = iter.next();
+				log.info("operation name: " + 
+					 ModelFacade.getFacade().getName(operation));
+			    }
+			    env.removeIterator(new String("operation"));
+			    iter = env.getIterator(new String("element"));
 			}
-			env.removeIterator(new String("operation"));
-			iter = env.getIterator(new String("element"));
+		    } else{
+			//log.info("Element name: " + 
+				// ModelFacade.getFacade().getName(element));
 		    }
 		}
+		env.removeIterator(new String("element"));
 	    }
-	    env.removeIterator(new String("element"));
+	    
+	    umlIf.caller(new String("getOwnedElements(model)"));
+	    
+	} catch(Exception e){
+	    log.info("Gui crash");
 	}
         JOptionPane.showMessageDialog( this, "Output generation complete!");
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -331,3 +357,5 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
     
 }
+
+
