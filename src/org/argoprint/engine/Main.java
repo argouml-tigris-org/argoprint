@@ -48,8 +48,8 @@ import org.argoprint.engine.interpreters.InterpreterCall;
 import org.argoprint.engine.interpreters.InterpreterDefault;
 import org.argoprint.engine.interpreters.InterpreterIf;
 import org.argoprint.engine.interpreters.InterpreterIterate;
+import org.argoprint.interfaces.UMLInterface;
 import org.argoprint.ui.Settings;
-import org.argoprint.uml_interface.UMLInterface;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -58,11 +58,11 @@ import org.xml.sax.SAXException;
  * The main processor for ArgoPrint.
  */
 public class Main {
-    private Interpreter _firstHandler;
-    private DOMParser _parser;
+    private Interpreter firstHandler;
+    private DOMParser parser;
     // TODO: remove 
-    private String _outputFile;
-    private ArgoPrintDataSource _dataSource;
+    private String outputFile;
+    private ArgoPrintDataSource dataSource;
     
     /**
      * Constructor with a dummy data source.
@@ -77,17 +77,19 @@ public class Main {
      * @param source The data source.
      */
     public Main(ArgoPrintDataSource source) {
-	_parser = new DOMParser();
-        _dataSource = source;
+	parser = new DOMParser();
+        dataSource = source;
 
-	Interpreter iCall = new InterpreterCall(_dataSource);
-	_firstHandler = iCall;
-	iCall.setFirstHandler(_firstHandler);
+	Interpreter iCall = new InterpreterCall(dataSource);
+	firstHandler = iCall;
+	iCall.setFirstHandler(firstHandler);
 	    
-	Interpreter iDefault = new InterpreterDefault(_dataSource, _firstHandler);
-	Interpreter iIterate = new InterpreterIterate(_dataSource, _firstHandler);
-	Interpreter iBind = new InterpreterBind(_dataSource, _firstHandler);
-	Interpreter iIf = new InterpreterIf(_dataSource, _firstHandler);
+	Interpreter iDefault =
+	    new InterpreterDefault(dataSource, firstHandler);
+	Interpreter iIterate =
+	    new InterpreterIterate(dataSource, firstHandler);
+	Interpreter iBind = new InterpreterBind(dataSource, firstHandler);
+	Interpreter iIf = new InterpreterIf(dataSource, firstHandler);
     
 	iCall.setNextHandler(iIterate);
     	iIterate.setNextHandler(iBind);
@@ -106,11 +108,11 @@ public class Main {
     public void initializeSystem(Settings settings) 
 	throws SAXException, IOException {
 
-	((UMLInterface) _dataSource).initialize();
-	_outputFile = settings.getOutputFile();
+	((UMLInterface) dataSource).initialize();
+	outputFile = settings.getOutputFile();
 	// TODO: set outputDir of interface
 	// ((UMLInterface)dataSource).setOutputPath(settings.getOutputDir);
-	_parser.parse(new InputSource(settings.getTemplate()));
+	parser.parse(new InputSource(settings.getTemplate()));
     }
 
     /**
@@ -123,9 +125,9 @@ public class Main {
      */
     public void go()
 	throws IOException, BadTemplateException, UnsupportedCallException {
-	Document document = _parser.getDocument();
-	_firstHandler.handleTag(document, new Environment());
-	FileOutputStream outputStream = new FileOutputStream(_outputFile);
+	Document document = parser.getDocument();
+	firstHandler.handleTag(document, new Environment());
+	FileOutputStream outputStream = new FileOutputStream(outputFile);
 	OutputFormat outputFormat = new OutputFormat(document);
 	outputFormat.setIndent(4);
 	outputFormat.setPreserveSpace(false);

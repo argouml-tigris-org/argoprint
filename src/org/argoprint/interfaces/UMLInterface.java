@@ -1,4 +1,5 @@
 //$Id$
+// Copyright (c) 2005, Linus Tolke
 //Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
@@ -30,7 +31,7 @@
 //ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
 //THE POSSIBILITY OF SUCH DAMAGE.
 
-package org.argoprint.uml_interface;
+package org.argoprint.interfaces;
 
 import java.io.File;
 import java.io.FileOutputStream;
