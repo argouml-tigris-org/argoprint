@@ -8,12 +8,12 @@ import java.util.*;
 class Environment{
     Environment instance;
 
-    private Set iteratorSet;
+    private HashTableet iteratorTable;
 
-    public boolean exists(String name){
+    public boolean iteratorExists(String name){
 	//TODO: fix "naming" of a iterator
 
-	Iterator iter = iteratorSet.iterator();
+	Iterator iter = iteratorTable.iterator();
 	while(iter.hasNext()){
 	    //if(name.equals(((Iterator) (iter.next())).getName())){
 		return true;
@@ -21,11 +21,11 @@ class Environment{
 	} 
 	return false;
     }
-    public boolean add(Iterator iterator){
+    public boolean addIterator(String name, Iterator iterator){
 	return false;
     }
 
-    public boolean remove(String name){	
+    public boolean removeIterator(String name){	
 	return false;
     }
 
