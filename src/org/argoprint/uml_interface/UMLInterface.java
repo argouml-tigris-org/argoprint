@@ -130,6 +130,7 @@ public class UMLInterface
      */
     public UMLInterface() {
 	//super( "action.save-graphics", NO_ICON);
+	//_facade = new ModelFacade(); 
 	_facade = ModelFacade.getFacade();
     }
 
@@ -242,11 +243,13 @@ public class UMLInterface
     public Object caller(String call)
 	throws Exception{
 	//_log.info("call: " + call);
-	Class c = _facade.getClass();
-	Method[] theMethods = c.getMethods();
+	//Class c = _facade.getClass();
+	//Method[] theMethods = c.getMethods();
 
 	if(call.endsWith(new String("()"))){
-	    int callLength = call.length()-2;
+	   Class c = _facade.getClass();
+	   Method[] theMethods = c.getMethods();
+	   int callLength = call.length()-2;
 	    
 	    String callName = new String(call.substring(0, callLength - 1));
 	    
@@ -268,36 +271,47 @@ public class UMLInterface
 		}	    
 	    }
 	} else if(call.endsWith(new String(")"))){
+	    Class c= _facade.getClass();;
+	    Method[] theMethods = c.getMethods();
 	    int callLength = call.indexOf((int) '(') + 1;
 	    
 	    String callName = new String(call.substring(0, callLength - 1));
 	    String arg = 
 		new String(call.substring(callLength, call.length() - 1));
-	    
+	    Object args[] = new Object[1];  
+	    Object thisObject = null;
+
+	    if(arg.equals(new String("model"))){
+		args[0] = _project.getModel();
+		//c = _facade.getClass();
+		//theMethods = c.getMethods();
+	    } else if(arg.equals(new String("project"))){
+		thisObject = _project;
+		args = null;
+		c = _project.getClass();
+		int vectorLen = c.getMethods().length;
+		theMethods = new Method[vectorLen];
+		theMethods = c.getMethods();
+	    } else {
+		//c = _facade.getClass();
+		//theMethods = c.getMethods();
+	    }
+ 
 	    for (int i = 0; i < theMethods.length; i++) {
 		if(callName.equals(theMethods[i].getName())){
-		    try{
-			if(arg.equals(new String("model"))){		    
-			    Object args[] = new Object[1];
-			    args[0] = _project.getModel(); 
-			    return theMethods[i].invoke(null, 
-							args);
-			}
+		    try{	
+			//_log.info("Call hit: " + arg + " " + callName);
+			//Object args[] = new Object[1];
+			//args[0] = _project.getModel(); 
+			return theMethods[i].invoke(thisObject, 
+						    args);
+		    }catch(Exception e){
+			throw e;
 		    }
-		    catch (IllegalAccessException ignore ){
-		    }
-		    catch (IllegalArgumentException ignore ){
-		    }
-		    catch (InvocationTargetException ignore ){
-		    }
-		    catch (NullPointerException ignore ){
-		    }
-		    catch (ExceptionInInitializerError ignore ){
-		    }		   
 		}	    
 	    }
 	    
-	    return null;
+	    //return null;
 	}
 	throw new Exception("Illegal method call");
 	//return new String("Illegal method call");
