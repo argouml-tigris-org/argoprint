@@ -32,7 +32,15 @@
 
 package org.argoprint.engine.interpreters;
 
+/**
+ * An exception thrown when we detect that the input document is incorrect.
+ */
 public class BadTemplateException extends Exception {
+    /**
+     * Construct the exception.
+     * 
+     * @param message The string message.
+     */
     public BadTemplateException(String message) {
         super(message);
     }

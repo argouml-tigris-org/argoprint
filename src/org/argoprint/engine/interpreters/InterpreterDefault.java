@@ -32,18 +32,27 @@
 
 package org.argoprint.engine.interpreters;
 
-import java.util.Vector;
-
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.UnsupportedCallException;
 import org.argoprint.engine.Environment;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * The default interpreter.<p>
+ * 
+ * This interpreter traverses recursively.
+ */
 public class InterpreterDefault extends Interpreter {
 
-    public InterpreterDefault(ArgoPrintDataSource dataSource) {
-	super("", dataSource);
+    /**
+     * Constructor for this interpreter.
+     * 
+     * @param dataSource The data source used.
+     * @param first The first interpreter to call.
+     */
+    public InterpreterDefault(ArgoPrintDataSource dataSource, Interpreter first) {
+	super("", dataSource, first);
     }
 
     /**
@@ -56,11 +65,13 @@ public class InterpreterDefault extends Interpreter {
         
 	NodeList children = tagNode.getChildNodes();
 	if (children.getLength() > 0) {
-	    Vector childrenVector = getVector(children);
-	    recurse(childrenVector, env);
+	    recurse(getVector(children), env);
 	}	
     }
 
+    /**
+     * @see Interpreter#canHandle(org.w3c.dom.Node)
+     */
     protected boolean canHandle(Node tagNode) {
 	return true;
     }

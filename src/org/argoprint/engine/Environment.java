@@ -38,16 +38,12 @@ import java.util.*;
  * The environment or scope for argoprint. Used for storing iterators.
  * @author matda701, Mattias Danielsson
  */
-public class Environment{
-
-    /**
-     * Reference to self
-     */
-    private Environment _instance;
-    
+public class Environment{    
     /**
      * Hashtable containing ArgoPrintIterator's hashed with
-     * name spcifyed by the user/template.
+     * name specified by the user/template.
+     * 
+     * String => ArgoPrintIterator
      */
     private Hashtable _iteratorTable;
 
@@ -55,12 +51,14 @@ public class Environment{
      * Constructor for Environment
      */ 
     public Environment(){
-        _instance = this;
-	_iteratorTable = new Hashtable();
+        _iteratorTable = new Hashtable();
     }
 
     /**
-     * Checks if iterator name exists in the table
+     * Checks if iterator name exists in the table.
+     * 
+     * @param name The iterator to search for.
+     * @return <tt>true</tt> if found.
      */    
     public boolean existsIterator(String name){
 	return _iteratorTable.containsKey(name);
@@ -70,8 +68,19 @@ public class Environment{
     /**
      * Adds an Iterator to the hashtable, hashed with name. Returns
      * true if succesful.
+     * 
+     * @param name The name to save the iterator under.
+     * @param iterator The iterator to save.
+     * @return true if all goes well.
      */
-    public boolean addIterator(String name, Iterator iterator){
+    public boolean addIterator(String name, Iterator iterator) {
+        if (name == null) {
+            return false;
+        }
+        if (iterator == null) {
+            return false;
+        }
+        
 	if(_iteratorTable.containsKey(name)){
 	    //Key collision occured. Perhaps solve this by calling rehash() ?
 	    //and calling addIterator recursively, Or perhaps totally 
@@ -79,48 +88,35 @@ public class Environment{
 	    return false;
 	}
 	
-	try{
-	    _iteratorTable.put(name, iterator);
-	}
-	catch(Exception e){
-	    //this means name or iterator is null
-	    return false;
-	}
-	
+	_iteratorTable.put(name, iterator);	
 	return true;
     }
     
     /**
-     * Removes the Iterator name from the hashtable. Returns
-     * true if succesful.
+     * Removes the iterator name from the hashtable.
+     * 
+     * @param name The name of the iterator to remove.
+     * @return <tt>true</tt> if there actually was an iterator with that name.
      */
-    public boolean removeIterator(String name){	
-	try{
-	    Iterator iter = (Iterator)_iteratorTable.remove(name);
-	    if(iter == null) { return false; }
-	} 
-	catch(Exception e){
+    public boolean removeIterator(String name) {
+        Iterator iter = (Iterator) _iteratorTable.remove(name);
+	if (iter == null) {
+	    return false;
 	}
 	return true;
     }
 
     /**
-     * Gets the Iterator called name from the hashtable. Returns
-     * the iterator if succesful, othervise null 
+     * Gets the Iterator called name from the hashtable. 
+     * 
+     * @param name The name of the iterator to get.
+     * @return The iterator if succesful, otherwise null.
      */
-    public ArgoPrintIterator getIterator(String name){	
-	try{
-	    return (ArgoPrintIterator)_iteratorTable.get(name);
-	}
-	catch(Exception e){
-	    return null;
-	}
-    }
-
-    /**
-     * Returns referenc to self
-     */
-    public Environment instance(){
-	return _instance;
+    public ArgoPrintIterator getIterator(String name) {
+        if (name == null) {
+            return null;
+        }
+        
+        return (ArgoPrintIterator) _iteratorTable.get(name);
     }
 }

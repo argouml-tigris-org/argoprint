@@ -35,7 +35,7 @@ package org.argoprint.engine;
 import java.util.*;
 
 /**
- * Class which extends iterator too better keep track of current object
+ * Class which extends iterator to better keep track of current object.
  *
  * @author matda701, Mattias Danielsson
  */
@@ -44,54 +44,55 @@ public class ArgoPrintIterator implements Iterator{
     /**
      * The iterator
      */ 
-    private Iterator _iterator;
+    private Iterator iterator;
 
     /**
      * The current object in the iterator. null until next() has been run
      */
-    private Object _currentObject;
+    private Object currentObject;
 
     /**
-     * Constructor, takes the iterator to be wrapped into ArgoPrintIterator
+     * Constructor, takes the iterator to be wrapped into ArgoPrintIterator.
+     * 
+     * @param iter The iterator to wrap.
      */
     public ArgoPrintIterator(Iterator iter){
-	_iterator = iter;
+	iterator = iter;
     }
 
     /**
-     * Checks if the iterator has more objects
+     * @see java.util.Iterator#hasNext()
      */
-    public boolean hasNext(){ return _iterator.hasNext(); }
+    public boolean hasNext() { 
+        return iterator.hasNext(); 
+    }
    
     /**
-     * Returns the next object in the iterator. Also updates _currentObject
-     */ 
+     * @see java.util.Iterator#next()
+     * 
+     * Also updates currentObject.
+     */
     public Object next(){
-	_currentObject = _iterator.next();
-	return _currentObject;
+	currentObject = iterator.next();
+	return currentObject;
     }
 
     /**
-     * Removes last object returned by next(). Se Iterator for more info
+     * @see java.util.Iterator#remove()
      */
     public void remove() 
 	throws UnsupportedOperationException,
 	       IllegalStateException {
-	try{
-	    _iterator.remove();
-	} catch(UnsupportedOperationException e){
-	    throw e;
-	}
-	catch(IllegalStateException e){
-	    throw e;
-	}
+        iterator.remove();
     }
 
     /**
-     * Returns the currentObject in the iterator. Null if next() hasnt been
-     * invoked.
+     * Returns the currentObject in the iterator. Null if {@link #next()} 
+     * hasn't been invoked.
+     * 
+     * @return the current object.
      */
-    public Object currentObject(){
-	return _currentObject;
+    public Object getCurrentObject(){
+	return currentObject;
     }
 }

@@ -39,16 +39,22 @@ package org.argoprint.ui;
  */
 
 import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
-import org.apache.log4j.Logger;
 import org.argoprint.engine.Main;
 import org.argouml.util.SuffixFilter;
 
@@ -56,24 +62,14 @@ import org.argouml.util.SuffixFilter;
  *
  * @author  Martin Gyllensten, Per Engstrom
  */
-public class ArgoPrintJDialog extends javax.swing.JDialog {
+public class ArgoPrintJDialog extends JDialog {
 
-    private Logger log;
-    
-    /**
-     * Sets the logger (log) to logger
-     *
-     * @param logger a Logger
-     */
-    public void setLog(Logger logger) { log = logger; }
-    
     /**
      * Creates new form JDialog
      *
      * @param parent The parent of the ArgoPrint gui (should be ArgoUML's gui).
-     * @param modal not user (hardcoded to true).
      */
-    public ArgoPrintJDialog(java.awt.Frame parent, boolean modal) {
+    public ArgoPrintJDialog(Frame parent) {
         super(parent, true);
         initComponents();
     }
@@ -83,27 +79,27 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
      * 
      */
     private void initComponents() {
-	jUIPanel = new javax.swing.JPanel();
-	jButtonPanel = new javax.swing.JPanel();
-        jTemplateLabel = new javax.swing.JLabel();
-        jTemplateTextField = new javax.swing.JTextField();
-        jTemplateBrowseButton = new javax.swing.JButton();
-        jOutputFileLabel = new javax.swing.JLabel();
-        jOutputFileTextField = new javax.swing.JTextField();
-        jOutputFileBrowseButton = new javax.swing.JButton();
-        jOutputDirLabel = new javax.swing.JLabel();
-        jOutputDirTextField = new javax.swing.JTextField();
-        jOutputDirBrowseButton = new javax.swing.JButton();
-//      jLabel4 = new javax.swing.JLabel();
-        jGenerateButton = new javax.swing.JButton();
-        jCancelButton = new javax.swing.JButton();
+	jUIPanel = new JPanel();
+	jButtonPanel = new JPanel();
+        jTemplateLabel = new JLabel();
+        jTemplateTextField = new JTextField();
+        jTemplateBrowseButton = new JButton();
+        jOutputFileLabel = new JLabel();
+        jOutputFileTextField = new JTextField();
+        jOutputFileBrowseButton = new JButton();
+        jOutputDirLabel = new JLabel();
+        jOutputDirTextField = new JTextField();
+        jOutputDirBrowseButton = new JButton();
+//      jLabel4 = new JLabel();
+        jGenerateButton = new JButton();
+        jCancelButton = new JButton();
 
 	/** Dialog config */
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("ArgoPrint");
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent evt) {
-                closeDialog(evt);
+                closeDialog();
             }
         });
 
@@ -130,7 +126,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
         jTemplateBrowseButton.setText("Browse");
         jTemplateBrowseButton.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent evt) {
-		jTemplateBrowseButtonActionPerformed(evt);
+		jTemplateBrowseButtonActionPerformed();
 	    }
 
         });
@@ -145,7 +141,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
         jOutputFileBrowseButton.setText("Browse");
         jOutputFileBrowseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                jOutputFileBrowseButtonActionPerformed(evt);
+                jOutputFileBrowseButtonActionPerformed();
             }
         });
 
@@ -164,7 +160,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
         jOutputDirBrowseButton.setText("Browse");
         jOutputDirBrowseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                jOutputDirBrowseButtonActionPerformed(evt);
+                jOutputDirBrowseButtonActionPerformed();
             }
         });
 	
@@ -173,7 +169,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
         jGenerateButton.setText("Generate");
         jGenerateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                jGenerateButtonActionPerformed(evt);
+                jGenerateButtonActionPerformed();
             }
         });
 
@@ -183,7 +179,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
         jCancelButton.setText("Cancel");
         jCancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                jCancelButtonActionPerformed(evt);
+                jCancelButtonActionPerformed();
             }
         });
 
@@ -194,21 +190,17 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
     }
 
     /**
-     * Closes the dialog
-     *
-     * @param evt action event!!!
+     * Closes the dialog.
      */
-    private void jCancelButtonActionPerformed(ActionEvent evt) {
-	setVisible( false );
+    private void jCancelButtonActionPerformed() {
+	setVisible(false);
         dispose();
     }
 
     /**
-     * Open file browser
-     *
-     * @param evt action event!!!
+     * Open file browser.
      */
-    private void jOutputDirBrowseButtonActionPerformed(ActionEvent evt) {
+    private void jOutputDirBrowseButtonActionPerformed() {
 
         JFileChooser chooser = new JFileChooser();
         
@@ -221,10 +213,8 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 
     /**
      * Open file browser
-     *
-     * @param evt action event!!!
      */
-    private void jOutputFileBrowseButtonActionPerformed(ActionEvent evt) {
+    private void jOutputFileBrowseButtonActionPerformed() {
         
         JFileChooser chooser = new JFileChooser();
         
@@ -236,10 +226,8 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 
     /**
      * Open file browser
-     *
-     * @param evt action event!!!
      */
-    private void jTemplateBrowseButtonActionPerformed(ActionEvent evt) {
+    private void jTemplateBrowseButtonActionPerformed() {
 
         JFileChooser chooser = new JFileChooser(jTemplateTextField.getText());
         
@@ -256,10 +244,8 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 
     /**
      * Executes a generation
-     *
-     * @param evt action event!!!
      */
-    private void jGenerateButtonActionPerformed(ActionEvent evt) {
+    private void jGenerateButtonActionPerformed() {
 	/******************************************************
          * This is where Engine is invoked!!!!!
          *
@@ -293,8 +279,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 					     jOutputDirTextField.getText());
 	
 	    Main main = new Main();
-	    //try{
-	    main.initializeSystem(settings, log);
+	    main.initializeSystem(settings);
 	    main.go();
 	}
 	catch (Exception e) {
@@ -308,34 +293,32 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 
     /**
      * Closes the dialog
-     *
-     * @param evt window event!!!
      */
-    private void closeDialog(WindowEvent evt) {
+    private void closeDialog() {
         setVisible(false);
         dispose();
     }
 
     /** main panel */
-    private javax.swing.JPanel jUIPanel;
+    private JPanel jUIPanel;
     /** the button panel */
-    private javax.swing.JPanel jButtonPanel;
+    private JPanel jButtonPanel;
     /** browse directory button */
-    private javax.swing.JButton jOutputDirBrowseButton;
+    private JButton jOutputDirBrowseButton;
     /** output file button */
-    private javax.swing.JButton jOutputFileBrowseButton;
+    private JButton jOutputFileBrowseButton;
     /** template file button */
-    private javax.swing.JButton jTemplateBrowseButton;
+    private JButton jTemplateBrowseButton;
     /** generation executor */
-    private javax.swing.JButton jGenerateButton;
+    private JButton jGenerateButton;
     /** cancel button */
-    private javax.swing.JButton jCancelButton;
+    private JButton jCancelButton;
     /** directory text field */
-    private javax.swing.JTextField jOutputDirTextField;
+    private JTextField jOutputDirTextField;
     /** output text field */
-    private javax.swing.JTextField jOutputFileTextField;
+    private JTextField jOutputFileTextField;
     /** template text field */
-    private javax.swing.JTextField jTemplateTextField;
+    private JTextField jTemplateTextField;
     /**
      * Remember the last file we used.
      *

@@ -41,12 +41,46 @@ import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.UnsupportedCallException;
 import org.argoprint.engine.ArgoPrintIterator;
 import org.argoprint.engine.Environment;
-import org.w3c.dom.*;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+/**
+ * This Interpreter processes the iterate tag.<p>
+ * 
+ * The iterate tag looks like this:<ul>
+ * <li>&lt;ap:iterate 
+ *           what="expression1" iteratorname="name" sortvalue="expression"&gt;
+ *       Tags processed one time for each value of <tt>expression1</tt>
+ *       while <tt>name</tt> is bound to them one at the time.
+ *     &lt;/ap:iterate&gt;
+ * </ul>
+ * <p>
+ * 
+ * TODO: Suggested new syntax to make it easier if the expression1 is empty:<ul>
+ * <li>&lt;ap:iterate 
+ *           what="expression1" iteratorname="name" sortvalue="expression"&gt;
+ *       &lt;ap:do&gt;
+ *         Tags processed one time for each value of <tt>expression1</tt>
+ *         while <tt>name</tt> is bound to them one at the time.
+ *       &lt;/ap:do&gt;
+ *       &lt;ap:else&gt;
+ *         Tags processed if <tt>expression1</tt> is empty.
+ *       &lt;/ap:else&gt;
+ *     &lt;/ap:iterate&gt;
+ * </ul>
+ * 
+ */
 public class InterpreterIterate extends Interpreter {
 
-    public InterpreterIterate(ArgoPrintDataSource dataSource) {
-	super("iterate", dataSource);
+    /**
+     * Constructor for this Interpreter.
+     * 
+     * @param dataSource The data source to call.
+     * @param handler The handler to call next.
+     */
+    public InterpreterIterate(ArgoPrintDataSource dataSource, Interpreter handler) {
+	super("iterate", dataSource, handler);
     }
 
     /**
@@ -59,17 +93,13 @@ public class InterpreterIterate extends Interpreter {
 		
 	// Get the collection
 	Object callReturnValue = callDataSource("what", attributes, env);
-	if (!(callReturnValue instanceof Collection)
-	    && !(callReturnValue instanceof Object)) {
-	    throw new UnsupportedCallException("The object returned from the call "
-					       + "to the data source is not a collection.");
-	} else if (!(callReturnValue instanceof Collection)
-		   && (callReturnValue instanceof Object)) {
+	if (callReturnValue == null) {
+	    throw new UnsupportedCallException("null returned from the call");
+	} else if (!(callReturnValue instanceof Collection)) {
 	    ArrayList tmpCollection = new ArrayList();
 	    tmpCollection.add(callReturnValue);
 	    callReturnValue = tmpCollection;
 	}
-		
 		
 	Collection iterateCollection = (Collection) callReturnValue;
 
@@ -89,7 +119,6 @@ public class InterpreterIterate extends Interpreter {
 	    new ArgoPrintIterator(iterateCollection.iterator());
 	env.addIterator(iteratorname, iterator);
 
-	Document document = tagNode.getOwnerDocument();
 	Node parentNode = tagNode.getParentNode();
 	NodeList children = tagNode.getChildNodes();
 	Node newNode;
@@ -127,7 +156,7 @@ public class InterpreterIterate extends Interpreter {
 	Object returned;
 	while (iterator.hasNext()) {
 	    object = iterator.next();
-	    returned = _dataSource.caller(sortvalue, object);
+	    returned = dataSource.caller(sortvalue, object);
 	    if (returned == null)
 		returned = "null";
 	    else if (!(returned instanceof String))

@@ -71,6 +71,9 @@ public class Settings {
     /**
      * Constructor. Sets attributes to corresponding argument.
      * 
+     * @param template The template to process.
+     * @param file The output file.
+     * @param dir The output directory.
      * @throws FileNotFoundException if we cannot read or write the files involved.
      */
     public Settings(String template, String file, String dir) 
@@ -113,44 +116,49 @@ public class Settings {
     } 
 
     /**
-     * Setter for outputDir
+     * Setter for outputDir.
+     * 
+     * @param dir The directory.
      */
     public void setOutputDir(String dir) {
-	_outputDir = new String(dir);
+	_outputDir = dir;
     }
 
     /**
-     * Setter for outputFile
+     * Setter for outputFile.
+     * 
+     * @param file The output file.
      */
     public void setOutputFile(String file) {
-	_outputFile = new String(file);
+	_outputFile = file;
     }
     
     /**
-     * Getter for outputDir
+     * Getter for output directory.
+     * 
+     * @return The directory.
      */
     public String getOutputDir() {
 	return _outputDir;
     }
 
     /**
-     * Getter for outputFile
+     * Getter for output file.
+     * 
+     * @return The file.
      */
     public String getOutputFile() {
 	return _outputFile;
     }
 
     /**
-     * Getter for template
+     * Getter for template.
+     * 
+     * @return The template as a stream.
+     * @throws FileNotFoundException if the file cannot be found.
      */
-    public FileInputStream getTemplate() {
-	try {
-	    return new FileInputStream(_template);
-	}
-	catch (FileNotFoundException e) {
-	    throw new RuntimeException("File not found "
-				       + _template + " shouldn't happen!");
-	}
+    public FileInputStream getTemplate() throws FileNotFoundException {
+        return new FileInputStream(_template);
     }
 }
 

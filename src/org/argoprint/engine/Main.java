@@ -32,14 +32,12 @@
 
 package org.argoprint.engine;
 import org.argoprint.ArgoPrintDataSource;
+import org.argoprint.UnsupportedCallException;
 import org.argoprint.engine.interpreters.*;
-
-import org.apache.log4j.Logger;
 
 import org.argoprint.ui.Settings;
 import org.argoprint.uml_interface.*;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import org.w3c.dom.Document;
@@ -48,81 +46,75 @@ import org.xml.sax.InputSource;
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xml.serialize.*;
 
+/**
+ * The main processor for ArgoPrint.
+ */
 public class Main {
     private Interpreter _firstHandler;
     private DOMParser _parser;
     // TODO: remove 
     private String _outputFile;
     private ArgoPrintDataSource _dataSource;
-    private Logger _log;
-
+    
+    /**
+     * Constructor with a dummy data source.
+     */
     public Main() {
-//    public Main(boolean initDataSource) {
-	_parser = new DOMParser(); 
-	_dataSource = new UMLInterface(); 
-	//_dataSource = new DataSourceStub();
-
-
-
-	// Initialize the CoR
-	Interpreter iDefault = new InterpreterDefault(_dataSource);
-	Interpreter iCall = new InterpreterCall(_dataSource);
-	Interpreter iIterate = new InterpreterIterate(_dataSource);
-	Interpreter iBind = new InterpreterBind(_dataSource);
-	Interpreter iIf = new InterpreterIf(_dataSource);
-
-	_firstHandler = iCall;
-
-	iCall.setNextHandler(iIterate);
-	iCall.setFirstHandler(_firstHandler);
-	iIterate.setNextHandler(iBind);
-	iIterate.setFirstHandler(_firstHandler);
-	iBind.setNextHandler(iIf);
-	iBind.setFirstHandler(_firstHandler);
-	iIf.setNextHandler(iDefault);
-	iIf.setFirstHandler(_firstHandler);
-	iDefault.setFirstHandler(_firstHandler);
+        this(new UMLInterface());
     }
 
+    /**
+     * Constructor with a given data source.
+     * 
+     * @param source The data source.
+     */
     public Main(ArgoPrintDataSource source) {
-//    public Main(boolean initDataSource) {
 	_parser = new DOMParser();
         _dataSource = source;
 
-	// Initialize the CoR
-	Interpreter iDefault = new InterpreterDefault(_dataSource);
 	Interpreter iCall = new InterpreterCall(_dataSource);
-	Interpreter iIterate = new InterpreterIterate(_dataSource);
-	Interpreter iBind = new InterpreterBind(_dataSource);
-	Interpreter iIf = new InterpreterIf(_dataSource);
-
 	_firstHandler = iCall;
-
-	iCall.setNextHandler(iIterate);
 	iCall.setFirstHandler(_firstHandler);
-	iIterate.setNextHandler(iBind);
-	iIterate.setFirstHandler(_firstHandler);
-	iBind.setNextHandler(iIf);
-	iBind.setFirstHandler(_firstHandler);
-	iIf.setNextHandler(iDefault);
-	iIf.setFirstHandler(_firstHandler);
-	iDefault.setFirstHandler(_firstHandler);
+	    
+	Interpreter iDefault = new InterpreterDefault(_dataSource, _firstHandler);
+	Interpreter iIterate = new InterpreterIterate(_dataSource, _firstHandler);
+	Interpreter iBind = new InterpreterBind(_dataSource, _firstHandler);
+	Interpreter iIf = new InterpreterIf(_dataSource, _firstHandler);
+    
+	iCall.setNextHandler(iIterate);
+    	iIterate.setNextHandler(iBind);
+    	iBind.setNextHandler(iIf);
+    	iIf.setNextHandler(iDefault);
     }
 
-
-    public void initializeSystem(Settings settings, Logger log) 
+    /**
+     * Initializes ArgoPrint.
+     * 
+     * @param settings The settings.
+     * @throws SAXException If we cannot parse the template.
+     * @throws IOException If something goes wrong while reading or writing 
+     *         the files.
+     */
+    public void initializeSystem(Settings settings) 
 	throws SAXException, IOException {
 
-	((UMLInterface) _dataSource).initialize(log);
-	_log = log;
+	((UMLInterface) _dataSource).initialize();
 	_outputFile = settings.getOutputFile();
 	// TODO: set outputDir of interface
-	// ((UMLInterface)_dataSource).setOutputPath(settings.getOutputDir);
+	// ((UMLInterface)dataSource).setOutputPath(settings.getOutputDir);
 	_parser.parse(new InputSource(settings.getTemplate()));
     }
 
+    /**
+     * Does the actual work.
+     * 
+     * @throws IOException If sometihing goes wrong while reading or writing 
+     *         the files.
+     * @throws BadTemplateException if the input file is incorrect.
+     * @throws UnsupportedCallException if the data source calls are incorrect.
+     */
     public void go()
-	throws FileNotFoundException, IOException, Exception {
+	throws IOException, BadTemplateException, UnsupportedCallException {
 	Document document = _parser.getDocument();
 	_firstHandler.handleTag(document, new Environment());
 	FileOutputStream outputStream = new FileOutputStream(_outputFile);

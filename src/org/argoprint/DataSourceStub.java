@@ -36,6 +36,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Vector;
 
+/**
+ * This class is responsible for making the calls to the objects themselves.
+ */
 public class DataSourceStub implements ArgoPrintDataSource {
     
     /**
@@ -67,6 +70,9 @@ public class DataSourceStub implements ArgoPrintDataSource {
         return returnValue;
     }
     
+    /**
+     * @see org.argoprint.ArgoPrintDataSource#caller(java.lang.String)
+     */
     public Object caller(String call) throws UnsupportedCallException {
         Vector v = new Vector(5);
         if (call.equals("getString()"))

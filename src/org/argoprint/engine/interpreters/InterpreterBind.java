@@ -31,7 +31,6 @@
 //THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.argoprint.engine.interpreters;
-import java.util.Vector;
 
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.UnsupportedCallException;
@@ -67,8 +66,14 @@ import org.w3c.dom.NodeList;
  */
 public class InterpreterBind extends Interpreter {
 
-    public InterpreterBind(ArgoPrintDataSource dataSource) {
-	super("bind", dataSource);
+    /**
+     * Constructor for the interpreter.
+     * 
+     * @param dataSource The data source to call.
+     * @param first The interpreter where we restart the parsing.
+     */
+    public InterpreterBind(ArgoPrintDataSource dataSource, Interpreter first) {
+	super("bind", dataSource, first);
     }
 
     /**
@@ -102,8 +107,7 @@ public class InterpreterBind extends Interpreter {
                 }
                 children = child.getChildNodes();
                 // Recurse on the contents of the attr tag.
-                Vector childrenVector = getVector(children);
-                recurse(childrenVector, env);
+                recurse(getVector(children), env);
                 child.normalize();
 				
 		// Extract the text and put it in the attribute

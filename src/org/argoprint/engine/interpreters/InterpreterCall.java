@@ -48,6 +48,11 @@ import org.w3c.dom.Node;
  */
 public class InterpreterCall extends Interpreter {
 
+    /**
+     * Constructor for this interpreter.
+     * 
+     * @param dataSource
+     */
     public InterpreterCall(ArgoPrintDataSource dataSource) {
 	super("call", dataSource);
     }

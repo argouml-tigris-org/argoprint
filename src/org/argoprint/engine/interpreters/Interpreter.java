@@ -33,8 +33,7 @@
 
 package org.argoprint.engine.interpreters;
 
-import java.util.Vector;
-
+import org.apache.xpath.NodeSet;
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.UnsupportedCallException;
 import org.argoprint.engine.ArgoPrintIterator;
@@ -47,25 +46,47 @@ import org.w3c.dom.NodeList;
  * Superclass for the interpreters.
  */
 public abstract class Interpreter {
+    /**
+     * The prefix of all ArgoPrint xml tags.
+     */
     protected static final String PREFIX = "ap";
     private String tagName;
     private Interpreter _nextHandler;
-    protected Interpreter firstHandler;
-    protected ArgoPrintDataSource _dataSource;
-    
-    public Interpreter() {
-    }
     
     /**
+     * The handler that is to be called first.
+     */
+    protected Interpreter firstHandler;
+    
+    /**
+     * The data source that we are working from.
+     */
+    protected ArgoPrintDataSource dataSource;
+    
+    /**
+     * Constructs a new Interpreter.
+     * 
      * @param name The name of the tag that this Interpreter can process.
      * @param source The ArgoPrintDataSource that this Interpreter
      * should fetch data from.
      */
     public Interpreter(String name, ArgoPrintDataSource source) {
+        this(name, source, null);
+    }
+
+    /**
+     * Constructs a new Interpreter.
+     * 
+     * @param name The name of the tag that this Interpreter can process.
+     * @param source The ArgoPrintDataSource that this Interpreter
+     * should fetch data from.
+     * @param first The firstHandler to set up.
+     */
+    public Interpreter(String name, ArgoPrintDataSource source, Interpreter first) {
     	tagName = name;
-    	_dataSource = source;
+    	dataSource = source;
+    	firstHandler = first;
     	_nextHandler = null;
-    	firstHandler = null;
     }
     
     /**
@@ -162,7 +183,7 @@ public abstract class Interpreter {
 	Object returnValue;
 	Node iteratorAttribute = attributes.getNamedItem("iterator");
 	if (iteratorAttribute == null) {
-	    returnValue = _dataSource.caller(callAttrNode.getNodeValue());
+	    returnValue = dataSource.caller(callAttrNode.getNodeValue());
 	} else {
 	    if (!env.existsIterator(iteratorAttribute.getNodeValue())) {
 		throw new BadTemplateException(
@@ -173,38 +194,65 @@ public abstract class Interpreter {
 	    
 	    ArgoPrintIterator iterator =
 		env.getIterator(iteratorAttribute.getNodeValue());
-	    returnValue = _dataSource.caller(callAttrNode.getNodeValue(),
-					     iterator.currentObject());
+	    returnValue = dataSource.caller(callAttrNode.getNodeValue(),
+					     iterator.getCurrentObject());
 	}
 	return returnValue;
     }
 		
+    /**
+     * Tests the node name.
+     * 
+     * @param node The node to test.
+     * @param prefix The prefix to find.
+     * @param localName The name.
+     * @return <tt>true</tt> if the name matches.
+     */
     protected boolean isNodeNamed(Node node, String prefix, String localName) {
-	if ((node.getLocalName() == null) || node.getPrefix() == null)
+	if ((node.getLocalName() == null) || node.getPrefix() == null) {
 	    return false;
-	else
+	} else {
 	    return (node.getLocalName().equals(localName)
 		    && node.getPrefix().equals(prefix));
+	}
     }
 	
+    /**
+     * @param node The node to test.
+     * @param localName The name.
+     * @see #isNodeNamed(Node, String, String)
+     * @return <tt>true</tt> if the name matches.
+     */
     protected boolean isNodeNamed(Node node, String localName) {
 	return isNodeNamed(node, PREFIX, localName);
     }
 	
-    protected Vector getVector(NodeList nodeList) { 
-	int numNodes = nodeList.getLength();
-	Vector vector = new Vector(numNodes);
-	for (int i = 0; i < numNodes; i++) {
-	    vector.add(i, nodeList.item(i));
-	}
-	return vector;
+    /**
+     * Get a copy of the NodeList.
+     * 
+     * @param nodeList The NodeList to copy.
+     * @return The newly created NodeList.
+     */
+    protected static NodeList getVector(NodeList nodeList) {
+        NodeSet set = new NodeSet(nodeList);
+        set.setShouldCacheNodes(true);
+        return (NodeList) set;
     }
 	
-    protected void recurse(Vector nodes, Environment env)
+    /**
+     * Continue the parsing for each of the specified nodes.
+     * 
+     * @param nodes The specified nodes.
+     * @param env Current environment.
+     * @throws BadTemplateException Thrown if the input is incorrect.
+     * @throws UnsupportedCallException Thrown if there is some problem with
+     *         calling the data source.
+     */
+    protected void recurse(NodeList nodes, Environment env)
     	throws BadTemplateException, UnsupportedCallException {
         
-	for (int i = 0; i < nodes.size(); i++) {
-	    firstHandler.handleTag((Node) nodes.get(i), env);
+	for (int i = 0; i < nodes.getLength(); i++) {
+	    firstHandler.handleTag(nodes.item(i), env);
 	}
     }
 }

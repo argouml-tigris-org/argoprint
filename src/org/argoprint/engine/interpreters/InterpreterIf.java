@@ -32,8 +32,6 @@
 
 package org.argoprint.engine.interpreters;
 
-import java.util.Vector;
-
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.UnsupportedCallException;
 import org.argoprint.engine.Environment;
@@ -57,8 +55,14 @@ import org.w3c.dom.NodeList;
  */
 public class InterpreterIf extends Interpreter {
 
-    public InterpreterIf(ArgoPrintDataSource dataSource) {
-	super("if", dataSource);
+    /**
+     * Constructor for this interpreter.
+     * 
+     * @param dataSource The data source to call.
+     * @param first The interpreter to call when working recursively.
+     */
+    public InterpreterIf(ArgoPrintDataSource dataSource, Interpreter first) {
+	super("if", dataSource, first);
     }
 
     /**
@@ -132,9 +136,9 @@ public class InterpreterIf extends Interpreter {
         Node ifParent = tagNode.getParentNode();
         if (!(resultChildren == null || resultChildren.getLength() == 0)) { 
             Node resultParent = resultChildren.item(0).getParentNode();
-            Vector resultVector = getVector(resultChildren);
-            for (int i = 0; i < resultVector.size(); i++) {
-        	Node child = (Node) resultVector.get(i);
+            NodeList resultVector = getVector(resultChildren);
+            for (int i = 0; i < resultVector.getLength(); i++) {
+        	Node child = resultVector.item(i);
         	resultParent.removeChild(child);
         	ifParent.insertBefore(child, tagNode);
             }

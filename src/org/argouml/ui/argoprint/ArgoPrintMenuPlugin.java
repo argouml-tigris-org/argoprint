@@ -66,6 +66,8 @@ public class ArgoPrintMenuPlugin extends UMLAction
     // Main methods.
 
     /**
+     * @see org.argouml.uml.ui.UMLAction#actionPerformed(java.awt.event.ActionEvent)
+     *
      * Just let the tester know that we got executed.
      */
     public void actionPerformed(ActionEvent event) {
@@ -73,28 +75,37 @@ public class ArgoPrintMenuPlugin extends UMLAction
 
 	// This is where the ArgoPrint GUI frame is created and displayed
 	ArgoPrintJDialog argoPrintDialog = 
-	    new ArgoPrintJDialog(new javax.swing.JFrame(), true);
+	    new ArgoPrintJDialog(new javax.swing.JFrame());
 	LOG.info("Setting Gui Log");
-	argoPrintDialog.setLog(LOG);
 	LOG.info("Showing ArgoPrint Dialog");
 	argoPrintDialog.show();
     }
 
+    /**
+     * @see org.argouml.application.api.ArgoModule#setModuleEnabled(boolean)
+     */
     public void setModuleEnabled(boolean v) { }
     
+    /**
+     * @see org.argouml.application.api.ArgoModule#initializeModule()
+     */
     public boolean initializeModule() {
-        LOG.info ("+-----------------------------+");
-        LOG.info ("| ArgoPrint initialized       |");
-        LOG.info ("+-----------------------------+");
+        LOG.info ("ArgoPrint initialized");
    	return true;
     }
 
+    /**
+     * @see org.argouml.application.api.PluggableMenu#buildContext(javax.swing.JMenuItem, java.lang.String)
+     */
     public Object[] buildContext(JMenuItem a, String b) {
         return new Object[] {
 	    a, b
 	};
     }
 
+    /**
+     * @see org.argouml.application.api.Pluggable#inContext(java.lang.Object[])
+     */
     public boolean inContext(Object[] o) {
         if (o.length < 2) return false;
        
@@ -103,20 +114,51 @@ public class ArgoPrintMenuPlugin extends UMLAction
 	}
         return false;
     }
+    
+    /**
+     * @see org.argouml.application.api.ArgoModule#isModuleEnabled()
+     */
     public boolean isModuleEnabled() { return true; }
+    
+    /**
+     * @see org.argouml.application.api.ArgoModule#getModulePopUpActions(java.util.Vector, java.lang.Object)
+     */
     public Vector getModulePopUpActions(Vector v, Object o) { return null; }
+    
+    /**
+     * @see org.argouml.application.api.ArgoModule#shutdownModule()
+     */
     public boolean shutdownModule() { return true; }
 
+    /**
+     * @see org.argouml.application.api.ArgoModule#getModuleName()
+     */
     public String getModuleName() { return "ArgoPrintMenuPlugin"; }
+
+    /**
+     * @see org.argouml.application.api.ArgoModule#getModuleDescription()
+     */
     public String getModuleDescription() { return "Menu Item for ArgoPrint"; }
+    
+    /**
+     * @see org.argouml.application.api.ArgoModule#getModuleAuthor()
+     */
     public String getModuleAuthor() { return "Mattias Danielsson"; }
+    
+    /**
+     * @see org.argouml.application.api.ArgoModule#getModuleVersion()
+     */
     public String getModuleVersion() { return "0.0.1"; }
+    
+    /**
+     * @see org.argouml.application.api.ArgoModule#getModuleKey()
+     */
     public String getModuleKey() { return "module.argoprint.menu.plugins"; }
 
-    public JMenuItem getMenuItem(JMenuItem mi, String s) {
-        return getMenuItem(buildContext(mi, s));
-    }
 
+    /**
+     * @see org.argouml.application.api.PluggableMenu#getMenuItem(java.lang.Object[])
+     */
     public JMenuItem getMenuItem(Object [] context) {
         if (!inContext(context)) {
 	    return null;

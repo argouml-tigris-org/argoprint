@@ -33,19 +33,13 @@
 package org.argoprint.uml_interface;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
-
-import javax.swing.JOptionPane;
-
 import org.apache.log4j.Logger;
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.UnsupportedCallException;
@@ -54,7 +48,6 @@ import org.argouml.kernel.ProjectManager;
 import org.argouml.model.ModelFacade;
 import org.argouml.model.uml.UmlFactory;
 import org.argouml.model.uml.foundation.core.CoreHelper;
-import org.argouml.ui.ArgoDiagram;
 import org.argouml.ui.ProjectBrowser;
 import org.argouml.uml.diagram.ui.UMLDiagram;
 import org.argouml.util.FileFilters;
@@ -74,8 +67,8 @@ import org.tigris.gef.util.Util;
  */
 public class UMLInterface 
     implements ArgoPrintDataSource {
-    public static final String separator = "/";
-
+    private static final Logger LOG = Logger.getLogger(UMLInterface.class);
+    
     /**
      * The ArgoUML project that ArgoPrint is applied to. Must be
      * set prior to use by using the setProject(..) method
@@ -93,11 +86,6 @@ public class UMLInterface
      */
     private List _classes; 
 
-    /**
-     * A reference to the ArgoUML Logger. (Uses log4java) 
-     */
-    private Logger _log;
-	
     /**
      * The ArgoPrint output dir. Used when saving diagrams as pictures. 
      * Must be set prior to use.
@@ -128,8 +116,7 @@ public class UMLInterface
      * Initializes fields prior to usage. Can be used instead of the 
      * individual setters.
      */
-    public void initialize(Logger log) {
-	_log = log;
+    public void initialize() {
 	_projectBrowser = ProjectBrowser.getInstance();
 	_project = ProjectManager.getManager().getCurrentProject();
     }
@@ -138,49 +125,35 @@ public class UMLInterface
     // setters
 
     /**
-     * Sets the logger (_log) to logger
-     */
-    public void setLog(Logger logger) { _log = logger; }
-    
-    /**
-     * Sets the projectBrowswer to browser
+     * Sets the projectBrowswer.
+     * 
+     * @param browser The browser.
      */
     public void setProjectBrowser(ProjectBrowser browser) {
 	_projectBrowser = browser;
     }
     
     /**
-     * Sets the project to proj
+     * Sets the project.
+     * 
+     * @param proj The project.
      */
-    public void setProject(Project proj) { _project = proj; }
+    public void setProject(Project proj) { 
+        _project = proj; 
+    }
 
     /**
-     * Sets the outputPath to path
+     * Sets the outputPath.
+     * 
+     * @param dir The path.
      */
-    public void setOutputDir(String dir) { _outputDir = new String(dir); }
+    public void setOutputDir(String dir) { 
+        _outputDir = dir; 
+    }
 
     ////////////////////////////////////////////////////////////////
     // main methods
-    
-    /**
-     * Checks if ModelFacade has a method named method. Depracated!
-     */
-    public boolean hasMethod(String method) {
-	Iterator iter = _classes.iterator();
-
-	while (iter.hasNext()) {
-	    Class c = (iter.next()).getClass();
-	    Method[] theMethods = c.getMethods();
-      
-	    for (int i = 0; i < theMethods.length; i++) {
-		if (method.equals(theMethods[i].getName())) {
-		    return true;
-		}
-	    }
-	}
-	return false;
-    }
-    
+        
     /**
      * @see ArgoPrintDataSource#caller(String, Object)
      * 
@@ -211,19 +184,19 @@ public class UMLInterface
 			    return theMethods[i].invoke(null, args);
 			}
 			catch (IllegalAccessException e) {
-			    _log.info("Crash" + e.getMessage());
+			    LOG.info("Crash" + e.getMessage());
 			}
 			catch (IllegalArgumentException e) {
-			    _log.info("Crash" + e.getMessage());
+			    LOG.info("Crash" + e.getMessage());
 			}
 			catch (InvocationTargetException e) {
-			    _log.info("Crash" + e.getMessage());
+			    LOG.info("Crash" + e.getMessage());
 			}
 			catch (NullPointerException e) {
-			    _log.info("Crash" + e.getMessage());
+			    LOG.info("Crash" + e.getMessage());
 			}
 			catch (ExceptionInInitializerError e) {
-			    _log.info("Crash" + e.getMessage());
+			    LOG.info("Crash" + e.getMessage());
 			}		   
 		    }	    
 		}
@@ -237,7 +210,11 @@ public class UMLInterface
     /**
      * Calls method named call in ModelFacade. Used when argument is to
      * be on of the default. ex. calledMethodName(model) and not an
-     * iteratorObject
+     * iteratorObject.
+     * 
+     * @param call The string to call.
+     * @return The result of the operation.
+     * @throws UnsupportedCallException if the call was incorrectly made.
      */
     public Object caller(String call) throws UnsupportedCallException {
 	
@@ -293,7 +270,7 @@ public class UMLInterface
 	    } else if (call.endsWith(")")) {
 
 		Method[] theMethods = c.getMethods();
-		int callLength = call.indexOf((int) '(') + 1;
+		int callLength = call.indexOf('(') + 1;
 	    
 		String callName = new String(call.substring(0, callLength - 1));
 		String arg = 
@@ -339,186 +316,77 @@ public class UMLInterface
     }
     
     /**
-     * Returns all diagrams in the project. TODO: Figure out a clever
-     * way to invoke with caller. Solved by using reflections on Project
-     * Therefor not needed.
-     */    
-    public Collection getAllDiagrams() {
-	return _project.getDiagrams();
-    }
-
-
-    /**
      * Saves a diagram as gif in the directory specified by _outputDir.
      * Returns a String with the path to the saved gif file.
      * TODO: Solve same Bug as in trySaveAllDiagrams() and implement 
-     * better control for overwrite of old files. 
+     * better control for overwrite of old files.
+     * 
+     * @param diagram The diagram to save.
+     * @return The name of the file created.
+     * @throws IOException if there is some problem with the creation 
+     *         of the files.
+     * @throws UnsupportedCallException if we cannot construct the diagram.
      */
     public String saveDiagram(UMLDiagram diagram) 
-	throws Exception {
+    	throws IOException, UnsupportedCallException {
+        
 	//Todo: fix bug mentioned i trySaveAllDiagrams
 
-	if ( diagram instanceof Diagram ) {
+	if (diagram != null) {
 	    String defaultName = ((Diagram) diagram).getName();
-	    _log.info("active diagram" + 
+	    LOG.info("active diagram" + 
 		      _project.getActiveDiagram().getName());
-	    _project.setActiveDiagram((ArgoDiagram) diagram);
-	    _log.info("active diagram" + 
+	    _project.setActiveDiagram(diagram);
+	    LOG.info("active diagram" + 
 		      _project.getActiveDiagram().getName());
 	    
 	    defaultName = Util.stripJunk(defaultName);
 	    
-	    _log.info("diagram name " + defaultName);
+	    LOG.info("diagram name " + defaultName);
 	    
 	    File defFile = 
 		new File(_outputDir 
 			 + defaultName + "."
 			 + FileFilters.GIFFilter._suffix);
 		
-	    _log.info("diagram filename " + defaultName + "."
+	    LOG.info("diagram filename " + defaultName + "."
 		      + FileFilters.GIFFilter._suffix);
 
 	    if (defFile != null) {
 		String path = defFile.getParent();
-		_log.info("diagram path " + path); 
+		LOG.info("diagram path " + path); 
 		    
 		String name = defFile.getName();
-		_log.info("diagram name " + name);
+		LOG.info("diagram name " + name);
 		    
 		String extension = SuffixFilter.getExtension(defFile);
-		_log.info("diagram ext " + extension);
+		LOG.info("diagram ext " + extension);
 		    
 		CmdSaveGraphics cmd = null;
 			
 		cmd = new CmdSaveGIF();
 			    
 
-		if ( !path.endsWith( separator ) ) {
-		    path += separator;
+		if ( !path.endsWith( "/" ) ) {
+		    path += "/";
 		}
 			
 		_projectBrowser.showStatus( "Writing " + path + name + "..." );
-		_log.info( "Writing " + path + name + "..." );    
+		LOG.info( "Writing " + path + name + "..." );    
 
-		if ( defFile.exists() ) {
-		    String t = "Overwrite " + path + name;
-		    int response =
-			JOptionPane.showConfirmDialog(_projectBrowser,
-						      t, t,
-						      JOptionPane.YES_NO_OPTION);
-		    if (response == JOptionPane.NO_OPTION) { 
-			throw new Exception("Cannot overwrite file");
-		    }
-		}
-		    
 		FileOutputStream fo = new FileOutputStream( defFile );
 		cmd.setStream(fo);
 		cmd.doIt();
 		fo.close();
 		_projectBrowser.showStatus( "Wrote " + path + name );
-		_log.info( "Wrote " + path + name + "..." );
+		LOG.info( "Wrote " + path + name + "..." );
 		//return true;
 		return path + name;
 	    }
 	}
 	
-	throw new Exception("Not a valid diagram");
+	throw new UnsupportedCallException("Not a valid diagram");
     }
-
-    /**
-     * Tests saving of diagrams as gif-files.
-     * TODO: Solve bug that causes only open diagram to
-     * be saved. 
-     */
-    public boolean trySaveAllDiagrams( boolean overwrite ) {
-	
-	_log.info("trySaveAllDiagrams started");
-
-	Vector diagramVector =
-	    _project.getDiagrams();
-	
-	int diagramVectorSize = diagramVector.size();
-		
-	for (int i = 0; i < diagramVectorSize; i++) {
-	    Object target = diagramVector.elementAt(i); 
-	    
-	    if ( target instanceof Diagram ) {
-		String defaultName = ((Diagram) target).getName();
-		_log.info("active diagram" + 
-			  _project.getActiveDiagram().getName());
-		_project.setActiveDiagram((ArgoDiagram) target);
-		_log.info("active diagram" + 
-			_project.getActiveDiagram().getName());
-
-		defaultName = Util.stripJunk(defaultName);
-
-		_log.info("diagram name " + defaultName);
-
-		try {
-		    File defFile = 
-			new File("/home/pum3/danielsson/" + 
-				 defaultName + "."
-				 + FileFilters.GIFFilter._suffix);
-
-		    _log.info("diagram filename " + defaultName + "."
-			     + FileFilters.GIFFilter._suffix);
-
-		    if (defFile != null) {
-			String path = defFile.getParent();
-			_log.info("diagram path " + path); 
-
-			String name = defFile.getName();
-			_log.info("diagram name " + name);
-
-			String extension = SuffixFilter.getExtension(defFile);
-			_log.info("diagram ext " + extension);
-     
-			CmdSaveGraphics cmd = null;
-			    
-			cmd = new CmdSaveGIF();
-			    
-
-			if ( !path.endsWith( separator ) ) {
-			    path += separator;
-			}
-			
-			_projectBrowser.showStatus( "Writing " + path + name + "..." );
-			_log.info( "Writing " + path + name + "..." );    
-
-			if ( defFile.exists() && !overwrite ) {
-			    String t = "Overwrite " + path + name;
-			    int response =
-				JOptionPane.showConfirmDialog(_projectBrowser,
-							      t, t,
-							      JOptionPane.YES_NO_OPTION);
-			    if (response == JOptionPane.NO_OPTION) return false;
-			}
-			    
-			FileOutputStream fo = new FileOutputStream( defFile );
-			cmd.setStream(fo);
-			cmd.doIt();
-			fo.close();
-			_projectBrowser.showStatus( "Wrote " + path + name );
-			_log.info( "Wrote " + path + name + "..." );
-			//return true;
-		    }
-		    
-		}
-		catch ( FileNotFoundException ignore ) {
-		    //cat.error("got a FileNotFoundException", ignore);
-		}
-		catch ( IOException ignore ) {
-		    //cat.error("got an IOException", ignore);
-		}
-		
-		//diagramVector.removeElementAt(0);
-	    }
-
-	    //return false;
-	}
-	return true;
-    } /*end of method save all diags */
-   
 } /* end class UMLInteface */
 
 
