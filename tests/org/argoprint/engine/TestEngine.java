@@ -16,7 +16,7 @@ public class TestEngine extends TestCase {
     /** Specifies the test suite.
      */
     public static Test suite() {
-        return null;
+        return new TestSuite(TestEngine.class);
     }
 
     /** Tests the Main.initializeSystem()-method.
@@ -30,7 +30,7 @@ public class TestEngine extends TestCase {
         _main.initializeSystem(s);
     }
 
-    public void testGoWithoutInitialize() {
+    public void testGoWithoutInitialize() throws Exception {
         boolean caught_exception = false;
         try {
             _main.go();
@@ -42,6 +42,7 @@ public class TestEngine extends TestCase {
         if (!caught_exception) {
             fail("Go-method did not throw an exception!");
         }
+
     }
 
     /** @See junit.framework.TestCase#setUp()
@@ -49,6 +50,6 @@ public class TestEngine extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         _main = new Main(false);
-        assertNotNull("Could not create a Main object.", _main);
+        assertNotNull("Could not create a Main-object.", _main);
     }
 }
