@@ -160,7 +160,7 @@ public class UMLInterface {
 
     /**
      * Calls method named call in ModelFacade 
-     * returns Object, which is String, Collection
+     * returns Object, which often is String or Collection
      */
     public Object caller(String call, Object args[]){
 	if(hasMethod(call)){
@@ -194,8 +194,12 @@ public class UMLInterface {
 	//should trow exception
 	return new String("Not a known method");
     }
-
     
+    /**
+     * Calls method named call in ModelFacade 
+     * returns boolean, caller(..) can be used instead but
+     * then Booolean.booleanValue() must be used 
+     */
     public boolean booleanCaller(String call, Object args[]){
 	if(hasMethod(call)){
 	    Class c = facade.getClass();
@@ -231,6 +235,11 @@ public class UMLInterface {
 	//return new String("Not a known method");
     }
 
+    /**
+     * Tests saving of diagrams as gif-files.
+     * TODO: Solve bug that causes only open diagram to
+     * be saved. 
+     */
     public boolean trySaveAllDiagrams( boolean overwrite ) {
 	
 	log.info("trySaveAllDiagrams started");
@@ -243,7 +252,7 @@ public class UMLInterface {
 	for(int i = 0; i < diagramVectorSize; i++){
 	    Object target = diagramVector.elementAt(i); 
 	    
-	    if ( target instanceof Diagram ) {
+	    if( target instanceof Diagram ) {
 		String defaultName = ((Diagram) target).getName();
 		log.info("active diagram" + 
 			 project.getActiveDiagram().getName());
@@ -322,4 +331,4 @@ public class UMLInterface {
 	return true;
     }/*end of method save all diags */
    
-} /* end class ActionSaveGraphics */
+} /* end class UMLInteface */
