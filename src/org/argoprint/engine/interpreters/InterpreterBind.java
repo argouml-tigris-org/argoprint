@@ -31,6 +31,8 @@
 //THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.argoprint.engine.interpreters;
+import java.util.Vector;
+
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.engine.Environment;
 import org.w3c.dom.Document;
@@ -71,21 +73,23 @@ public class InterpreterBind extends Interpreter {
                 if (attr == null)
                     throw new BadTemplateException("attr tag contains no name attribute.");
                 children = child.getChildNodes();
-                if (children.getLength() != 1)
-                    throw new BadTemplateException("attr tag must have excactly one child.");
                 // Recurse on the contents of the attr tag.
-                _firstHandler.handleTag(children.item(0), env);
+                Vector childrenVector = getVector(children);
+                recurse(childrenVector, env);
+                child.normalize();
+				
+				// Extract the text and put it in the attribute	                
                 children = child.getChildNodes();
-                if (children.getLength() != 1)
-                    throw new BadTemplateException("Child of attr tag must evaluate to excatly one tag.");
-                if (children.item(0).getNodeType() != Node.TEXT_NODE)
-                    throw new BadTemplateException("Child of attr tag must evaluate to text.");
-                newElement.setAttribute(attr.getNodeValue(), children.item(0).getNodeValue());
+				if (children.getLength() == 0)
+					newElement.setAttribute(attr.getNodeValue(), "");
+                else if ((children.item(0).getNodeType() == Node.TEXT_NODE) && (children.getLength() == 1))  
+					newElement.setAttribute(attr.getNodeValue(), children.item(0).getNodeValue());
+				else
+                    throw new BadTemplateException("Malformed attr tag.");
                 i++;
             }
             else {
                 tagNode.removeChild(child);
-                
                 newElement.appendChild(child);
                 _firstHandler.handleTag(child, env);
                 // Don't increment i since removeChild removed index i
