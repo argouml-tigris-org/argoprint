@@ -16,7 +16,7 @@
 
     <property name="ant.xml-libs" value="${ANT_HOME}/lib/jaxp.jar:${ANT_HOME}/lib/parser.jar"/>
 
-    <property name="debug" value="off"/>
+    <property name="debug" value="on"/>
     <property name="optimize" value="on"/>
     <property name="deprecation" value="off"/>
 
