@@ -1,5 +1,5 @@
 //$Id$
-//Copyright (c) 2003, Mikael Albertsson, Mattias Danielsson, Per Engström, 
+//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
 //All rights reserved.
@@ -41,16 +41,10 @@ package org.argoprint.ui;
 import org.argoprint.uml_interface.*;
 import org.argoprint.engine.*;
 
-import org.argouml.kernel.Project;
-import org.argouml.kernel.ProjectManager;
-import org.argouml.ui.ProjectBrowser;
-
-import org.argouml.model.ModelFacade;
+import org.argouml.util.SuffixFilter;
 
 import java.awt.*;
 import java.awt.event.*;
-
-import java.lang.*;
 
 import java.util.*;
 
@@ -58,7 +52,6 @@ import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.filechooser.*;
-import java.awt.*;
 
 /**
  *
@@ -73,7 +66,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
      *
      * @param logger a Logger
      */
-    public void setLog(Logger logger){ log = logger; }
+    public void setLog(Logger logger) { log = logger; }
     
     /**
      * Creates new form JDialog
@@ -109,8 +102,8 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 	/** Dialog config */
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("ArgoPrint");
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent evt) {
                 closeDialog(evt);
             }
         });
@@ -131,15 +124,16 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 	
         jUIPanel.add(jTemplateLabel);
 
-        jTemplateTextField.setText("myTemplate.xml");
+        jTemplateTextField.setText(templateFilename);
 	
         jUIPanel.add(jTemplateTextField);
 
         jTemplateBrowseButton.setText("Browse");
-        jTemplateBrowseButton.addActionListener(new java.awt.event.ActionListener() {
-		public void actionPerformed(java.awt.event.ActionEvent evt) {
-		    jTemplateBrowseButtonActionPerformed(evt);
-		}
+        jTemplateBrowseButton.addActionListener(new ActionListener() {
+	    public void actionPerformed(ActionEvent evt) {
+		jTemplateBrowseButtonActionPerformed(evt);
+	    }
+
         });
 
 	jUIPanel.add(jTemplateBrowseButton);
@@ -150,8 +144,8 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
         jUIPanel.add(jOutputFileTextField);
 
         jOutputFileBrowseButton.setText("Browse");
-        jOutputFileBrowseButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jOutputFileBrowseButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jOutputFileBrowseButtonActionPerformed(evt);
             }
         });
@@ -169,8 +163,8 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
         jUIPanel.add(jOutputDirTextField);
 
         jOutputDirBrowseButton.setText("Browse");
-        jOutputDirBrowseButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jOutputDirBrowseButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jOutputDirBrowseButtonActionPerformed(evt);
             }
         });
@@ -178,8 +172,8 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
         jUIPanel.add(jOutputDirBrowseButton);
 
         jGenerateButton.setText("Generate");
-        jGenerateButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jGenerateButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jGenerateButtonActionPerformed(evt);
             }
         });
@@ -188,8 +182,8 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 
 
         jCancelButton.setText("Cancel");
-        jCancelButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jCancelButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 jCancelButtonActionPerformed(evt);
             }
         });
@@ -205,7 +199,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
      *
      * @param evt action event!!!
      */
-    private void jCancelButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void jCancelButtonActionPerformed(ActionEvent evt) {
 	setVisible( false );
         dispose();
     }
@@ -215,14 +209,14 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
      *
      * @param evt action event!!!
      */
-    private void jOutputDirBrowseButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void jOutputDirBrowseButtonActionPerformed(ActionEvent evt) {
 
         JFileChooser chooser = new JFileChooser();
         
         chooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
         int returnVal = chooser.showOpenDialog( this );
-        if(returnVal == JFileChooser.APPROVE_OPTION) {
-                jOutputDirTextField.setText( chooser.getSelectedFile().getPath() );
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	    jOutputDirTextField.setText( chooser.getSelectedFile().getPath() );
         }
     }
 
@@ -231,13 +225,13 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
      *
      * @param evt action event!!!
      */
-    private void jOutputFileBrowseButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void jOutputFileBrowseButtonActionPerformed(ActionEvent evt) {
         
         JFileChooser chooser = new JFileChooser();
         
         int returnVal = chooser.showOpenDialog( this );
-        if(returnVal == JFileChooser.APPROVE_OPTION) {
-                jOutputFileTextField.setText( chooser.getSelectedFile().getPath() );
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	    jOutputFileTextField.setText(chooser.getSelectedFile().getPath());
         }
     }
 
@@ -246,13 +240,17 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
      *
      * @param evt action event!!!
      */
-    private void jTemplateBrowseButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void jTemplateBrowseButtonActionPerformed(ActionEvent evt) {
 
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = new JFileChooser(jTemplateTextField.getText());
         
+	SuffixFilter filter = new SuffixFilter("xml", "An XML file.");
+	chooser.addChoosableFileFilter(filter);
+	chooser.setFileFilter(filter);
+
         int returnVal = chooser.showOpenDialog( this );
-        if(returnVal == JFileChooser.APPROVE_OPTION) {
-                jTemplateTextField.setText(chooser.getSelectedFile().getPath() );
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	    jTemplateTextField.setText(chooser.getSelectedFile().getPath());
         }
 
     }
@@ -262,7 +260,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
      *
      * @param evt action event!!!
      */
-    private void jGenerateButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void jGenerateButtonActionPerformed(ActionEvent evt) {
 	/******************************************************
          * This is where Engine is invoked!!!!!
          *
@@ -289,8 +287,9 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 //  	    JOptionPane.showMessageDialog( this, e.getMessage()); 
 //  	}
 	
-	try{
-	    Settings settings = new Settings(jTemplateTextField.getText(),
+	try {
+	    templateFilename = jTemplateTextField.getText();
+	    Settings settings = new Settings(templateFilename,
 					     jOutputFileTextField.getText(),
 					     jOutputDirTextField.getText());
 	
@@ -299,7 +298,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 	    main.initializeSystem(settings, log);
 	    main.go();
 	}
-	catch(Exception e){
+	catch (Exception e) {
 	    JOptionPane.showMessageDialog( this, e.getMessage());   
 	    e.printStackTrace();
 	    return;
@@ -313,7 +312,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
      *
      * @param evt window event!!!
      */
-    private void closeDialog(java.awt.event.WindowEvent evt) {
+    private void closeDialog(WindowEvent evt) {
         setVisible(false);
         dispose();
     }
@@ -338,8 +337,13 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
     private javax.swing.JTextField jOutputFileTextField;
     /** template text field */
     private javax.swing.JTextField jTemplateTextField;
-    /** THE PYGMY SHREW!!! */
-//  private javax.swing.JLabel jLabel4;
+    /**
+     * Remember the last file we used.
+     *
+     * TODO: This is not a very beautiful solution.
+     */
+    private static String templateFilename = "myTemplate.xml";
+
     /** output dir label */
     private javax.swing.JLabel jOutputDirLabel;
     /** output file label */

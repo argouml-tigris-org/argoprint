@@ -1,5 +1,5 @@
 //$Id$
-//Copyright (c) 2003, Mikael Albertsson, Mattias Danielsson, Per Engström, 
+//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
 //All rights reserved.
@@ -44,85 +44,96 @@ import org.w3c.dom.*;
 
 public class InterpreterIterate extends Interpreter {
 
-	public InterpreterIterate(ArgoPrintDataSource dataSource) {
-		super("iterate", dataSource);
+    public InterpreterIterate(ArgoPrintDataSource dataSource) {
+	super("iterate", dataSource);
+    }
+
+    /**
+     * Processes the iterate tag.
+     *
+     * @see Interpreter#processTag
+     */
+    protected void processTag(Node tagNode, Environment env) throws Exception {
+	NamedNodeMap attributes = tagNode.getAttributes();
+		
+	// Get the collection
+	Object callReturnValue = callDataSource("what", attributes, env);
+	if (!(callReturnValue instanceof Collection)
+	    && !(callReturnValue instanceof Object)) {
+	    throw new Exception("The object returned from the call "
+				+ "to the data source is not a collection.");
+	} else if (!(callReturnValue instanceof Collection)
+		   && (callReturnValue instanceof Object)) {
+	    ArrayList tmpCollection = new ArrayList();
+	    tmpCollection.add(callReturnValue);
+	    callReturnValue = tmpCollection;
 	}
+		
+		
+	Collection iterateCollection = (Collection) callReturnValue;
 
-	/**
-	 * Processes the iterate tag.
-	 */
-	protected void processTag(Node tagNode, Environment env) throws Exception {
-		NamedNodeMap attributes = tagNode.getAttributes();
-		
-		// Get the collection
-		Object callReturnValue = callDataSource("what", attributes, env);
-		if (!(callReturnValue instanceof Collection) && 
-		    !(callReturnValue instanceof Object)){
-			throw new Exception("The object returned from the call to the data source is not a collection.");
-		} else if (!(callReturnValue instanceof Collection) && 
-			   (callReturnValue instanceof Object)){
-		    ArrayList tmpCollection = new ArrayList();
-		    tmpCollection.add(callReturnValue);
-		    callReturnValue = tmpCollection;
-		}
-		
-		
-		Collection iterateCollection = (Collection) callReturnValue;
-
-		Node sortvalueAttribute = attributes.getNamedItem("sortvalue");
-		if (sortvalueAttribute != null) {
-			String sortvalue = sortvalueAttribute.getNodeValue();
-			iterateCollection = sortCollection(iterateCollection, sortvalue);
-		}
+	Node sortvalueAttribute = attributes.getNamedItem("sortvalue");
+	if (sortvalueAttribute != null) {
+	    String sortvalue = sortvalueAttribute.getNodeValue();
+	    iterateCollection = sortCollection(iterateCollection, sortvalue);
+	}
 			
-		Node iteratornameAttribute = attributes.getNamedItem("iteratorname");
-		if (iteratornameAttribute == null) 
-			throw new BadTemplateException("Iterate tag contains no iteratorname attribute.");
-		String iteratorname = iteratornameAttribute.getNodeValue();
+	Node iteratornameAttribute = attributes.getNamedItem("iteratorname");
+	if (iteratornameAttribute == null) 
+	    throw new BadTemplateException("Iterate tag contains no "
+					   + "iteratorname attribute.");
+	String iteratorname = iteratornameAttribute.getNodeValue();
 		
-		ArgoPrintIterator iterator = new ArgoPrintIterator(iterateCollection.iterator());
-		env.addIterator(iteratorname, iterator);
+	ArgoPrintIterator iterator =
+	    new ArgoPrintIterator(iterateCollection.iterator());
+	env.addIterator(iteratorname, iterator);
 
-		Document document = tagNode.getOwnerDocument();
-		Node parentNode = tagNode.getParentNode();
-		NodeList children = tagNode.getChildNodes();
-		Node newNode;
+	Document document = tagNode.getOwnerDocument();
+	Node parentNode = tagNode.getParentNode();
+	NodeList children = tagNode.getChildNodes();
+	Node newNode;
 
-		// For every object in the iterator, clone every child, attach it to the parent and recurse
-		while (iterator.hasNext()) {
-			iterator.next();
-			for (int i = 0; i < children.getLength(); i++) {
-				newNode = children.item(i).cloneNode(true);
-				parentNode.insertBefore(newNode, tagNode);
-				_firstHandler.handleTag(newNode, env);
-			}
-		}
-		env.removeIterator(iteratorname);
-		parentNode.removeChild(tagNode);
+	// For every object in the iterator, clone every child, attach
+	// it to the parent and recurse
+	while (iterator.hasNext()) {
+	    iterator.next();
+	    for (int i = 0; i < children.getLength(); i++) {
+		newNode = children.item(i).cloneNode(true);
+		parentNode.insertBefore(newNode, tagNode);
+		_firstHandler.handleTag(newNode, env);
+	    }
 	}
+	env.removeIterator(iteratorname);
+	parentNode.removeChild(tagNode);
+    }
 	
-	/**
-	 * Sorts a Collection according to a String returned by a call to the data source for each object in the collection. 
-	 * 
-	 * @param collection The collection to sort.
-	 * @param sortvalue The call that will be applied to each object providing a value to sort on.
-	 * @return A sorted Collection.
-	 * @throws Exception
-	 */
-	private Collection sortCollection(Collection collection, String sortvalue) throws Exception {
-		Iterator iterator = collection.iterator();
-		TreeMap sortedMap = new TreeMap();
-		Object object;
-		Object returned;
-		while (iterator.hasNext()) {
-			object = iterator.next();
-			returned = _dataSource.caller(sortvalue, object);
-			if (returned == null)
-				returned = "null";
-			else if (!(returned instanceof String))
-				throw new Exception("The sortvalue function did not return a String.");
-			sortedMap.put(returned, object);
-		}
-		return sortedMap.values();
+    /**
+     * Sorts a Collection according to a String returned by a call to
+     * the data source for each object in the collection.
+     * 
+     * @param collection The collection to sort.
+     * @param sortvalue The call that will be applied to each object
+     * providing a value to sort on.
+     * @return A sorted Collection.
+     * @throws Exception
+     */
+    private Collection sortCollection(Collection collection, String sortvalue)
+	throws Exception {
+
+	Iterator iterator = collection.iterator();
+	TreeMap sortedMap = new TreeMap();
+	Object object;
+	Object returned;
+	while (iterator.hasNext()) {
+	    object = iterator.next();
+	    returned = _dataSource.caller(sortvalue, object);
+	    if (returned == null)
+		returned = "null";
+	    else if (!(returned instanceof String))
+		throw new Exception("The sortvalue function did not "
+				    + "return a String.");
+	    sortedMap.put(returned, object);
 	}
+	return sortedMap.values();
+    }
 }

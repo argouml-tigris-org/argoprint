@@ -1,5 +1,5 @@
 //$Id$
-//Copyright (c) 2003, Mikael Albertsson, Mattias Danielsson, Per Engström, 
+//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
 //All rights reserved.
@@ -41,51 +41,78 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * This Interpreter handle the bind tag.
+ *
+ * The bind tag looks like this:
+ * <ap:bind name="NAME"><ap:attr name="NAME">blabla</ap:attr>...</ap:bind>
+ *
+ * TODO:
+ * Suggested new version of this tag to allow:
+ * <ap:bind name="NAME">
+ *   <ap:attr>
+ *     <ap:name>blabla</ap:name>
+ *     <ap:value>blabla</ap:value>
+ *   </ap:attr>
+ *   <ap:attr>
+ *     <ap:name>blabla</ap:name>
+ *     <ap:value>blabla</ap:value>
+ *   </ap:attr>
+ *   ...
+ *   <ap:contents>
+ *     blabla
+ *   </ap:contents>
+ * </ap:bind>
+ */
 public class InterpreterBind extends Interpreter {
 
-	public InterpreterBind(ArgoPrintDataSource dataSource) {
-		super("bind", dataSource);
-	}
+    public InterpreterBind(ArgoPrintDataSource dataSource) {
+	super("bind", dataSource);
+    }
 
-	/**
-	 * Processes the bind tag.
-	 * 
-	 * @param tagNode
-	 * @param env
-	 */
-	protected void processTag(Node tagNode, Environment env) throws Exception {
+    /**
+     * Processes the bind tag.
+     * 
+     * @see Interpreter
+     */
+    protected void processTag(Node tagNode, Environment env) throws Exception {
 		
-		// Create the new element
-		NamedNodeMap attributes = tagNode.getAttributes();
-		Node attr = attributes.getNamedItem("name");
-		if (attr == null)
-			throw new BadTemplateException("Bind tag contains no name attribute.");
-		Document document = tagNode.getOwnerDocument();
-		Element newElement = document.createElement(attr.getNodeValue());
+	// Create the new element
+	NamedNodeMap attributes = tagNode.getAttributes();
+	Node attr = attributes.getNamedItem("name");
+	if (attr == null)
+	    throw new BadTemplateException("Bind tag contains no "
+					   + "name attribute.");
+	Document document = tagNode.getOwnerDocument();
+	Element newElement = document.createElement(attr.getNodeValue());
 
         NodeList children;
-		NodeList bindChildren = tagNode.getChildNodes();
-		for (int i = 0; i < bindChildren.getLength();) {
+	NodeList bindChildren = tagNode.getChildNodes();
+	for (int i = 0; i < bindChildren.getLength();) {
             Node child = bindChildren.item(i);
-			if (isNodeNamed(child, PREFIX, "attr")) {
-				attributes = child.getAttributes();
-				attr = attributes.getNamedItem("name");
+	    if (isNodeNamed(child, "attr")) {
+		attributes = child.getAttributes();
+		attr = attributes.getNamedItem("name");
                 if (attr == null)
-                    throw new BadTemplateException("attr tag contains no name attribute.");
+                    throw new BadTemplateException("attr tag contains no "
+						   + "name attribute.");
                 children = child.getChildNodes();
                 // Recurse on the contents of the attr tag.
                 Vector childrenVector = getVector(children);
                 recurse(childrenVector, env);
                 child.normalize();
 				
-				// Extract the text and put it in the attribute	                
+		// Extract the text and put it in the attribute
                 children = child.getChildNodes();
-				if (children.getLength() == 0)
-					newElement.setAttribute(attr.getNodeValue(), "");
-                else if ((children.item(0).getNodeType() == Node.TEXT_NODE) && (children.getLength() == 1))  
-					newElement.setAttribute(attr.getNodeValue(), children.item(0).getNodeValue());
-				else
+		if (children.getLength() == 0) {
+		    newElement.setAttribute(attr.getNodeValue(), "");
+		} else if ((children.item(0).getNodeType() == Node.TEXT_NODE)
+			   && (children.getLength() == 1)) {
+		    newElement.setAttribute(attr.getNodeValue(),
+					    children.item(0).getNodeValue());
+		} else {
                     throw new BadTemplateException("Malformed attr tag.");
+		}
                 i++;
             }
             else {

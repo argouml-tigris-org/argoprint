@@ -1,5 +1,5 @@
 //$Id$
-//Copyright (c) 2003, Mikael Albertsson, Mattias Danielsson, Per Engström, 
+//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
 //All rights reserved.
@@ -38,69 +38,79 @@ import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.engine.Environment;
 import org.w3c.dom.*;
 
+/**
+ * This Interpreter processes the if tag.
+ *
+ * The if tag looks like this:
+ * <ap:if cond="VALUE">blabla</ap:if>,
+ * <ap:if cond="VALUE"><ap:then>blabla</ap:then></ap:if>, or
+ * <ap:if cond="VALUE">
+ *   <ap:then>blabla</ap:then>
+ *   <ap:else>blabla</ap:else>
+ * </ap:if>
+ */
 public class InterpreterIf extends Interpreter {
 
-	public InterpreterIf(ArgoPrintDataSource dataSource) {
-		super("if", dataSource);
+    public InterpreterIf(ArgoPrintDataSource dataSource) {
+	super("if", dataSource);
+    }
+
+    /**
+     * Processes the if tag.
+     *
+     * @see Interpreter
+     */
+    protected void processTag(Node tagNode, Environment env) throws Exception {
+	// TODO: divide into some private methods
+
+	// Evaluate condition
+	NamedNodeMap attributes = tagNode.getAttributes();
+	Object returnValue = callDataSource("cond", attributes, env);
+	if (!(returnValue instanceof Boolean))
+	    throw new BadTemplateException("The condition did not evaluate "
+					   + "to a Boolean.");
+		
+	NodeList ifChildren = tagNode.getChildNodes();
+		
+	// Find then and else nodes
+	// TODO: What should happen if we have several "then" or several "else"
+	Node thenNode = null;
+	Node elseNode = null;
+	for (int i = 0; i < ifChildren.getLength(); i++) {
+	    if (isNodeNamed(ifChildren.item(i), "then"))
+		thenNode = ifChildren.item(i);
+	    else if (isNodeNamed(ifChildren.item(i), "else"))
+		elseNode = ifChildren.item(i);
 	}
-
-	/**
-	 * Processes the if tag.
-	 * 
-	 * @param tagNode
-	 * @param env
-	 */
-	protected void processTag(Node tagNode, Environment env) throws Exception {
-		// TODO: divide into some private methods
-
-		// Evaluate condition
-		NamedNodeMap attributes = tagNode.getAttributes();
-		Object returnValue = callDataSource("cond", attributes, env);
-		if (!(returnValue instanceof Boolean))
-			throw new BadTemplateException("The condition did not evaluate to a Boolean.");
-		
-		NodeList ifChildren = tagNode.getChildNodes();
-		
-		// Find then and else nodes
-		Node thenNode = null;
-		Node elseNode = null;
-		for (int i = 0; i < ifChildren.getLength(); i++) {
-			if (isNodeNamed(ifChildren.item(i), PREFIX, "then"))
-				thenNode = ifChildren.item(i);
-			else if (isNodeNamed(ifChildren.item(i), PREFIX, "else"))
-				elseNode = ifChildren.item(i);
-		}
 						
-		// Decide what part of the sub tree (if any) shall be used
-		NodeList resultChildren;
-		if (((Boolean)returnValue).booleanValue()) {
-			if (thenNode == null)
-				resultChildren = ifChildren;
-			else
-				resultChildren = thenNode.getChildNodes();
-		}
-		else {
-			if (elseNode == null)
-				resultChildren = null;
-			else
-				resultChildren = elseNode.getChildNodes();
-		}
-		
-		// Attach the result to parent and remove if tag
-		Node ifParent = tagNode.getParentNode();
-		if (!(resultChildren == null || resultChildren.getLength() == 0)) { 
-			Node resultParent = resultChildren.item(0).getParentNode();
-			Vector resultVector = getVector(resultChildren);
-			for (int i = 0; i < resultVector.size(); i++) {
-				Node child = (Node)resultVector.get(i);
-				resultParent.removeChild(child);
-				ifParent.insertBefore(child, tagNode);
-			}
-			recurse(resultVector, env);
-		}
-		ifParent.removeChild(tagNode);
+	// Decide what part of the sub tree (if any) shall be used
+	NodeList resultChildren;
+	if (((Boolean) returnValue).booleanValue()) {
+	    if (thenNode == null)
+		resultChildren = ifChildren;
+	    else
+		resultChildren = thenNode.getChildNodes();
 	}
-	
-
+	else {
+	    if (elseNode == null)
+		resultChildren = null;
+	    else
+		resultChildren = elseNode.getChildNodes();
+	}
+		
+	// Attach the result to parent and remove if tag
+	Node ifParent = tagNode.getParentNode();
+	if (!(resultChildren == null || resultChildren.getLength() == 0)) { 
+	    Node resultParent = resultChildren.item(0).getParentNode();
+	    Vector resultVector = getVector(resultChildren);
+	    for (int i = 0; i < resultVector.size(); i++) {
+		Node child = (Node) resultVector.get(i);
+		resultParent.removeChild(child);
+		ifParent.insertBefore(child, tagNode);
+	    }
+	    recurse(resultVector, env);
+	}
+	ifParent.removeChild(tagNode);
+    }
 }
 	

@@ -1,5 +1,5 @@
 //$Id$
-//Copyright (c) 2003, Mikael Albertsson, Mattias Danielsson, Per Engström, 
+//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
 //All rights reserved.
@@ -41,7 +41,7 @@ import org.argoprint.engine.*;
 /**
  * Superclass for the interpreters.
  */
-abstract public class Interpreter{
+public abstract class Interpreter {
     protected static final String PREFIX = "ap";
     private String _tagName;
     private Interpreter _nextHandler;
@@ -53,7 +53,8 @@ abstract public class Interpreter{
     
     /**
      * @param tagName The name of the tag that this Interpreter can process.
-     * @param dataSource The ArgoPrintDataSource that this Interpreter should fetch data from.
+     * @param dataSource The ArgoPrintDataSource that this Interpreter
+     * should fetch data from.
      */
     public Interpreter(String tagName, ArgoPrintDataSource dataSource) {
     	_tagName = tagName;
@@ -85,6 +86,8 @@ abstract public class Interpreter{
      *  
      * @param tagNode The Node to handle.
      * @param env The environment in which the Node is to be processed.
+     * @throws Exception if anything goes wrong, either in the datasource or 
+     * in the parsing of the template.
      */
     public void handleTag(Node tagNode, Environment env)
 	throws Exception {
@@ -92,54 +95,69 @@ abstract public class Interpreter{
 	    processTag(tagNode, env);
 	else
 	    if (_nextHandler == null)
-		throw new Exception("The last Interpreter in the chain could not handle the Node.");
+		throw new Exception("The last Interpreter in the chain "
+				    + "could not handle the Node.");
 	    else
 		_nextHandler.handleTag(tagNode, env);	
     }
 
-    protected abstract void processTag(Node tagNode, Environment env) throws Exception;
+
+    /**
+     * Processes the tag.
+     *
+     * @param tagNode is the node to process
+     * @param env is the environment that the node has.
+     * @throws Exception if anything goes wrong.
+     */
+    protected abstract void processTag(Node tagNode, Environment env)
+	throws Exception;
 
     /**
      * Checks if this Interpreter can handle this Node.
      * 
-     * @param tagNode
-     * @return
+     * @param tagNode the node
+     * @return true if this Interpreter can handle this node.
      */
-    protected boolean canHandle(Node tagNode){
-	if (tagNode.getNodeType() == Node.ELEMENT_NODE && tagNode.getLocalName().equals(_tagName) && tagNode.getPrefix().equals(PREFIX)) {
-	    return true;
-	}
-	else {
-	    return false;
-	}
+    protected boolean canHandle(Node tagNode) {
+	return (tagNode.getNodeType() == Node.ELEMENT_NODE
+		&& tagNode.getLocalName().equals(_tagName)
+		&& tagNode.getPrefix().equals(PREFIX));
     }
     
     /**
-     * Uses the attributes what and iterator to call the data source and return the value.
+     * Uses the attributes what and iterator to call the data source
+     * and return the value.
      * 
      * @param callAttr The name of the attribute containing the call.
-     * @param attributes A NamedNodeMap of map of attributes that must contain at least the attribute what.
+     * @param attributes A NamedNodeMap of map of attributes that must
+     * contain at least the attribute what.
      * @param env The Environment in which to process the call.
      * @return The Object as returned from the data source.
-     * @throws Exception
+     * @throws BadTemplateException if the correct attributes are not found.
+     * @throws Exception if the DataSource throws Exceptions.
      */
-    protected Object callDataSource(String callAttr, NamedNodeMap attributes, Environment env) 
-	throws Exception {
+    protected Object callDataSource(String callAttr,
+				    NamedNodeMap attributes, Environment env) 
+	throws BadTemplateException, Exception {
 	Node callAttrNode = attributes.getNamedItem(callAttr);
 	if (callAttrNode == null)
-	    throw new BadTemplateException(_tagName + " tag contains no " + callAttr +" attribute.");
+	    throw new BadTemplateException(_tagName + " tag contains no "
+					   + callAttr + " attribute.");
 	Object returnValue;
 	Node iteratorAttribute = attributes.getNamedItem("iterator");
 	if (iteratorAttribute == null)
 	    returnValue = _dataSource.caller(callAttrNode.getNodeValue());
 	else {
 	    if (!env.existsIterator(iteratorAttribute.getNodeValue()))
-		throw new BadTemplateException("Value of iterator in " + _tagName + 
-					       " tag does not correspond to a valid iterator. "
-					       + iteratorAttribute.getNodeValue());
+		throw new BadTemplateException(
+	                "Value of iterator in " + _tagName + 
+			" tag does not correspond to a valid iterator. "
+			+ iteratorAttribute.getNodeValue());
 	    
-	    ArgoPrintIterator iterator = env.getIterator(iteratorAttribute.getNodeValue());
-	    returnValue = _dataSource.caller(callAttrNode.getNodeValue(), iterator.currentObject());
+	    ArgoPrintIterator iterator =
+		env.getIterator(iteratorAttribute.getNodeValue());
+	    returnValue = _dataSource.caller(callAttrNode.getNodeValue(),
+					     iterator.currentObject());
 	}
 	return returnValue;
     }
@@ -148,13 +166,18 @@ abstract public class Interpreter{
 	if ((node.getLocalName() == null) || node.getPrefix() == null)
 	    return false;
 	else
-	    return (node.getLocalName().equals(localName) && node.getPrefix().equals(prefix));
+	    return (node.getLocalName().equals(localName)
+		    && node.getPrefix().equals(prefix));
+    }
+	
+    protected boolean isNodeNamed(Node node, String localName) {
+	return isNodeNamed(node, PREFIX, localName);
     }
 	
     protected Vector getVector(NodeList nodeList) { 
 	int numNodes = nodeList.getLength();
 	Vector vector = new Vector(numNodes);
-	for (int i = 0; i < numNodes; i++){
+	for (int i = 0; i < numNodes; i++) {
 	    vector.add(i, nodeList.item(i));
 	}
 	return vector;
@@ -162,7 +185,7 @@ abstract public class Interpreter{
 	
     protected void recurse(Vector nodes, Environment env) throws Exception {
 	for (int i = 0; i < nodes.size(); i++) {
-	    _firstHandler.handleTag((Node)nodes.get(i), env);
+	    _firstHandler.handleTag((Node) nodes.get(i), env);
 	}
     }
 }

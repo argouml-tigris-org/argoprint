@@ -1,5 +1,5 @@
 //$Id$
-//Copyright (c) 2003, Mikael Albertsson, Mattias Danielsson, Per Engström, 
+//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
 //All rights reserved.
@@ -38,27 +38,32 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+/**
+ * Handles the call tag.
+ *
+ * A call looks like this:
+ * <ap:call what="EXPRESSION"></ap:call>
+ */
 public class InterpreterCall extends Interpreter {
 
-	public InterpreterCall(ArgoPrintDataSource dataSource) {
-		super("call", dataSource);
-	}
+    public InterpreterCall(ArgoPrintDataSource dataSource) {
+	super("call", dataSource);
+    }
 
-	/**
-	 * Processes the call tag.
-	 * 
-	 * @param tagNode
-	 * @param env
-	 */
-	protected void processTag(Node tagNode, Environment env) throws Exception {
-		NamedNodeMap attributes = tagNode.getAttributes();
-		Object returnValue = callDataSource("what", attributes, env);
+    /**
+     * Processes the call tag.
+     * 
+     * @see Interpreter#processTag
+     */
+    protected void processTag(Node tagNode, Environment env) throws Exception {
+	NamedNodeMap attributes = tagNode.getAttributes();
+	Object returnValue = callDataSource("what", attributes, env);
         if (returnValue == null)
-            returnValue = new String("null");
-		Document document = tagNode.getOwnerDocument();
-		Node parentNode = tagNode.getParentNode();
-		Node fetchedData = document.createTextNode(returnValue.toString());
-		parentNode.replaceChild(fetchedData, tagNode);
-	}	
+            returnValue = "null";
+	Document document = tagNode.getOwnerDocument();
+	Node parentNode = tagNode.getParentNode();
+	Node fetchedData = document.createTextNode(returnValue.toString());
+	parentNode.replaceChild(fetchedData, tagNode);
+    }	
 }	
 	

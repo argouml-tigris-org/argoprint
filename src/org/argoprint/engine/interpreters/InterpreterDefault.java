@@ -1,5 +1,5 @@
 //$Id$
-//Copyright (c) 2003, Mikael Albertsson, Mattias Danielsson, Per Engström, 
+//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
 //All rights reserved.
@@ -40,25 +40,24 @@ import org.w3c.dom.NodeList;
 
 public class InterpreterDefault extends Interpreter {
 
-	public InterpreterDefault(ArgoPrintDataSource dataSource) {
-		super("", dataSource);
-	}
+    public InterpreterDefault(ArgoPrintDataSource dataSource) {
+	super("", dataSource);
+    }
 
-	/**
-	 * Only needs to recurse on the children.
-	 * 
-	 * @param tagNode
-	 * @param env
-	 */
-	protected void processTag(Node tagNode, Environment env) throws Exception {
-		NodeList children = tagNode.getChildNodes();
-		if (children.getLength() > 0) {
-			Vector childrenVector = getVector(children);
-			recurse(childrenVector, env);
-		}	
-	}
+    /**
+     * Only needs to recurse on the children.
+     * 
+     * @see Interpreter#processTag
+     */
+    protected void processTag(Node tagNode, Environment env) throws Exception {
+	NodeList children = tagNode.getChildNodes();
+	if (children.getLength() > 0) {
+	    Vector childrenVector = getVector(children);
+	    recurse(childrenVector, env);
+	}	
+    }
 
-	protected boolean canHandle(Node tagNode){
-		return true;
-	}
+    protected boolean canHandle(Node tagNode) {
+	return true;
+    }
 }

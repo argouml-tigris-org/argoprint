@@ -38,9 +38,8 @@ package org.argoprint;
  * An interface that should be implemented by a class that acts as a data 
  * source for ArgoPrint.
  */
-public abstract interface ArgoPrintDataSource {
-    public abstract Object caller(String call, Object iteratorObject) 
-	throws Exception;
+public interface ArgoPrintDataSource {
+    Object caller(String call, Object iteratorObject) throws Exception;
     
-    public abstract Object caller(String call) throws Exception;
+    Object caller(String call) throws Exception;
 }

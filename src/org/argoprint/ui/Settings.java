@@ -73,9 +73,9 @@ public class Settings {
      */
     public Settings(String template, String file, String dir) 
 	throws Exception {
-	_outputDir = new String(dir);
-	_outputFile = new String(file);
 	_template = new File(template);
+	_outputFile = file;
+	_outputDir = dir;
 	
 	try {
 	    checkCorrectness();
@@ -83,8 +83,8 @@ public class Settings {
 	    throw e;
 	}
     } 
-    
-    
+
+
     /**
      * Function to check if member attributes, ie path-/filenames are valid.
      * throws Exceptions if incorrect values or r/w-rights is not correct.
