@@ -49,25 +49,31 @@ import org.w3c.dom.NodeList;
  * This Interpreter processes the iterate tag.<p>
  * 
  * The iterate tag looks like this:<ul>
- * <li>&lt;ap:iterate 
+ * <li>Simple syntax:<pre>
+ *     &lt;ap:iterate 
  *           what="expression1" iteratorname="name" sortvalue="expression"&gt;
  *       Tags processed one time for each value of <tt>expression1</tt>
  *       while <tt>name</tt> is bound to them one at the time.
  *     &lt;/ap:iterate&gt;
- * </ul>
- * <p>
+ * </pre>
  * 
- * TODO: Suggested new syntax to make it easier if the expression1 is empty:<ul>
- * <li>&lt;ap:iterate 
+ * <li>Complex syntax:<pre>
+ *       &lt;ap:iterate 
  *           what="expression1" iteratorname="name" sortvalue="expression"&gt;
- *       &lt;ap:do&gt;
+ *       &lt;ap:any&gt;
+ *         Tags processes first if <tt>expression1</tt> is not empty.
+ *         &lt;ap:foreach&gt;
  *         Tags processed one time for each value of <tt>expression1</tt>
  *         while <tt>name</tt> is bound to them one at the time.
- *       &lt;/ap:do&gt;
+ *         &lt;/ap:foreach&gt;
+ *         Tags processes last if <tt>expression1</tt> is not empty.
+ *       &lt;ap:/any&gt;
  *       &lt;ap:else&gt;
  *         Tags processed if <tt>expression1</tt> is empty.
  *       &lt;/ap:else&gt;
  *     &lt;/ap:iterate&gt;
+ * </pre>
+ *     The ap:else tags is optional.
  * </ul>
  * 
  */
@@ -88,55 +94,94 @@ public class InterpreterIterate extends Interpreter {
      *
      * @see Interpreter#processTag(Node, Environment)
      */
-    protected void processTag(Node tagNode, Environment env) throws BadTemplateException, UnsupportedCallException {
+    protected void processTag(Node tagNode, Environment env) 
+    	throws BadTemplateException, UnsupportedCallException {
+
 	NamedNodeMap attributes = tagNode.getAttributes();
 		
-	// Get the collection
-	Object callReturnValue = callDataSource("what", attributes, env);
-	if (callReturnValue == null) {
-	    throw new UnsupportedCallException("null returned from the call");
-	} else if (!(callReturnValue instanceof Collection)) {
-	    ArrayList tmpCollection = new ArrayList();
-	    tmpCollection.add(callReturnValue);
-	    callReturnValue = tmpCollection;
-	}
-		
-	Collection iterateCollection = (Collection) callReturnValue;
+	ArgoPrintIterator iterator = calculateIterator(env, attributes);
 
-	Node sortvalueAttribute = attributes.getNamedItem("sortvalue");
-	if (sortvalueAttribute != null) {
-	    String sortvalue = sortvalueAttribute.getNodeValue();
-	    iterateCollection = sortCollection(iterateCollection, sortvalue);
-	}
-			
 	Node iteratornameAttribute = attributes.getNamedItem("iteratorname");
 	if (iteratornameAttribute == null) 
 	    throw new BadTemplateException("Iterate tag contains no "
 					   + "iteratorname attribute.");
 	String iteratorname = iteratornameAttribute.getNodeValue();
-		
-	ArgoPrintIterator iterator =
-	    new ArgoPrintIterator(iterateCollection.iterator());
-	env.addIterator(iteratorname, iterator);
 
 	Node parentNode = tagNode.getParentNode();
 	NodeList children = tagNode.getChildNodes();
-	Node newNode;
+	
+	NodeList anyList = findList(children, "any");
+	NodeList elseList = null;
 
-	// For every object in the iterator, clone every child, attach
-	// it to the parent and recurse
-	while (iterator.hasNext()) {
-	    iterator.next();
-	    for (int i = 0; i < children.getLength(); i++) {
-		newNode = children.item(i).cloneNode(true);
-		parentNode.insertBefore(newNode, tagNode);
-		firstHandler.handleTag(newNode, env);
+	env.addIterator(iteratorname, iterator);    
+	
+	if (anyList != null) {
+	    // Complex syntax.
+	    elseList = findList(children, "else");
+	    
+	    if (iterator.hasNext()) {
+	        env.setCurrentIterator(iterator);
+	        for (int i = 0; i < anyList.getLength(); i++) {
+	            Node newNode = anyList.item(i).cloneNode(true);
+	            parentNode.insertBefore(newNode, tagNode);
+	            firstHandler.handleTag(newNode, env);
+	        }
+	        env.setCurrentIterator(null);
+	    } else if (elseList != null) {
+	        for (int i = 0; i < elseList.getLength(); i++) {
+	            Node newNode = elseList.item(i).cloneNode(true);
+	            parentNode.insertBefore(newNode, tagNode);
+	            firstHandler.handleTag(newNode, env);
+	        }	    
+	    }
+	} else {
+	    // Simple syntax.
+	    // For every object in the iterator, clone every child, attach
+	    // it to the parent and recurse
+	    while (iterator.hasNext()) {
+	        iterator.next();
+	        for (int i = 0; i < children.getLength(); i++) {
+	            Node newNode = children.item(i).cloneNode(true);
+	            parentNode.insertBefore(newNode, tagNode);
+	            firstHandler.handleTag(newNode, env);
+	        }
 	    }
 	}
+
 	env.removeIterator(iteratorname);
 	parentNode.removeChild(tagNode);
     }
 	
+    /**
+     * Get the collection.
+     * 
+     * @param attributes Where we search for attributes.
+     * @return A newly created iterator.
+     * @param env is the environment that the node has.
+     * @throws BadTemplateException when the input file is syntactically wrong.
+     * @throws UnsupportedCallException when the input triggers invalid calls.
+     */
+    private ArgoPrintIterator calculateIterator(Environment env, NamedNodeMap attributes) throws BadTemplateException, UnsupportedCallException {
+        Object callReturnValue = callDataSource("what", attributes, env);
+        if (callReturnValue == null) {
+            throw new UnsupportedCallException("null returned from the call");
+        } else if (!(callReturnValue instanceof Collection)) {
+            ArrayList tmpCollection = new ArrayList();
+            tmpCollection.add(callReturnValue);
+            callReturnValue = tmpCollection;
+        }
+        	
+        Collection iterateCollection = (Collection) callReturnValue;
+
+        Node sortvalueAttribute = attributes.getNamedItem("sortvalue");
+        if (sortvalueAttribute != null) {
+            String sortvalue = sortvalueAttribute.getNodeValue();
+            iterateCollection = sortCollection(iterateCollection, sortvalue);
+        }
+        		
+        return new ArgoPrintIterator(iterateCollection.iterator());
+    }
+
     /**
      * Sorts a Collection according to a String returned by a call to
      * the data source for each object in the collection.

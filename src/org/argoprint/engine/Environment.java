@@ -38,7 +38,7 @@ import java.util.*;
  * The environment or scope for argoprint. Used for storing iterators.
  * @author matda701, Mattias Danielsson
  */
-public class Environment{    
+public class Environment {    
     /**
      * Hashtable containing ArgoPrintIterator's hashed with
      * name specified by the user/template.
@@ -48,9 +48,15 @@ public class Environment{
     private Hashtable _iteratorTable;
 
     /**
+     * The current iterator. The current iterator is the iterator within
+     * an any clause (accessed with foreach).
+     */
+    private ArgoPrintIterator currentIterator;
+
+    /**
      * Constructor for Environment
      */ 
-    public Environment(){
+    public Environment() {
         _iteratorTable = new Hashtable();
     }
 
@@ -60,7 +66,7 @@ public class Environment{
      * @param name The iterator to search for.
      * @return <tt>true</tt> if found.
      */    
-    public boolean existsIterator(String name){
+    public boolean existsIterator(String name) {
 	return _iteratorTable.containsKey(name);
     }
   
@@ -81,7 +87,7 @@ public class Environment{
             return false;
         }
         
-	if(_iteratorTable.containsKey(name)){
+	if(_iteratorTable.containsKey(name)) {
 	    //Key collision occured. Perhaps solve this by calling rehash() ?
 	    //and calling addIterator recursively, Or perhaps totally 
 	    //unneccesary since add and get solves this automagically
@@ -118,5 +124,18 @@ public class Environment{
         }
         
         return (ArgoPrintIterator) _iteratorTable.get(name);
+    }
+    
+    /**
+     * @return Returns the currentIterator.
+     */
+    public ArgoPrintIterator getCurrentIterator() {
+        return currentIterator;
+    }
+    /**
+     * @param iterator The currentIterator to set.
+     */
+    public void setCurrentIterator(ArgoPrintIterator iterator) {
+        currentIterator = iterator;
     }
 }

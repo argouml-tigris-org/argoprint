@@ -103,24 +103,6 @@ public class InterpreterIf extends Interpreter {
     }
 
     /**
-     * Return the child node with a given name.<p>
-     * 
-     * This returns the first found node with the name.
-     * 
-     * @param children where to search for the node.
-     * @param nodeName The name to search from.
-     * @return The found node (or <tt>null</tt> if not found).
-     */
-    private Node findNode(NodeList children, String nodeName) {
-        for (int i = 0; i < children.getLength(); i++) {
-            if (isNodeNamed(children.item(i), nodeName)) {
-        	return children.item(i);
-            }
-        }
-        return null;
-    }
-
-    /**
      * Attach the result to parent and remove if tag
      * 
      * @param tagNode the node that we are removing.
