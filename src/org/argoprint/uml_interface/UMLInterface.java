@@ -1,5 +1,5 @@
 //$Id$
-//Copyright (c) 2003, Mikael Albertsson, Mattias Danielsson, Per Engström, 
+//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
 //Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
 //Mattias Sidebäck.
 //All rights reserved.
@@ -60,6 +60,8 @@ import org.argouml.util.SuffixFilter;
 import org.argouml.util.osdep.OsUtil;
 
 import org.argouml.model.ModelFacade;
+import org.argouml.model.uml.UmlFactory;
+import org.argouml.model.uml.foundation.core.CoreHelper;
 import org.argouml.application.api.*;
 
 import org.tigris.gef.base.CmdSaveEPS;
@@ -107,9 +109,9 @@ public class UMLInterface
     private ProjectBrowser _projectBrowser;
     
     /**
-     * A reference to the ModelFacade
+     * Classes to search for methods.
      */
-    private ModelFacade _facade; 
+    private List _classes; 
 
     /**
      * A reference to the ArgoUML Logger. (Uses log4java) 
@@ -130,8 +132,16 @@ public class UMLInterface
      */
     public UMLInterface() {
 	//super( "action.save-graphics", NO_ICON);
-	//_facade = new ModelFacade(); 
-	_facade = ModelFacade.getFacade();
+	//_classes = new ModelFacade(); 
+	_classes = new ArrayList();
+	_classes.add(new ModelFacade());
+	_classes.add(UmlFactory.getFactory());
+	_classes.add(CoreHelper.getHelper());
+	_classes.add(UmlFactory.getFactory().getDataTypes());
+	_classes.add(UmlFactory.getFactory().getCore());
+	_classes.add(UmlFactory.getFactory().getCommonBehavior());
+	_classes.add(UmlFactory.getFactory().getUseCases());
+	// TODO: Add all of them.
     }
 
     /**
@@ -176,12 +186,16 @@ public class UMLInterface
      * Checks if ModelFacade has a method named method. Depracated!
      */
     public boolean hasMethod(String method){
-	Class c = _facade.getClass();
-	Method[] theMethods = c.getMethods();
+	Iterator iter = _classes.iterator();
+
+	while (iter.hasNext()) {
+	    Class c = (iter.next()).getClass();
+	    Method[] theMethods = c.getMethods();
       
-	for (int i = 0; i < theMethods.length; i++) {
-	    if(method.equals(theMethods[i].getName())){
-		return true;
+	    for (int i = 0; i < theMethods.length; i++) {
+		if(method.equals(theMethods[i].getName())){
+		    return true;
+		}
 	    }
 	}
 	return false;
@@ -195,39 +209,43 @@ public class UMLInterface
     public Object caller(String call, Object iteratorObject)
 	throws Exception{
 	//_log.info("Arg call: " + call + " Arg: " + 
-	//	  _facade.getName(iteratorObject)); 
-	Class c = _facade.getClass();
-	Method[] theMethods = c.getMethods();   
-	
-	Object args[] = new Object[1];
-	args[0] = iteratorObject;
-
-	if(call.endsWith(new String("()"))){
-	    int callLength = call.length()-2;
+	//	  _classes.getName(iteratorObject)); 
+	Iterator iter = _classes.iterator();
+	while (iter.hasNext()) {
 	    
-	    String callName = new String(call.substring(0, callLength));
-	    for (int i = 0; i < theMethods.length; i++) {
+	    Class c = (iter.next()).getClass();
+	    Method[] theMethods = c.getMethods();   
+	
+	    Object args[] = new Object[1];
+	    args[0] = iteratorObject;
+
+	    if(call.endsWith(new String("()"))){
+		int callLength = call.length()-2;
+	    
+		String callName = new String(call.substring(0, callLength));
+		for (int i = 0; i < theMethods.length; i++) {
 		
-		if(callName.equals(theMethods[i].getName())){
-		    try{
-			return theMethods[i].invoke(null, args);
-		    }
-		    catch (IllegalAccessException e){
-			_log.info("Crash" + e.getMessage());
-		    }
-		    catch (IllegalArgumentException e){
-			_log.info("Crash" + e.getMessage());
-		    }
-		    catch (InvocationTargetException e){
-			_log.info("Crash" + e.getMessage());
-		    }
-		    catch (NullPointerException e){
-			_log.info("Crash" + e.getMessage());
-		    }
-		    catch (ExceptionInInitializerError e){
-			_log.info("Crash" + e.getMessage());
-		    }		   
-		}	    
+		    if(callName.equals(theMethods[i].getName())){
+			try{
+			    return theMethods[i].invoke(null, args);
+			}
+			catch (IllegalAccessException e){
+			    _log.info("Crash" + e.getMessage());
+			}
+			catch (IllegalArgumentException e){
+			    _log.info("Crash" + e.getMessage());
+			}
+			catch (InvocationTargetException e){
+			    _log.info("Crash" + e.getMessage());
+			}
+			catch (NullPointerException e){
+			    _log.info("Crash" + e.getMessage());
+			}
+			catch (ExceptionInInitializerError e){
+			    _log.info("Crash" + e.getMessage());
+			}		   
+		    }	    
+		}
 	    }
 	}
 	//throw new Exception("Illegal method call");
@@ -240,123 +258,85 @@ public class UMLInterface
      * be on of the default. ex. calledMethodName(model) and not an
      * iteratorObject
      */
-    public Object caller(String call)
-	throws Exception{
-	//_log.info("call: " + call);
-	//Class c = _facade.getClass();
-	//Method[] theMethods = c.getMethods();
+    public Object caller(String call) throws Exception {
+	
+	Iterator iter = _classes.iterator();
 
-	if(call.endsWith(new String("()"))){
-	   Class c = _facade.getClass();
-	   Method[] theMethods = c.getMethods();
-	   int callLength = call.length()-2;
-	    
-	    String callName = new String(call.substring(0, callLength - 1));
-	    
-	    for (int i = 0; i < theMethods.length; i++) {
-		if(callName.equals(theMethods[i].getName())){
-		    try{
-			return theMethods[i].invoke(null, null);
-		    }
-		    catch (IllegalAccessException ignore ){
-		    }
-		    catch (IllegalArgumentException ignore ){
-		    }
-		    catch (InvocationTargetException ignore ){
-		    }
-		    catch (NullPointerException ignore ){
-		    }
-		    catch (ExceptionInInitializerError ignore ){
-		    }		   
-		}	    
-	    }
-	} else if(call.endsWith(new String(")"))){
-	    Class c= _facade.getClass();;
-	    Method[] theMethods = c.getMethods();
-	    int callLength = call.indexOf((int) '(') + 1;
-	    
-	    String callName = new String(call.substring(0, callLength - 1));
-	    String arg = 
-		new String(call.substring(callLength, call.length() - 1));
-	    Object args[] = new Object[1];  
-	    Object thisObject = null;
+	while (iter.hasNext()) {
+	    Class c = iter.next().getClass();
 
-	    if(arg.equals(new String("model"))){
-		args[0] = _project.getModel();
-		//c = _facade.getClass();
-		//theMethods = c.getMethods();
-	    } else if(arg.equals(new String("project"))){
-		thisObject = _project;
-		args = null;
-		c = _project.getClass();
-		int vectorLen = c.getMethods().length;
-		theMethods = new Method[vectorLen];
-		theMethods = c.getMethods();
-	    } else {
-		//c = _facade.getClass();
-		//theMethods = c.getMethods();
-	    }
+	    if(call.endsWith(new String("()"))){
+
+		Method[] theMethods = c.getMethods();
+		int callLength = call.length()-2;
+
+		System.out.println("Class " + c + " with "
+				   + theMethods.length + " methods: ");
+
+		String callName = new String(call.substring(0, callLength - 1));
+		for (int i = 0; i < theMethods.length; i++) {
+		    if(callName.equals(theMethods[i].getName())){
+			try{
+			    System.out.println("Trying: " 
+					       + c + "." + callName + "()");
+			    return theMethods[i].invoke(null, null);
+			}
+			catch (IllegalAccessException ignore ){
+			}
+			catch (IllegalArgumentException ignore ){
+			}
+			catch (InvocationTargetException ignore ){
+			}
+			catch (NullPointerException ignore ){
+			}
+			catch (ExceptionInInitializerError ignore ){
+			}		   
+		    }	    
+		}
+	    } else if(call.endsWith(new String(")"))){
+
+		Method[] theMethods = c.getMethods();
+		int callLength = call.indexOf((int) '(') + 1;
+	    
+		String callName = new String(call.substring(0, callLength - 1));
+		String arg = 
+		    new String(call.substring(callLength, call.length() - 1));
+		Object args[] = new Object[1];  
+		Object thisObject = null;
+
+		if(arg.equals(new String("model"))){
+		    args[0] = _project.getModel();
+		} else if(arg.equals(new String("project"))){
+		    thisObject = _project;
+		    args = null;
+		    c = _project.getClass();
+		    int vectorLen = c.getMethods().length;
+		    theMethods = new Method[vectorLen];
+		    theMethods = c.getMethods();
+		}
  
-	    for (int i = 0; i < theMethods.length; i++) {
-		if(callName.equals(theMethods[i].getName())){
-		    try{	
-			//_log.info("Call hit: " + arg + " " + callName);
-			//Object args[] = new Object[1];
-			//args[0] = _project.getModel(); 
-			return theMethods[i].invoke(thisObject, 
-						    args);
-		    }catch(Exception e){
-			throw e;
-		    }
-		}	    
+		for (int i = 0; i < theMethods.length; i++) {
+		    if(callName.equals(theMethods[i].getName())){
+			try{	
+			    //_log.info("Call hit: " + arg + " " + callName);
+			    //Object args[] = new Object[1];
+			    //args[0] = _project.getModel(); 
+			    return theMethods[i].invoke(thisObject, 
+							args);
+			}catch(Exception e){
+			    throw e;
+			}
+		    }	    
+		}
+
+		//return null;
 	    }
-	    
-	    //return null;
 	}
-	throw new Exception("Illegal method call");
+
+	throw new Exception("Illegal method call: " + call);
 	//return new String("Illegal method call");
     }
     
-    /**
-     * Calls method named call in ModelFacade 
-     * returns boolean, caller(..) can be used instead but
-     * then Booolean.booleanValue() must be used. Depracated! 
-     */
-    public boolean booleanCaller(String call, Object args[]){
-	if(hasMethod(call)){
-	    Class c = _facade.getClass();
-	    Method[] theMethods = c.getMethods();   
-	    
-	    for (int i = 0; i < theMethods.length; i++) {
-		if(call.equals(theMethods[i].getName())){
-		    try{
-			Object answer = theMethods[i].invoke(null, args);
-			return ((Boolean)answer).booleanValue();
-			//break;
-		    }
-		    catch(IllegalAccessException ignore ){
-			
-		    }
-		    catch(IllegalArgumentException ignore ){
-		       
-		    }
-		    catch(InvocationTargetException ignore ){
-			
-		    }
-		    catch(NullPointerException ignore ){
-			
-		    }
-		    catch(ExceptionInInitializerError ignore ){
-			
-		    }		    
-		}		
-	    }
-	}
-	//should be throw exeption
-	return false;
-	//return new String("Not a known method");
-    }
-
     /**
      * Returns all diagrams in the project. TODO: Figure out a clever
      * way to invoke with caller. Solved by using reflections on Project
