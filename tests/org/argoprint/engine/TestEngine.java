@@ -49,7 +49,7 @@ public class TestEngine extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        _main = new Main(false);
+        _main = new Main(null);
         assertNotNull("Could not create a Main-object.", _main);
     }
 }

@@ -62,7 +62,9 @@
     <!-- Test tag for Bind. -->
     <collect_bind>
         <ap:bind name="img">
-            <ap:attr name="src">Hoj</ap:attr>
+            <ap:attr name="src">
+                Hoj
+            </ap:attr>
             image
         </ap:bind>
     </collect_bind>

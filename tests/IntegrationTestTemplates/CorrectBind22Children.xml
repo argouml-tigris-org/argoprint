@@ -1,0 +1,93 @@
+<root>
+    <ap:bind name="img">
+        <ap:attr name="c">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="l">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="z">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="x">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="q">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="w">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="e">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="r">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="t">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="y">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="u">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="i">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="o">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="p">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="a">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="s">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="d">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="f">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="g">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="h">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="j">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        <ap:attr name="k">
+            Hoj
+            <ap:call what="getString()"/>
+        </ap:attr>
+        image
+    </ap:bind>
+</root>

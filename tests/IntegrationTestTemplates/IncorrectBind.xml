@@ -1,7 +1,7 @@
 <root>
     <ap:bind name="img">
         <ap:attr name="src">
-            Hoj
+            <ap:call what="ThisMethodDoesNotExist()"/>
         </ap:attr>
         image
     </ap:bind>
