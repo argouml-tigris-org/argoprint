@@ -120,7 +120,7 @@ public class UMLInterface
     // main methods
     
     /**
-     * Checks if ModelFacade has a method named method
+     * Checks if ModelFacade has a method named method. Depracated!
      */
     public boolean hasMethod(String method){
 	Class c = facade.getClass();
@@ -175,37 +175,115 @@ public class UMLInterface
      * Calls method named call in ModelFacade 
      * returns Object, which often is String or Collection
      */
-    public Object caller(String call, Object args[]){
-	if(hasMethod(call)){
-	    Class c = facade.getClass();
-	    Method[] theMethods = c.getMethods();   
+    public Object caller(String call, Object iteratorObject)
+	throws Exception{
+	
+	Class c = facade.getClass();
+	Method[] theMethods = c.getMethods();   
+	
+	Object args[] = new Object[1];
+	args[0] = iteratorObject;
+
+	if(call.endsWith(new String("()"))){
+	    int callLength = call.length()-2;
 	    
+	    String callName = new String(call.substring(0, callLength));
+	    //log.info(callName);
 	    for (int i = 0; i < theMethods.length; i++) {
-		if(call.equals(theMethods[i].getName())){
+		
+		if(callName.equals(theMethods[i].getName())){
+		    //log.info("method hit " + callName);
 		    try{
-			return theMethods[i].invoke(null, args);
-		    //break;
+			Object obj = theMethods[i].invoke(null, args);
+			//log.info("object: " + obj.toString());
+			return obj; //theMethods[i].invoke(null, args);
+			//break;
 		    }
-		    catch (IllegalAccessException ignore ){
-			//cat.error("got a FileNotFoundException", ignore);
+		    catch (IllegalAccessException e){
+			log.info("Crash" + e.getMessage());
 		    }
-		    catch ( IllegalArgumentException ignore ){
-			//cat.error("got a FileNotFoundException", ignore);
+		    catch (IllegalArgumentException e){
+			log.info("Crash" + e.getMessage());
 		    }
-		    catch ( InvocationTargetException ignore ){
-			//cat.error("got a FileNotFoundException", ignore);
+		    catch (InvocationTargetException e){
+			log.info("Crash" + e.getMessage());
 		    }
-		    catch ( NullPointerException ignore ){
-			//cat.error("got a FileNotFoundException", ignore);
+		    catch (NullPointerException e){
+			log.info("Crash" + e.getMessage());
 		    }
-		    catch ( ExceptionInInitializerError ignore ){
-			//cat.error("got a FileNotFoundException", ignore);
+		    catch (ExceptionInInitializerError e){
+			log.info("Crash" + e.getMessage());
 		    }		   
 		}	    
 	    }
 	}
-	//should trow exception
+	 //should throw exception
 	return new String("Not a known method");
+    }
+    
+    public Object caller(String call)
+	throws Exception{
+	
+	Class c = facade.getClass();
+	Method[] theMethods = c.getMethods();
+
+	if(call.endsWith(new String("()"))){
+	    int callLength = call.length()-2;
+	    
+	    String callName = new String(call.substring(0, callLength - 1));
+	    
+	    for (int i = 0; i < theMethods.length; i++) {
+		if(callName.equals(theMethods[i].getName())){
+		    try{
+			return theMethods[i].invoke(null, null);
+		    }
+		    catch (IllegalAccessException ignore ){
+		    }
+		    catch (IllegalArgumentException ignore ){
+		    }
+		    catch (InvocationTargetException ignore ){
+		    }
+		    catch (NullPointerException ignore ){
+		    }
+		    catch (ExceptionInInitializerError ignore ){
+		    }		   
+		}	    
+	    }
+	} else if(call.endsWith(new String(")"))){
+	    
+	    
+	    int callLength = call.indexOf((int) '(') + 1;
+	    String callName = new String(call.substring(0, callLength - 1));
+	    String arg = 
+		new String(call.substring(callLength, call.length() - 1));
+	    //log.info("call name: " + callName + "call arg: " + arg);
+	    
+	    for (int i = 0; i < theMethods.length; i++) {
+		if(callName.equals(theMethods[i].getName())){
+		    try{
+			if(arg.equals(new String("model"))){		    
+			    Object args[] = new Object[1];
+			    args[0] = project.getModel(); 
+			    return theMethods[i].invoke(null, 
+							args);
+			}
+		    }
+		    catch (IllegalAccessException ignore ){
+		    }
+		    catch (IllegalArgumentException ignore ){
+		    }
+		    catch (InvocationTargetException ignore ){
+		    }
+		    catch (NullPointerException ignore ){
+		    }
+		    catch (ExceptionInInitializerError ignore ){
+		    }		   
+		}	    
+	    }
+	    
+	    return null;
+	}
+	return new String("Illegal method call");
     }
     
     /**
