@@ -60,7 +60,7 @@ public class Settings{
     /**
      * Setter for the path template 
      */
-    public void setTemplete(String template){
+    public void setTemplate(String template){
 	_template = new String(template);
     }
 
