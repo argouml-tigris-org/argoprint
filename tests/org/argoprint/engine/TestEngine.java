@@ -23,7 +23,7 @@ public class TestEngine extends TestCase {
     public void testInitializeSystem() {
         Settings s = new Settings();
         s.setDir("/tmp/");
-        s.setTemplate("EngineTest.xml");
+        s.setTemplate("TestEngine.xml");
         s.setFile("/tmp/EngineTestResult");
         assertTrue(_main.initializeSystem(s));
     }
