@@ -44,6 +44,7 @@ import java.awt.Rectangle;
 
 import java.lang.reflect.*;
 import java.lang.Class;
+
 import java.lang.Boolean;
 
 import org.tigris.gef.base.*;
@@ -87,7 +88,7 @@ public class UMLInterface
      * The ArgoPrint output dir. Used when saving diagrams as pictures. 
      * Must be set prior to use.
      */
-    String _outputPath;
+    String _outputDir;
 
     ////////////////////////////////////////////////////////////////
     // constructors
@@ -98,6 +99,16 @@ public class UMLInterface
     public UMLInterface() {
 	//super( "action.save-graphics", NO_ICON);
 	_facade = ModelFacade.getFacade();
+    }
+
+    /**
+     * Initializes fields prior to usage. Can be used instead of the 
+     * individual setters.
+     */
+    public void initialize(Logger log){
+	_log = log;
+	_projectBrowser = ProjectBrowser.getInstance();
+	_project = ProjectManager.getManager().getCurrentProject();
     }
 
     ////////////////////////////////////////////////////////////////
@@ -123,7 +134,7 @@ public class UMLInterface
     /**
      * Sets the outputPath to path
      */
-    public void setOutputPath(String path){ _outputPath = new String(path); }
+    public void setOutputDir(String dir){ _outputDir = new String(dir); }
 
     ////////////////////////////////////////////////////////////////
     // main methods
@@ -150,7 +161,7 @@ public class UMLInterface
      */
     public Object caller(String call, Object iteratorObject)
 	throws Exception{
-	
+	_log.info("Arg call: " + call + " Arg: " + _facade.getName(iteratorObject)); 
 	Class c = _facade.getClass();
 	Method[] theMethods = c.getMethods();   
 	
@@ -185,8 +196,8 @@ public class UMLInterface
 		}	    
 	    }
 	}
-	throw new Exception("Illegal method call");
-	//return new String("Not a known method");
+	//throw new Exception("Illegal method call");
+	return new String("Not a known method");
     }
 
     
@@ -197,7 +208,7 @@ public class UMLInterface
      */
     public Object caller(String call)
 	throws Exception{
-	
+	_log.info("call: " + call);
 	Class c = _facade.getClass();
 	Method[] theMethods = c.getMethods();
 
@@ -309,7 +320,7 @@ public class UMLInterface
 
 
     /**
-     * Saves a diagram as gif in the directory specified by _outputPath.
+     * Saves a diagram as gif in the directory specified by _outputDir.
      * Returns a String with the path to the saved gif file. Not implemented
      * yet... TODO: Solve same Bug as in trySaveAllDiagrams()
      */
