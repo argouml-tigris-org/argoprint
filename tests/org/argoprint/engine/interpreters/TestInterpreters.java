@@ -28,6 +28,28 @@ public class TestInterpreters extends TestCase {
         return new TestSuite(TestInterpreters.class);
     }
 
+    public void testIterate() throws Exception {
+        // Get a node that should not be changed.
+        NodeList nodes  = _doc.getChildNodes().item(0).getChildNodes();
+        Node param_node = null;
+        Node comp_node  = null;
+
+        int pos = findNode(nodes, "expected_ap_iterate_result", 0);
+        comp_node  = nodes.item(pos).getChildNodes().item(0);
+
+        pos = findNode(nodes, "ap:iterate", 0);
+        assertTrue(pos != -1);
+        param_node = nodes.item(pos);
+
+        _iterate.handleTag(param_node, _env);
+
+        // Get the node at the same position as the call-node used to be.
+        Node result_node = nodes.item(pos);
+
+        assertTrue("Iterate-interpreter does not give expected result.",
+                   nodesEqual(result_node, comp_node));
+    }
+ 
     public void testCall() throws Exception {
         // Get a node that should not be changed.
         NodeList nodes  = _doc.getChildNodes().item(0).getChildNodes();
@@ -88,22 +110,24 @@ public class TestInterpreters extends TestCase {
 
         _call    = new InterpreterCall(_uml_int);
         _call.setFirstHandler(_call);
-        //_call.setNextHandler(_default);
-/*
-        _bind    = new InterpreterBind();
-        _if      = new InterpreterIf();
-*/
         _iterate = new InterpreterIterate(_uml_int);
+	_iterate.setFirstHandler(_iterate);
         _default = new InterpreterDefault(_uml_int);
         _default.setFirstHandler(_default);
+/*
+        _bind    = new InterpreterBind();
+	_bind.setFirstHandler(_bind);
+        _if      = new InterpreterIf();
+	_if.setFirstHandler(_bind);
+*/
 
 
 
 /*
         assertNotNull("Could not create InterpreterBind.",    _bind);
-        assertNotNull("Could not create InterpreterCall.",    _call);
         assertNotNull("Could not create InterpreterIf.",      _if);
 */
+        assertNotNull("Could not create InterpreterCall.",    _call);
         assertNotNull("Could not create InterpreterIterate.", _iterate);
         assertNotNull("Could not create InterpreterDefault.", _default);
     }
