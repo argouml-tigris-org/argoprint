@@ -3,6 +3,7 @@ package org.argoprint.engine.interpreters;
 import junit.framework.*;
 import org.w3c.dom.*;
 import org.apache.xerces.parsers.DOMParser;
+import org.apache.xml.serialize.*;
 
 import org.argoprint.engine.interpreters.*;
 import org.argoprint.engine.Environment;
@@ -28,12 +29,12 @@ public class TestInterpreters extends TestCase {
 
     public static Test suite() {
         // Code calling the tests.
+        /*
         TestSuite s = new TestSuite();
         s.addTest(new TestInterpreters("testIterate"));
         return s;
-        /*
-        return new TestSuite(TestInterpreters.class);
         */
+        return new TestSuite(TestInterpreters.class);
     }
 
     public void testIterate() throws Exception {
@@ -42,20 +43,32 @@ public class TestInterpreters extends TestCase {
         Node param_node = null;
         Node comp_node  = null;
 
-        int pos = findNode(nodes, "expected_ap_iterate_result", 0);
-        comp_node  = nodes.item(pos).getChildNodes().item(0);
+        int expect_pos = findNode(nodes, "expected_ap_iterate_result", 0);
+        assertTrue("expected_ap_iterate_result-node not found.", expect_pos != -1);
+        int collect_pos = findNode(nodes.item(expect_pos).getChildNodes(), "collect_iterate", 0);
+        comp_node  = nodes.item(expect_pos).getChildNodes().item(collect_pos);
 
-        pos = findNode(nodes, "ap:iterate", 0);
-        assertTrue(pos != -1);
-        param_node = nodes.item(pos);
+        collect_pos = findNode(nodes, "collect_iterate", 0);
+        assertTrue("collect_iterate-node not found.", collect_pos != -1);
+        int iterate_pos = findNode(nodes.item(collect_pos).getChildNodes(), "ap:iterate", 0);
+        assertTrue("ap:iterate-node not found.", iterate_pos != -1);
+        param_node = nodes.item(collect_pos).getChildNodes().item(iterate_pos);
 
         _iterate.handleTag(param_node, _env);
 
         // Get the node at the same position as the call-node used to be.
-        Node result_node = nodes.item(pos);
+        Node result_node = nodes.item(collect_pos);
+
+        ByteArrayOutputStream comp_stream   = new ByteArrayOutputStream();
+        ByteArrayOutputStream result_stream = new ByteArrayOutputStream();
+
+        XMLSerializer ser1 = new XMLSerializer(comp_stream, null);
+        XMLSerializer ser2 = new XMLSerializer(result_stream, null);
+        ser1.serialize((Element)comp_node);
+        ser2.serialize((Element)result_node);
 
         assertTrue("Iterate-interpreter does not give expected result.",
-                   nodesEqual(result_node, comp_node));
+                   comp_stream.toString().equals(result_stream.toString()));
     }
  
     public void testCall() throws Exception {
@@ -64,20 +77,36 @@ public class TestInterpreters extends TestCase {
         Node param_node = null;
         Node comp_node  = null;
 
-        int pos = findNode(nodes, "expected_ap_call_result", 0);
-        comp_node  = nodes.item(pos).getChildNodes().item(0);
+        // Find the position of the expected result for the call node.
+        int expect_pos = findNode(nodes, "expected_ap_call_result", 0);
+        // Find the position of the cellction-node within that node.
+        int collect_pos = findNode(nodes.item(expect_pos).getChildNodes(), "collect_call", 0);
+        comp_node  = nodes.item(expect_pos).getChildNodes().item(collect_pos);
 
-        pos = findNode(nodes, "ap:call", 0);
-        assertTrue(pos != -1);
-        param_node = nodes.item(pos);
+        // Find the position of the collect_call around the ap:call-node.
+        collect_pos = findNode(nodes, "collect_call", 0);
+        assertTrue(collect_pos != -1);
+        // Find the position of the ap:call-tag within that node.
+        int call_pos = findNode(nodes.item(collect_pos).getChildNodes(), "ap:call", 0);
+        assertTrue(call_pos != -1);
+        param_node = nodes.item(collect_pos).getChildNodes().item(call_pos);
 
         _call.handleTag(param_node, _env);
 
-        // Get the node at the same position as the call-node used to be.
-        Node result_node = nodes.item(pos);
+        // Get the node at the same position as the collect_call-node used to
+        // be.
+        Node result_node = nodes.item(collect_pos);
+
+        ByteArrayOutputStream comp_stream   = new ByteArrayOutputStream();
+        ByteArrayOutputStream result_stream = new ByteArrayOutputStream();
+
+        XMLSerializer ser1 = new XMLSerializer(comp_stream, null);
+        XMLSerializer ser2 = new XMLSerializer(result_stream, null);
+        ser1.serialize((Element)comp_node);
+        ser2.serialize((Element)result_node);
 
         assertTrue("Call-interpreter does not give expected result.",
-                   nodesEqual(result_node, comp_node));
+                   comp_stream.toString().equals(result_stream.toString()));
     }
 
     public void testDefault() throws Exception {
@@ -87,7 +116,7 @@ public class TestInterpreters extends TestCase {
         Node comp_node  = null;
 
 
-        int pos = findNode(nodes, "tok", 0);
+        int pos = findNode(nodes, "default", 0);
 
         param_node = nodes.item(pos).cloneNode(true);
         comp_node  = nodes.item(pos).cloneNode(true);
@@ -116,12 +145,13 @@ public class TestInterpreters extends TestCase {
         _env = new Environment();
         assertNotNull(_env);
 
+        _default = new InterpreterDefault(_uml_int);
+        _default.setFirstHandler(_default);
         _call    = new InterpreterCall(_uml_int);
         _call.setFirstHandler(_call);
         _iterate = new InterpreterIterate(_uml_int);
-	_iterate.setFirstHandler(_iterate);
-        _default = new InterpreterDefault(_uml_int);
-        _default.setFirstHandler(_default);
+        _iterate.setFirstHandler(_iterate);
+        _iterate.setNextHandler(_default);
 /*
         _bind    = new InterpreterBind();
 	_bind.setFirstHandler(_bind);
@@ -150,6 +180,7 @@ public class TestInterpreters extends TestCase {
 
         if (left == null || right == null) {
             if (left != right) {
+                System.out.println("One node null");
                 return false;
             } else {
                 return true;
@@ -157,14 +188,19 @@ public class TestInterpreters extends TestCase {
         }
 
         if (left.getNodeType() != right.getNodeType()) {
+            System.out.println("Node types not same");
             return false;
         }
         if (left.getChildNodes().getLength() != right.getChildNodes().getLength()) {
+            System.out.println("Not same amount of children");
+            System.out.println(left.getChildNodes().getLength());
+            System.out.println(right.getChildNodes().getLength());
             return false;
         }
 
         if (left.getAttributes() == null || right.getAttributes() == null) {
             if (left.getAttributes() != right.getAttributes()) {
+                System.out.println("One attributes null");
                 return false;
             }
         } else if (!mapsEqual(left.getAttributes(), right.getAttributes())) {
