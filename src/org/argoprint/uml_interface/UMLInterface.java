@@ -45,6 +45,11 @@ import java.lang.Boolean;
 import org.tigris.gef.base.*;
 import org.tigris.gef.persistence.*;
 
+
+/*TODO: Implement an interface, which the UMLInterface implements...
+ *to make argoprint more generally extendable
+ */
+
 /** 
  * The class ArgoPrint uses to interface to the ArgoUML model.
  * It primarily communicates with ModelFacade using java.lang.reflect.*
@@ -76,6 +81,11 @@ public class UMLInterface {
      */
     private Logger log;
 	
+    /**
+     * The ArgoPrint output dir. Used when saving diagrams as pictures. Must be set prior to use.
+     */
+    String outputPath;
+
     ////////////////////////////////////////////////////////////////
     // constructors
     public UMLInterface() {
@@ -102,6 +112,11 @@ public class UMLInterface {
      * Sets the project to proj
      */
     public void setProject(Project proj){ project = proj; }
+
+    /**
+     * Sets the outputPath to path
+     */
+    public void setOutputPath(String path){ outputPath = new String(path); }
 
     ////////////////////////////////////////////////////////////////
     // main methods
