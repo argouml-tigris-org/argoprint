@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * The environment or scope for argoprint. Used for storing iterators.
  */
-class Environment{
+public class Environment{
     Environment instance;
 
     private Hashtable iteratorTable;
