@@ -22,10 +22,18 @@ public class TestInterpreters extends TestCase {
     private Document       _doc     = null;
     private Environment    _env     = null;
 
+    public TestInterpreters(String s) {
+        super(s);
+    }
 
     public static Test suite() {
         // Code calling the tests.
+        TestSuite s = new TestSuite();
+        s.addTest(new TestInterpreters("testIterate"));
+        return s;
+        /*
         return new TestSuite(TestInterpreters.class);
+        */
     }
 
     public void testIterate() throws Exception {
