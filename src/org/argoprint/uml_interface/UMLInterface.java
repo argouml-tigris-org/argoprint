@@ -359,7 +359,8 @@ public class UMLInterface
 
     /**
      * Returns all diagrams in the project. TODO: Figure out a clever
-     * way to invoke with caller.
+     * way to invoke with caller. Solved by using reflections on Project
+     * Therefor not needed.
      */    
     public Collection getAllDiagrams(){
 	return _project.getDiagrams();
@@ -368,13 +369,90 @@ public class UMLInterface
 
     /**
      * Saves a diagram as gif in the directory specified by _outputDir.
-     * Returns a String with the path to the saved gif file. Not implemented
-     * yet... TODO: Solve same Bug as in trySaveAllDiagrams()
+     * Returns a String with the path to the saved gif file.
+     * TODO: Solve same Bug as in trySaveAllDiagrams() and implement 
+     * better control for overwrite of old files. 
      */
-    public String saveDiagram(UMLDiagram diagram){
+    public String saveDiagram(UMLDiagram diagram) 
+	throws Exception{
 	//Todo: fix bug mentioned i trySaveAllDiagrams
-	//and implement function, in the same way but without the loop
-	return new String("Path/and/filename.gif");
+
+	if( diagram instanceof Diagram ) {
+	    String defaultName = ((Diagram) diagram).getName();
+	    _log.info("active diagram" + 
+		      _project.getActiveDiagram().getName());
+	    _project.setActiveDiagram((ArgoDiagram) diagram);
+	    _log.info("active diagram" + 
+		      _project.getActiveDiagram().getName());
+	    
+	    defaultName = Util.stripJunk(defaultName);
+	    
+	    _log.info("diagram name " + defaultName);
+	    
+	    try {
+		File defFile = 
+		    new File(_outputDir + 
+			     defaultName + "."
+			     + FileFilters.GIFFilter._suffix);
+		
+		_log.info("diagram filename " + defaultName + "."
+			  + FileFilters.GIFFilter._suffix);
+		
+		if (defFile != null) {
+		    String path = defFile.getParent();
+		    _log.info("diagram path " + path); 
+		    
+		    String name = defFile.getName();
+		    _log.info("diagram name " + name);
+		    
+		    String extension = SuffixFilter.getExtension(defFile);
+		    _log.info("diagram ext " + extension);
+		    
+		    CmdSaveGraphics cmd = null;
+			
+		    cmd = new CmdSaveGIF();
+			    
+
+		    if ( !path.endsWith( separator ) ) {
+			path += separator;
+		    }
+			
+		    _projectBrowser.showStatus( "Writing " + path + name + "..." );
+		    _log.info( "Writing " + path + name + "..." );    
+
+		    if ( defFile.exists() ) {
+			String t = "Overwrite " + path + name;
+			int response =
+			    JOptionPane.showConfirmDialog(_projectBrowser,
+							  t, t,
+							  JOptionPane.YES_NO_OPTION);
+			if (response == JOptionPane.NO_OPTION){ 
+			    throw new Exception("Cannot overwrite file");
+			}
+		    }
+		    
+		    FileOutputStream fo = new FileOutputStream( defFile );
+		    cmd.setStream(fo);
+		    cmd.doIt();
+		    fo.close();
+		    _projectBrowser.showStatus( "Wrote " + path + name );
+		    _log.info( "Wrote " + path + name + "..." );
+		    //return true;
+		    return new String(path + name);
+		}
+		
+	    }
+	    catch ( FileNotFoundException ignore )
+		{
+		    throw ignore;
+		}
+	    catch ( IOException ignore )
+		{
+		    throw ignore;
+		}
+	}
+	
+	throw new Exception("Not a valid diagram");
     }
 
     /**
