@@ -26,7 +26,7 @@ public class TestUI extends TestCase {
     public void testSettingsCorrectTemplate() {
         String template = "settings_template.xml";
 
-        _settings.setTemplete(template);
+        _settings.setTemplate(template);
         assertEquals(_settings.getTemplate(), template);
     }
 
@@ -56,7 +56,7 @@ public class TestUI extends TestCase {
         String template = "nonexistant_template.xml";
         boolean exception_caught = false;
         try {
-            _settings.setTemplete(template);
+            _settings.setTemplate(template);
         } catch (Exception e) {
             exception_caught = true;
         }
