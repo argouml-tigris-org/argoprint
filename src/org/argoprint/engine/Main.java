@@ -1,7 +1,6 @@
 package org.argoprint.engine;
+import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.engine.interpreters.*;
-import org.argoprint.uml_interface.UMLInterface;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,26 +10,32 @@ import org.xml.sax.SAXException;
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xml.serialize.*;
 
+import org.argoprint.DataSourceStub;
+
 public class Main {
 	private Interpreter _firstHandler;
 	private DOMParser _parser;
-	// TODO remove 
+	// TODO: remove 
 	private String _outputFile;
-	private UMLInterface _umlInterface;
+	private ArgoPrintDataSource _dataSource;
 
 	public Main() {
 		_parser = new DOMParser(); 
-		_umlInterface = new UMLInterface();
+		_dataSource = new DataSourceStub();
 		// Initialize the CoR
-		_firstHandler = new InterpreterDefault(_umlInterface);
-		_firstHandler.setFirstHandler(_firstHandler);
+		Interpreter interpreterDefault = new InterpreterDefault(_dataSource);
+		Interpreter interpreterCall = new InterpreterCall(_dataSource);
+		_firstHandler = interpreterCall;
+		interpreterCall.setNextHandler(interpreterDefault);
+		interpreterCall.setFirstHandler(interpreterCall);
+		interpreterDefault.setFirstHandler(interpreterCall);
 	}
 
-	// TODO change parameter to Settings when that class is finished
+	// TODO: change parameter to Settings when that class is finished
 	public void initializeSystem(String template, String outputFile, String outputDir) 
 	throws SAXException, IOException {
 		_outputFile = outputFile;
-		// TODO set outputDir of interface
+		// TODO: set outputDir of interface
 		_parser.parse(template);
 	}
 
