@@ -47,7 +47,6 @@ import org.argoprint.UnsupportedCallException;
 import org.argouml.kernel.Project;
 import org.argouml.kernel.ProjectManager;
 import org.argouml.model.Model;
-import org.argouml.model.ModelFacade;
 import org.argouml.ui.ProjectBrowser;
 import org.argouml.uml.diagram.ui.UMLDiagram;
 import org.argouml.util.FileFilters;
@@ -59,7 +58,7 @@ import org.tigris.gef.util.Util;
 
 /** 
  * The class ArgoPrint uses to interface to the ArgoUML model.
- * It primarily communicates with ModelFacade using java.lang.reflect.*
+ * It primarily communicates with Model subsystem Facade using reflection
  * To save diagrams gef is used. TODO: fix bug that causes only
  * the open diagram to be saved correctly.
  *
@@ -100,9 +99,8 @@ public class UMLInterface
      */
     public UMLInterface() {
 	//super( "action.save-graphics", NO_ICON);
-	//_classes = new ModelFacade(); 
 	_classes = new ArrayList();
-	_classes.add(new ModelFacade());
+	_classes.add(Model.getFacade());
 	_classes.add(Model.getUmlFactory());
 	_classes.add(Model.getCoreHelper());
 	_classes.add(Model.getDataTypesFactory());
@@ -157,7 +155,7 @@ public class UMLInterface
     /**
      * @see ArgoPrintDataSource#caller(String, Object)
      * 
-     * Calls method named call in ModelFacade 
+     * Calls method named call in one of the ArgoUML subsystem objects. 
      * returns Object, which often is String or Collection
      * iteratorObject is the argument for the method 
      */
@@ -208,7 +206,7 @@ public class UMLInterface
 
     
     /**
-     * Calls method named call in ModelFacade. Used when argument is to
+     * Calls method named call Model subsystem. Used when argument is to
      * be on of the default. ex. calledMethodName(model) and not an
      * iteratorObject.
      * 
