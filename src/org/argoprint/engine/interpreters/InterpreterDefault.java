@@ -2,14 +2,13 @@ package org.argoprint.engine.interpreters;
 import org.argoprint.engine.Environment;
 // TODO update this later
 import org.argoprint.uml_interface.UMLInterface;
-import org.argoprint.engine.Main;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class InterpreterDefault extends Interpreter {
 
-	public InterpreterDefault(String tagName, UMLInterface umlInterface, Main main) {
-		super(tagName, umlInterface, main);
+	public InterpreterDefault(UMLInterface umlInterface) {
+		super("", umlInterface);
 	}
 
 	/**
@@ -24,7 +23,7 @@ public class InterpreterDefault extends Interpreter {
 			// recurse on all children except text nodes
 			for (int i = 0; i < children.getLength(); i++){
 				if (children.item(i).getNodeType() != Node.TEXT_NODE)
-					_main.interpret(children.item(i), env);
+					_firstHandler.handleTag(children.item(i), env);
 			}
 		}
 	}
