@@ -105,10 +105,10 @@ public class UMLInterface
 	_classes.add(new ModelFacade());
 	_classes.add(Model.getUmlFactory());
 	_classes.add(Model.getCoreHelper());
-	_classes.add(Model.getUmlFactory().getDataTypes());
-	_classes.add(Model.getUmlFactory().getCore());
-	_classes.add(Model.getUmlFactory().getCommonBehavior());
-	_classes.add(Model.getUmlFactory().getUseCases());
+	_classes.add(Model.getDataTypesFactory());
+	_classes.add(Model.getCoreFactory());
+	_classes.add(Model.getCommonBehaviorFactory());
+	_classes.add(Model.getUseCasesFactory());
 	// TODO: Add all of them.
     }
 
