@@ -10,7 +10,6 @@ import org.argoprint.uml_interface.*;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-// import org.argoprint.ui.Settings;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import org.apache.xerces.parsers.DOMParser;
@@ -28,20 +27,29 @@ public class Main {
     
     public Main() {
 	_parser = new DOMParser(); 
-	_dataSource = new UMLInterface(); //new DataSourceStub();
+	_dataSource = new UMLInterface(); 
+	//_dataSource = new DataSourceStub();
 
 	
 	
 	// Initialize the CoR
-	Interpreter interpreterDefault = new InterpreterDefault(_dataSource);
-	Interpreter interpreterCall = new InterpreterCall(_dataSource);
-	Interpreter interpreterIterate = new InterpreterIterate(_dataSource);
-	_firstHandler = interpreterCall;
-	interpreterCall.setNextHandler(interpreterIterate);
-	interpreterCall.setFirstHandler(interpreterCall);
-	interpreterIterate.setNextHandler(interpreterDefault);
-	interpreterIterate.setFirstHandler(interpreterCall);
-	interpreterDefault.setFirstHandler(interpreterCall);
+	Interpreter iDefault = new InterpreterDefault(_dataSource);
+	Interpreter iCall = new InterpreterCall(_dataSource);
+	Interpreter iIterate = new InterpreterIterate(_dataSource);
+	Interpreter iBind = new InterpreterBind(_dataSource);
+	Interpreter iIf = new InterpreterIf(_dataSource);
+	
+	_firstHandler = iCall;
+	
+	iCall.setNextHandler(iIterate);
+	iCall.setFirstHandler(_firstHandler);
+	iIterate.setNextHandler(iBind);
+	iIterate.setFirstHandler(_firstHandler);
+	iBind.setNextHandler(iIf);
+	iBind.setFirstHandler(_firstHandler);
+	iIf.setNextHandler(iDefault);
+	iIf.setFirstHandler(_firstHandler);
+	iDefault.setFirstHandler(_firstHandler);
     }
 
     // TODO: change parameter to Settings when that class is finished
