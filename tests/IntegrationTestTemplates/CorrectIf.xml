@@ -1,0 +1,10 @@
+<root>
+    <ap:if cond="getTrueBoolean()">
+        <ap:then>
+            Correct!!
+        </ap:then>
+        <ap:else>
+            Incorrect!
+        </ap:else>
+    </ap:if>
+</root>

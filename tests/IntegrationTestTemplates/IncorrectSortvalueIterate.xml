@@ -1,0 +1,5 @@
+<root>
+    <ap:iterate what="getCollection()" iteratorname="it" sortvalue="thisMethodDoesNotExist">
+        <ap:call what="toString" iterator="it"/>
+    </ap:iterate>
+</root>

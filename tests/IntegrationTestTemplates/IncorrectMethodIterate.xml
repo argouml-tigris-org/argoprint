@@ -1,0 +1,5 @@
+<root>
+    <ap:iterate what="nonexistantMethod()" iteratorname="it">
+        Tjo.
+    </ap:iterate>
+</root>

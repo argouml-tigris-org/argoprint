@@ -1,0 +1,5 @@
+<root>
+    <ap:iterate what="getCollection()">
+        Topp.
+    </ap:iterate>
+</root>
