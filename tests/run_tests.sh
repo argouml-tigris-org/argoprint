@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # Set up the classpath variable to contain all the jar-files in the given
 # jar-dirs.
