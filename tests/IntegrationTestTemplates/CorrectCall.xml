@@ -1,0 +1,3 @@
+<root>
+    <ap:call what="getString()"/>
+</root>
