@@ -1,7 +1,40 @@
+// $Id$
+// Copyright (c) 2005, Linus Tolke.
+//
+//
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// * Redistributions of source code must retain the above copyright notice,
+//   this list of conditions and the following disclaimer.
+//
+// * Redistributions in binary form must reproduce the above copyright
+//   notice, this list of conditions and the following disclaimer in the
+//   documentation and/or other materials provided with the distribution.
+//
+// * Neither the name of the University of Linköping nor the names of its
+//   contributors may be used to endorse or promote products derived from
+//   this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
+
 package org.argoprint.engine.interpreters;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -9,28 +42,25 @@ import junit.framework.TestSuite;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.argoprint.DataSourceStub;
+import org.argoprint.UnsupportedCallException;
 import org.argoprint.XmlTestUtil;
 import org.argoprint.engine.Environment;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * Test for the interpreters.
+ */
 public class TestInterpreters extends TestCase {
-    private class InterpreterTestException extends Exception {
-        public InterpreterTestException(String message) {
-            super(message);
-        }
-    };
+    private InterpreterDefault defaultInterpreter;
 
-    private InterpreterDefault defaultInterpreter = null;
+    private DataSourceStub umlInt;
+    private Document       correctTemplate;
+    private Document       incorrectTemplate;
+    private Environment    env;
 
-    private DataSourceStub umlInt            = null;
-    private Document       correctTemplate   = null;
-    private Document       incorrectTemplate = null;
-    private Environment    env                = null;
-
-    private HashMap interpreters   = null;
+    private Map interpreters;
 
     /**
      * Constructor.
@@ -49,12 +79,21 @@ public class TestInterpreters extends TestCase {
         return new TestSuite(TestInterpreters.class);
     }
 
-    public void interpreterTest(String name, Document doc, int num)
-    	throws Exception {
+    /**
+     * Do the tests.
+     *
+     * @param nameArg The interpreter to test.
+     * @param doc The document.
+     * @param num The number in the node.
+     * @throws UnsupportedCallException if we cannot call evaluate a call.
+     * @throws BadTemplateException if the template is incorrect.
+     */
+    public void interpreterTest(String nameArg, Document doc, int num)
+    	throws BadTemplateException, UnsupportedCallException {
         // Get a node that should not be changed.
         NodeList nodes  = doc.getChildNodes().item(0).getChildNodes();
         Node compareNode  = null;
-        name = name.toLowerCase();
+        String name = nameArg.toLowerCase();
 
         // Get the node containing the expected result.
         int expectPos = findNode(nodes, "expected_ap_" + name + "_result", 0);
@@ -96,31 +135,69 @@ public class TestInterpreters extends TestCase {
                    XmlTestUtil.nodesEqual(compareNode, resultNode));
     }
 
-    /*
-     * Test cases.
+    /**
+     * Test iterate.
      *
+     * @throws UnsupportedCallException if we cannot call evaluate a call.
+     * @throws BadTemplateException if the template is incorrect.
      */
-    public void testCorrectIterate() throws Exception {
+    public void testCorrectIterate()
+    	throws BadTemplateException, UnsupportedCallException {
         interpreterTest("iterate", correctTemplate, 0);
     }
 
-    public void testCorrectIterateWithSortvalue() throws Exception {
+    /**
+     * Test iterate.
+     *
+     * @throws UnsupportedCallException if we cannot call evaluate a call.
+     * @throws BadTemplateException if the template is incorrect.
+     */
+    public void testCorrectIterateWithSortvalue()
+    	throws BadTemplateException, UnsupportedCallException {
         interpreterTest("iterate", correctTemplate, 1);
     }
 
-    public void testCorrectBind() throws Exception {
+    /**
+     * Test bind.
+     *
+     * @throws UnsupportedCallException if we cannot call evaluate a call.
+     * @throws BadTemplateException if the template is incorrect.
+     */
+    public void testCorrectBind()
+    	throws BadTemplateException, UnsupportedCallException {
         interpreterTest("bind", correctTemplate, 0);
     }
 
-    public void testCorrectIf() throws Exception {
+    /**
+     * Test if.
+     *
+     * @throws UnsupportedCallException if we cannot call evaluate a call.
+     * @throws BadTemplateException if the template is incorrect.
+     */
+    public void testCorrectIf()
+    	throws BadTemplateException, UnsupportedCallException {
         interpreterTest("if", correctTemplate, 0);
     }
 
-    public void testCorrectCall() throws Exception {
+    /**
+     * Test call.
+     *
+     * @throws UnsupportedCallException if we cannot call evaluate a call.
+     * @throws BadTemplateException if the template is incorrect.
+     */
+    public void testCorrectCall()
+    	throws BadTemplateException, UnsupportedCallException {
         interpreterTest("call", correctTemplate, 0);
     }
 
-    public void testDefault() throws Exception {
+    /**
+     * Test iterate.
+     *
+     * @throws UnsupportedCallException if we cannot call evaluate a call.
+     * @throws BadTemplateException if the template is incorrect.
+     */
+    public void testDefault()
+    	throws BadTemplateException, UnsupportedCallException {
         // Get a node that should not be changed.
         NodeList nodes =
             correctTemplate.getChildNodes().item(0).getChildNodes();
@@ -138,78 +215,85 @@ public class TestInterpreters extends TestCase {
                    XmlTestUtil.nodesEqual(paramNode, compNode));
     }
 
-    public void testIterateIncorrectSortvalue() throws Exception {
-        boolean exceptionCaught = false;
+    /**
+     * Test iterate with incorrect sort value.
+     *
+     * @throws BadTemplateException if the template is incorrect.
+     */
+    public void testIterateIncorrectSortvalue() throws BadTemplateException {
         try {
             interpreterTest("iterate", incorrectTemplate, 0);
-        } catch (InterpreterTestException e) {
-            throw e;
-        } catch (Exception e) {
-            exceptionCaught = true;
+        } catch (UnsupportedCallException e) {
+            return;
         }
-        if (!exceptionCaught) {
-            fail("Exception not thrown for <iterate> with bad sortvalue.");
-        }
+        fail("Exception not thrown for <iterate> with bad sortvalue.");
     }
 
-    public void testIterateIncorrectWhat() throws Exception {
-        boolean exceptionCaught = false;
+    /**
+     * Test iterate with incorrect what.
+     *
+     * @throws BadTemplateException if the template is incorrect.
+     */
+    public void testIterateIncorrectWhat() throws BadTemplateException {
         try {
             interpreterTest("iterate", incorrectTemplate, 1);
-        } catch (InterpreterTestException e) {
-            throw e;
-        } catch (Exception e) {
-            exceptionCaught = true;
+        } catch (UnsupportedCallException e) {
+            return;
         }
-        if (!exceptionCaught) {
-            fail("Exception not thrown for <iterate> called with "
-                 + "nonexistant method.");
-        }
+        fail("Exception not thrown for <iterate> called with "
+                + "nonexistant method.");
     }
 
-    public void testIterateNoIteratorName() throws Exception {
-        boolean exceptionCaught = false;
+    /**
+     * Test iterate without name.
+     *
+     * @throws UnsupportedCallException if we cannot call evaluate a call.
+     */
+    public void testIterateNoIteratorName() throws UnsupportedCallException {
         try {
             interpreterTest("iterate", incorrectTemplate, 2);
-        } catch (InterpreterTestException e) {
-            throw e;
-        } catch (Exception e) {
-            exceptionCaught = true;
+        } catch (BadTemplateException e) {
+            return;
         }
-        if (!exceptionCaught) {
-            fail("Exception not thrown for <iterate> without iteratorname.");
-        }
+        fail("Exception not thrown for <iterate> without iteratorname.");
     }
 
-    public void testCallIncorrectWhat() throws Exception {
-        boolean exceptionCaught = false;
+    /**
+     * Test iterate with incorrect what.
+     *
+     * @throws BadTemplateException if the template is incorrect.
+     */
+    public void testCallIncorrectWhat() throws BadTemplateException {
         try {
             interpreterTest("call", incorrectTemplate, 0);
-        } catch (InterpreterTestException e) {
-            throw e;
-        } catch (Exception e) {
-            exceptionCaught = true;
+        } catch (UnsupportedCallException e) {
+            return;
         }
-        if (!exceptionCaught) {
-            fail("Exception not thrown for <call> with nonexistant method.");
-        }
+        fail("Exception not thrown for <call> with nonexistant method.");
     }
 
-    public void testIfIncorrectWhat() throws Exception {
-        boolean exceptionCaught = false;
+    /**
+     * Test if with incorrect what.
+     *
+     * @throws UnsupportedCallException if we cannot call evaluate a call.
+     */
+    public void testIfIncorrectWhat() throws UnsupportedCallException {
         try {
             interpreterTest("if", incorrectTemplate, 0);
-        } catch (InterpreterTestException e) {
-            throw e;
-        } catch (Exception e) {
-            exceptionCaught = true;
+        } catch (BadTemplateException e) {
+            return;
         }
-        if (!exceptionCaught) {
-            fail("Exception not thrown for <if> with non-boolean method.");
-        }
+        fail("Exception not thrown for <if> with non-boolean method.");
     }
 
-    public void testBindAttrWithQuote() throws Exception {
+    /**
+     * Test bind.
+     *
+     * @throws UnsupportedCallException if we cannot call evaluate a call.
+     * @throws BadTemplateException if the template is incorrect.
+     */
+    public void testBindAttrWithQuote()
+    	throws BadTemplateException, UnsupportedCallException {
         interpreterTest("bind", incorrectTemplate, 0);
     }
 
@@ -218,43 +302,24 @@ public class TestInterpreters extends TestCase {
      */
     protected void setUp() throws IOException {
         // Prepare the nodes from the template.
-        DOMParser parser = new DOMParser();
 
         String correctTemplateName = "CorrectTemplate.xml";
         String incorrectTemplateName = "IncorrectTemplate.xml";
 
         // Parse the correct template.
-        try {
-            parser.parse("tests/org/argoprint/engine/interpreters/"
-                    + correctTemplateName);
-        } catch (org.xml.sax.SAXException e) {
-            fail("Could not parse " + correctTemplateName + ": "
-                    + e.getMessage());
-        }
-        correctTemplate = parser.getDocument();
+        correctTemplate = parseTestTemplate(correctTemplateName);
         assertNotNull("Could not get the " + correctTemplateName
                 + " from the parser.",
                 correctTemplate);
 
         // Parse the incorrect template.
-        try {
-            parser.parse("tests/org/argoprint/engine/interpreters/"
-                    + incorrectTemplateName);
-        } catch (org.xml.sax.SAXException e) {
-            fail("Could not parse " + incorrectTemplateName + ": "
-                    + e.getMessage());
-        }
-        incorrectTemplate = parser.getDocument();
+        incorrectTemplate = parseTestTemplate(incorrectTemplateName);
         assertNotNull("Could not get " + incorrectTemplateName
                 + " from the parser.",
                 incorrectTemplate);
 
         umlInt = new DataSourceStub();
-        assertNotNull(umlInt);
-
         env = new Environment();
-        assertNotNull(env);
-
         interpreters = new HashMap();
 
         defaultInterpreter = new InterpreterDefault(umlInt);
@@ -280,18 +345,37 @@ public class TestInterpreters extends TestCase {
         bindInterpreter.setFirstHandler(bindInterpreter);
         bindInterpreter.setNextHandler(defaultInterpreter);
         interpreters.put("bind", bindInterpreter);
-
-
-        assertNotNull("Could not create InterpreterBind.",    bindInterpreter);
-        assertNotNull("Could not create InterpreterIf.",      ifInterpreter);
-        assertNotNull("Could not create InterpreterCall.",    callInterpreter);
-        assertNotNull("Could not create InterpreterIterate.",
-                iterateInterpreter);
-        assertNotNull("Could not create InterpreterDefault.",
-                defaultInterpreter);
     }
 
 
+    /**
+     * Parse a test template.
+     *
+     * @param templateName The name of the template.
+     * @return The parsed document.
+     * @throws IOException if we cannot read the file.
+     */
+    private Document parseTestTemplate(String templateName) throws IOException {
+        DOMParser parser = new DOMParser();
+        try {
+            parser.parse("tests/org/argoprint/engine/interpreters/"
+                    + templateName);
+        } catch (org.xml.sax.SAXException e) {
+            fail("Could not parse " + templateName + ": "
+                    + e.getMessage());
+        }
+        Document document = parser.getDocument();
+        return document;
+    }
+
+    /**
+     * Find the index of a node in a NodeList.
+     *
+     * @param nodes The NodeList.
+     * @param name The node name to search for.
+     * @param start Where to start.
+     * @return The index.
+     */
     private int findNode(NodeList nodes, String name, int start) {
         for (int i = start; i < nodes.getLength(); ++i) {
             if (nodes.item(i).getNodeName().equals(name)) {
@@ -299,13 +383,5 @@ public class TestInterpreters extends TestCase {
             }
         }
         return -1;
-    }
-
-
-    /**
-     * @param params Arguments.
-     */
-    public static void main(String[] params) {
-        junit.textui.TestRunner.run(suite());
     }
 }
