@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 // import org.argoprint.ui.Settings;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xml.serialize.*;
@@ -22,8 +21,9 @@ public class Main {
 	public Main() {
 		_parser = new DOMParser(); 
 		_umlInterface = new UMLInterface();
-		// Initialize the CoR and send it the document
-		_firstHandler = new InterpreterDefault("", _umlInterface, this);
+		// Initialize the CoR
+		_firstHandler = new InterpreterDefault(_umlInterface);
+		_firstHandler.setFirstHandler(_firstHandler);
 	}
 
 	// TODO change parameter to Settings when that class is finished
@@ -37,16 +37,11 @@ public class Main {
 	public void go()
 	throws FileNotFoundException, IOException, Exception {
 		Document document = _parser.getDocument();
-		interpret(document, new Environment());
+		_firstHandler.handleTag(document, new Environment());
 		
 		FileOutputStream outputStream = new FileOutputStream(_outputFile);
 		XMLSerializer serializer = new XMLSerializer(outputStream, null);
 		// Currently only outputs the input document
 		serializer.serialize(document);
-	}
-
-	public void interpret(Node node, Environment env) 
-	throws Exception {
-		_firstHandler.handleTag(node, env);
 	}
 }
