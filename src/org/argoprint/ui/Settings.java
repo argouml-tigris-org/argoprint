@@ -32,11 +32,14 @@
 
 package org.argoprint.ui;
 
+
+import java.io.*;
 import java.lang.*;
 
 /**
  * Stores and manipulates settings when ArgoPrint is running.
- * Todo: Add control to se if path-/filenames are correct.
+ * Todo: Add control to se if path-/filenames are correct. Almost done!
+ * Todo: Add control in the setters! 
  *
  * @author matda701, Mattias Danielsson
  */
@@ -69,12 +72,50 @@ public class Settings{
     /**
      * Constructor. Sets attributes to corresponding argument.
      */
-    public Settings(String template, String file, String dir){
+    public Settings(String template, String file, String dir) 
+	throws Exception{
 	_outputDir = new String(dir);
 	_outputFile = new String(file);
 	_template = new String(template);
-    }
+	
+	try{
+	    checkCorrectness();
+	} catch(Exception e){
+	    throw e;
+	}
+    } 
     
+    
+    /**
+     * Function to check if member attributes, ie path-/filenames are valid.
+     * throws Exceptions if incorrect values or r/w-rights is not correct.
+     */
+    private void checkCorrectness() throws Exception{
+	try{
+	    File templateFile = new File(_template);
+	    
+	    if(!templateFile.exists()){
+		throw new Exception("Template file not found");
+	    }   
+	    if(!templateFile.canRead()){
+		throw new Exception("Can't read template file");
+	    }
+
+	    File outputFile = new File(_outputFile);
+	    if(!outputFile.canWrite()){
+		throw new Exception("Can't write to output file");
+	    }
+
+	    File outputDir = new File(_outputDir);
+	    if(!outputDir.isDirectory()){
+		throw new Exception("Not a valid output directory");
+	    }
+	}catch(Exception e){
+	    throw e;
+	}
+	
+    } 
+
     /**
      * Setter for outputDir
      */
