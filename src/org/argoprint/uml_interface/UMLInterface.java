@@ -1,5 +1,7 @@
 package org.argoprint.uml_interface;
 
+import org.argoprint.*;
+
 import java.awt.event.ActionEvent;
 
 import java.io.File;
@@ -45,18 +47,14 @@ import java.lang.Boolean;
 import org.tigris.gef.base.*;
 import org.tigris.gef.persistence.*;
 
-
-/*TODO: Implement an interface, which the UMLInterface implements...
- *to make argoprint more generally extendable
- */
-
 /** 
  * The class ArgoPrint uses to interface to the ArgoUML model.
  * It primarily communicates with ModelFacade using java.lang.reflect.*
  * To save diagrams gef is called. //TODO: fix bug that causes only
  * the open diagram to be saved correctly.
  */
-public class UMLInterface {
+public class UMLInterface 
+    implements ArgoPrintDataSource{
     public static final String separator = "/";
 
     /**
@@ -347,3 +345,10 @@ public class UMLInterface {
     }/*end of method save all diags */
    
 } /* end class UMLInteface */
+
+
+
+
+
+
+
