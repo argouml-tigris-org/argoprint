@@ -37,7 +37,7 @@ public class Settings{
     /**
      * Constructor. Sets attributes to corresponding argument.
      */
-    public Settings(String dir, String file, String template){
+    public Settings(String template, String file, String dir){
 	_outputDir = new String(dir);
 	_outputFile = new String(file);
 	_template = new String(template);
