@@ -43,12 +43,8 @@ public class DataSourceStub implements ArgoPrintDataSource {
 	public Object caller(String call, Object iteratorObject)
 	throws Exception {
 		Object returnValue = null;
-		try {
 		Method callMethod = iteratorObject.getClass().getMethod(call, new Class[0]);
 		returnValue = callMethod.invoke(iteratorObject, new Object[0]);
-		} catch (Exception e) {
-			System.out.println("Tried to call DataSourceStub with an iterator but failed: " + e.getMessage());
-		}
 		return returnValue;
 	}
 	
