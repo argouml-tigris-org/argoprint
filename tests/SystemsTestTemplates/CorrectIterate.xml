@@ -1,0 +1,5 @@
+<root>
+    <ap:iterate what="getCollection()" iteratorname="it">
+        Tjoho.
+    </ap:iterate>
+</root>
