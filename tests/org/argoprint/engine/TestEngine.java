@@ -1,12 +1,10 @@
 package org.argoprint.engine;
 
-import org.argoprint.ui.Settings;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.log4j.ConsoleAppender;
+import org.argoprint.ui.Settings;
 
 public class TestEngine extends TestCase {
 
@@ -23,10 +21,8 @@ public class TestEngine extends TestCase {
      *  @See org.argoprint.Engine.Main#initializeSystem()
      */
     public void testInitializeSystem() throws Exception {
-        Settings s = new Settings();
-        s.setOutputDir("/tmp/");
-        s.setTemplate("TestEngine.xml");
-        s.setOutputFile("/tmp/EngineTestResult");
+        Settings s =
+            new Settings("TestEngine.xml", "/tmp/EngineTestResult", "/tmp/");
         _main.initializeSystem(s);
     }
 

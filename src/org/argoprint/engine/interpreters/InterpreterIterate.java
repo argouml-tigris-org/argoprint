@@ -84,6 +84,15 @@ public class InterpreterIterate extends Interpreter {
     }
 
     /**
+     * Constructor for this Interpreter.
+     * 
+     * @param dataSource The data source to call.
+     */
+    public InterpreterIterate(ArgoPrintDataSource dataSource) {
+	this(dataSource, null);
+    }
+
+    /**
      * Processes the iterate tag.
      *
      * @see Interpreter#processTag(Node, Environment)

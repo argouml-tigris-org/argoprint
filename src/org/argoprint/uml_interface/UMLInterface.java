@@ -40,14 +40,14 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.UnsupportedCallException;
 import org.argouml.kernel.Project;
 import org.argouml.kernel.ProjectManager;
+import org.argouml.model.Model;
 import org.argouml.model.ModelFacade;
-import org.argouml.model.uml.UmlFactory;
-import org.argouml.model.uml.foundation.core.CoreHelper;
 import org.argouml.ui.ProjectBrowser;
 import org.argouml.uml.diagram.ui.UMLDiagram;
 import org.argouml.util.FileFilters;
@@ -103,12 +103,12 @@ public class UMLInterface
 	//_classes = new ModelFacade(); 
 	_classes = new ArrayList();
 	_classes.add(new ModelFacade());
-	_classes.add(UmlFactory.getFactory());
-	_classes.add(CoreHelper.getHelper());
-	_classes.add(UmlFactory.getFactory().getDataTypes());
-	_classes.add(UmlFactory.getFactory().getCore());
-	_classes.add(UmlFactory.getFactory().getCommonBehavior());
-	_classes.add(UmlFactory.getFactory().getUseCases());
+	_classes.add(Model.getUmlFactory());
+	_classes.add(Model.getCoreHelper());
+	_classes.add(Model.getUmlFactory().getDataTypes());
+	_classes.add(Model.getUmlFactory().getCore());
+	_classes.add(Model.getUmlFactory().getCommonBehavior());
+	_classes.add(Model.getUmlFactory().getUseCases());
 	// TODO: Add all of them.
     }
 
@@ -347,10 +347,10 @@ public class UMLInterface
 	    File defFile = 
 		new File(_outputDir 
 			 + defaultName + "."
-			 + FileFilters.GIFFilter._suffix);
+			 + FileFilters.GIF_FILTER.getSuffix());
 		
 	    LOG.info("diagram filename " + defaultName + "."
-		      + FileFilters.GIFFilter._suffix);
+		      + FileFilters.GIF_FILTER.getSuffix());
 
 	    if (defFile != null) {
 		String path = defFile.getParent();

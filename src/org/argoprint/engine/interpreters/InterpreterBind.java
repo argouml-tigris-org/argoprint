@@ -77,6 +77,15 @@ public class InterpreterBind extends Interpreter {
     }
 
     /**
+     * Constructor for the interpreter.
+     * 
+     * @param dataSource The data source to call.
+     */
+    public InterpreterBind(ArgoPrintDataSource dataSource) {
+	this(dataSource, null);
+    }
+
+    /**
      * Processes the bind tag.
      * 
      * @see Interpreter#processTag(Node, Environment)

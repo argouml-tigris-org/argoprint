@@ -1,17 +1,22 @@
 package org.argoprint.engine.interpreters;
 
-import junit.framework.*;
-import org.w3c.dom.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.apache.xerces.parsers.DOMParser;
-import org.apache.xml.serialize.*;
-
-import org.argoprint.engine.interpreters.*;
-import org.argoprint.engine.Environment;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
 import org.argoprint.DataSourceStub;
-
-import java.io.*;
-import java.lang.*;
-import java.util.*;
+import org.argoprint.engine.Environment;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class TestInterpreters extends TestCase {
     private class InterpreterTestException extends Exception {

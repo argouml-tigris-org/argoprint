@@ -160,5 +160,18 @@ public class Settings {
     public FileInputStream getTemplate() throws FileNotFoundException {
         return new FileInputStream(_template);
     }
-}
 
+    /**
+     * Setter for the template.
+     *
+     * @param template
+     * @throws FileNotFoundException if the file cannot be found.
+     */
+    public void setTemplate(String template) 
+    	throws FileNotFoundException {
+
+	_template = new File(template);
+
+	checkCorrectness();
+    }
+}

@@ -56,6 +56,15 @@ public class InterpreterDefault extends Interpreter {
     }
 
     /**
+     * Constructor for this interpreter.
+     * 
+     * @param dataSource The data source used.
+     */
+    public InterpreterDefault(ArgoPrintDataSource dataSource) {
+	this(dataSource, null);
+    }
+
+    /**
      * Only needs to recurse on the children.
      * 
      * @see Interpreter#processTag(Node, Environment)

@@ -1,18 +1,18 @@
 package org.argoprint.engine;
 
-import junit.framework.*;
-import org.w3c.dom.*;
+import java.io.ByteArrayOutputStream;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.apache.xerces.parsers.DOMParser;
-import org.apache.xml.serialize.*;
-
-import org.argoprint.ui.*;
-import org.argoprint.engine.interpreters.*;
-import org.argoprint.engine.Environment;
-import org.argoprint.*;
-
-import java.io.*;
-import java.lang.*;
-import java.util.*;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
+import org.argoprint.ArgoPrintDataSource;
+import org.argoprint.DataSourceStub;
+import org.argoprint.ui.Settings;
+import org.w3c.dom.NodeList;
 
 public class IntegrationTest extends TestCase {
     private Main _main = null;

@@ -66,6 +66,15 @@ public class InterpreterIf extends Interpreter {
     }
 
     /**
+     * Constructor for this interpreter.
+     * 
+     * @param dataSource The data source to call.
+     */
+    public InterpreterIf(ArgoPrintDataSource dataSource) {
+	this(dataSource, null);
+    }
+
+    /**
      * Processes the if tag.
      *
      * @see Interpreter#processTag(Node, Environment)

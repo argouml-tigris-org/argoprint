@@ -236,7 +236,7 @@ public abstract class Interpreter {
     protected static NodeList getVector(NodeList nodeList) {
         NodeSet set = new NodeSet(nodeList);
         set.setShouldCacheNodes(true);
-        return (NodeList) set;
+        return set;
     }
 	
     /**

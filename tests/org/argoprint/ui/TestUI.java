@@ -1,7 +1,8 @@
 package org.argoprint.ui;
 
-import org.argoprint.ui.*;
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class TestUI extends TestCase {
     private Settings _settings = null;
@@ -21,13 +22,6 @@ public class TestUI extends TestCase {
 
         _settings.setOutputDir(output_dir);
         assertEquals(_settings.getOutputDir(), output_dir);
-    }
-
-    public void testSettingsCorrectTemplate() {
-        String template = "settings_template.xml";
-
-        _settings.setTemplate(template);
-        assertEquals(_settings.getTemplate(), template);
     }
 
     public void testSettingsCorrectOutputFile() {
