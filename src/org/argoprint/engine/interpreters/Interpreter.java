@@ -114,4 +114,19 @@ abstract public class Interpreter{
 		else
 			return (node.getLocalName().equals(localName) && node.getPrefix().equals(prefix));
 	}
+	
+	protected Vector getVector(NodeList nodeList) { 
+		int numNodes = nodeList.getLength();
+		Vector vector = new Vector(numNodes);
+		for (int i = 0; i < numNodes; i++){
+			vector.add(i, nodeList.item(i));
+		}
+		return vector;
+	}
+	
+	protected void recurse(Vector nodes, Environment env) throws Exception {
+		for (int i = 0; i < nodes.size(); i++) {
+			_firstHandler.handleTag((Node)nodes.get(i), env);
+		}
+	}
 }
