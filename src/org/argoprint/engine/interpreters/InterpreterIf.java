@@ -1,5 +1,7 @@
 package org.argoprint.engine.interpreters;
 
+import java.util.Vector;
+
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.engine.Environment;
 import org.w3c.dom.*;
@@ -56,16 +58,17 @@ public class InterpreterIf extends Interpreter {
 		Node ifParent = tagNode.getParentNode();
 		if (!(resultChildren == null || resultChildren.getLength() == 0)) { 
 			Node resultParent = resultChildren.item(0).getParentNode();
-			Node resultChild;
-			while (resultChildren.getLength() > 0) {
-				resultChild = resultChildren.item(0);
-				resultParent.removeChild(resultChild);
-				ifParent.appendChild(resultChild);
+			Vector resultVector = getVector(resultChildren);
+			for (int i = 0; i < resultVector.size(); i++) {
+				Node child = (Node)resultVector.get(i);
+				resultParent.removeChild(child);
+				ifParent.insertBefore(child, tagNode);
 			}
+			recurse(resultVector, env);
 		}
 		ifParent.removeChild(tagNode);
-		
-		_firstHandler.handleTag(ifParent, env);
 	}
-}	
+	
+
+}
 	
