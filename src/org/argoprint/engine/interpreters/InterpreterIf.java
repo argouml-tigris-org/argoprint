@@ -17,12 +17,13 @@ public class InterpreterIf extends Interpreter {
 	 * @param env
 	 */
 	protected void processTag(Node tagNode, Environment env) throws Exception {
+		// TODO: divide into some private methods
+
 		// Evaluate condition
 		NamedNodeMap attributes = tagNode.getAttributes();
 		Object returnValue = callDataSource("cond", attributes, env);
 		if (!(returnValue instanceof Boolean))
 			throw new BadTemplateException("The condition did not evaluate to a Boolean.");
-		Boolean cond = (Boolean)returnValue;
 		
 		NodeList ifChildren = tagNode.getChildNodes();
 		
@@ -38,7 +39,7 @@ public class InterpreterIf extends Interpreter {
 						
 		// Decide what part of the sub tree (if any) shall be used
 		NodeList resultChildren;
-		if (cond.equals(Boolean.TRUE)) {
+		if (((Boolean)returnValue).booleanValue()) {
 			if (thenNode == null)
 				resultChildren = ifChildren;
 			else
@@ -64,7 +65,7 @@ public class InterpreterIf extends Interpreter {
 		}
 		ifParent.removeChild(tagNode);
 		
-		handleChildren(ifParent, env);
+		_firstHandler.handleTag(ifParent, env);
 	}
 }	
 	

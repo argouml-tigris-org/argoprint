@@ -114,13 +114,4 @@ abstract public class Interpreter{
 		else
 			return (node.getLocalName().equals(localName) && node.getPrefix().equals(prefix));
 	}
-	
-	protected void handleChildren(Node node, Environment env) throws Exception {
-		NodeList childrenNodeList = node.getChildNodes();
-		Vector children = new Vector(childrenNodeList.getLength());
-		for (int i = 0; i < children.size(); i++) 
-			children.add(childrenNodeList.item(i));
-		for (int i = 0; i < children.size(); i++)
-			_firstHandler.handleTag((Node)children.get(i), env);
-	}
 }
