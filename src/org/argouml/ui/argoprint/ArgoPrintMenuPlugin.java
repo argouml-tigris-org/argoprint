@@ -35,26 +35,16 @@
 
 package org.argouml.ui.argoprint;
 
-import org.argouml.application.api.*;
-import org.argouml.uml.ui.*;
+import java.awt.event.ActionEvent;
+import java.util.Vector;
 
-import org.argoprint.uml_interface.UMLInterface;
-import org.argoprint.ui.*;
+import javax.swing.JMenuItem;
 
-import org.argouml.kernel.Project;
-import org.argouml.kernel.ProjectManager;
-import org.argouml.ui.ProjectBrowser;
+import org.argoprint.ui.ArgoPrintJDialog;
+import org.argouml.application.api.PluggableMenu;
+import org.argouml.uml.ui.UMLAction;
 
-import org.argouml.model.ModelFacade;
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.lang.*;
-
-import java.util.*;
-
-import javax.swing.*;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -63,6 +53,8 @@ import javax.swing.*;
  */
 public class ArgoPrintMenuPlugin extends UMLAction
     implements PluggableMenu {
+    private static final Logger LOG = 
+        Logger.getLogger(ArgoPrintMenuPlugin.class);
     /**
      * This is not publicly creatable.
      */
@@ -77,23 +69,23 @@ public class ArgoPrintMenuPlugin extends UMLAction
      * Just let the tester know that we got executed.
      */
     public void actionPerformed(ActionEvent event) {
-	Argo.log.info("Starting ArgoPrint");
+	LOG.info("Starting ArgoPrint");
 
 	// This is where the ArgoPrint GUI frame is created and displayed
 	ArgoPrintJDialog argoPrintDialog = 
 	    new ArgoPrintJDialog(new javax.swing.JFrame(), true);
-	Argo.log.info("Setting Gui Log");
-	argoPrintDialog.setLog(Argo.log);
-	Argo.log.info("Showing ArgoPrint Dialog");
+	LOG.info("Setting Gui Log");
+	argoPrintDialog.setLog(LOG);
+	LOG.info("Showing ArgoPrint Dialog");
 	argoPrintDialog.show();
     }
 
     public void setModuleEnabled(boolean v) { }
     
     public boolean initializeModule() {
-        Argo.log.info ("+-----------------------------+");
-        Argo.log.info ("| ArgoPrint initialized       |");
-        Argo.log.info ("+-----------------------------+");
+        LOG.info ("+-----------------------------+");
+        LOG.info ("| ArgoPrint initialized       |");
+        LOG.info ("+-----------------------------+");
    	return true;
     }
 

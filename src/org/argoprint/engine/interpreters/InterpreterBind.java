@@ -34,6 +34,7 @@ package org.argoprint.engine.interpreters;
 import java.util.Vector;
 
 import org.argoprint.ArgoPrintDataSource;
+import org.argoprint.UnsupportedCallException;
 import org.argoprint.engine.Environment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -73,16 +74,18 @@ public class InterpreterBind extends Interpreter {
     /**
      * Processes the bind tag.
      * 
-     * @see Interpreter
+     * @see Interpreter#processTag(Node, Environment)
      */
-    protected void processTag(Node tagNode, Environment env) throws Exception {
+    protected void processTag(Node tagNode, Environment env) 
+    	throws BadTemplateException, UnsupportedCallException {
 		
 	// Create the new element
 	NamedNodeMap attributes = tagNode.getAttributes();
 	Node attr = attributes.getNamedItem("name");
-	if (attr == null)
+	if (attr == null) {
 	    throw new BadTemplateException("Bind tag contains no "
 					   + "name attribute.");
+	}
 	Document document = tagNode.getOwnerDocument();
 	Element newElement = document.createElement(attr.getNodeValue());
 
@@ -93,9 +96,10 @@ public class InterpreterBind extends Interpreter {
 	    if (isNodeNamed(child, "attr")) {
 		attributes = child.getAttributes();
 		attr = attributes.getNamedItem("name");
-                if (attr == null)
+                if (attr == null) {
                     throw new BadTemplateException("attr tag contains no "
 						   + "name attribute.");
+                }
                 children = child.getChildNodes();
                 // Recurse on the contents of the attr tag.
                 Vector childrenVector = getVector(children);
@@ -118,7 +122,7 @@ public class InterpreterBind extends Interpreter {
             else {
                 tagNode.removeChild(child);
                 newElement.appendChild(child);
-                _firstHandler.handleTag(child, env);
+                firstHandler.handleTag(child, env);
                 // Don't increment i since removeChild removed index i
             }
         }

@@ -70,45 +70,45 @@ public class Settings {
 
     /**
      * Constructor. Sets attributes to corresponding argument.
+     * 
+     * @throws FileNotFoundException if we cannot read or write the files involved.
      */
     public Settings(String template, String file, String dir) 
-	throws Exception {
+    	throws FileNotFoundException {
+        
 	_template = new File(template);
 	_outputFile = file;
 	_outputDir = dir;
 	
-	try {
-	    checkCorrectness();
-	} catch (Exception e) {
-	    throw e;
-	}
+	checkCorrectness();
     } 
 
 
     /**
      * Function to check if member attributes, ie path-/filenames are valid.
-     * throws Exceptions if incorrect values or r/w-rights is not correct.
+     * 
+     * @throws FileNotFoundException if we cannot read or write the files involved.
      */
-    private void checkCorrectness() throws Exception {
+    private void checkCorrectness() throws FileNotFoundException {
 
 	if (!_template.exists()) {
-	    throw new Exception("Template file not found");
+	    throw new FileNotFoundException("Template file not found");
 	}   
 	if (!_template.canRead()) {
-	    throw new Exception("Can't read template file");
+	    throw new FileNotFoundException("Can't read template file");
 	}
 
 	File outputFile = new File(_outputFile);
 	if (outputFile.exists()) {
 	    if (!outputFile.canWrite()) {
-		throw new Exception("Can't write to output file: "
+		throw new FileNotFoundException("Can't write to output file: "
 				    + outputFile);
 	    }
 	}
 
 	File outputDir = new File(_outputDir);
 	if (!outputDir.isDirectory()) {
-	    throw new Exception("Not a valid output directory");
+	    throw new FileNotFoundException("Not a valid output directory");
 	}
     } 
 

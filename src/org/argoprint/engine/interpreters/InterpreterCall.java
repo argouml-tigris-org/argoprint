@@ -32,7 +32,9 @@
 
 
 package org.argoprint.engine.interpreters;
+
 import org.argoprint.ArgoPrintDataSource;
+import org.argoprint.UnsupportedCallException;
 import org.argoprint.engine.Environment;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -53,13 +55,16 @@ public class InterpreterCall extends Interpreter {
     /**
      * Processes the call tag.
      * 
-     * @see Interpreter#processTag
+     * @see Interpreter#processTag(Node, Environment)
      */
-    protected void processTag(Node tagNode, Environment env) throws Exception {
+    protected void processTag(Node tagNode, Environment env) 
+    	throws BadTemplateException, UnsupportedCallException {
+        
 	NamedNodeMap attributes = tagNode.getAttributes();
 	Object returnValue = callDataSource("what", attributes, env);
-        if (returnValue == null)
+        if (returnValue == null) {
             returnValue = "null";
+        }
 	Document document = tagNode.getOwnerDocument();
 	Node parentNode = tagNode.getParentNode();
 	Node fetchedData = document.createTextNode(returnValue.toString());

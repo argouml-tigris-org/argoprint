@@ -35,19 +35,25 @@ package org.argoprint.engine.interpreters;
 import java.util.Vector;
 
 import org.argoprint.ArgoPrintDataSource;
+import org.argoprint.UnsupportedCallException;
 import org.argoprint.engine.Environment;
-import org.w3c.dom.*;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * This Interpreter processes the if tag.
+ * This Interpreter processes the if tag.<p>
  *
- * The if tag looks like this:
- * <ap:if cond="VALUE">blabla</ap:if>,
- * <ap:if cond="VALUE"><ap:then>blabla</ap:then></ap:if>, or
- * <ap:if cond="VALUE">
- *   <ap:then>blabla</ap:then>
- *   <ap:else>blabla</ap:else>
- * </ap:if>
+ * The if tag looks like this:<ul>
+ * <li>&lt;ap:if cond="VALUE"&gt;blabla&lt;/ap:if&gt;,
+ * <li>&lt;ap:if cond="VALUE"&gt;
+ *       &lt;ap:then&gt;blabla&lt;/ap:then&gt;
+ *     &lt;/ap:if&gt;, or
+ * <li>&lt;ap:if cond="VALUE"&gt;
+ *       &lt;ap:then&gt;blabla&lt;/ap:then&gt;
+ *       &lt;ap:else&gt;blabla&lt;/ap:else&gt;
+ *     &lt;/ap:if&gt;
+ * </ul>
  */
 public class InterpreterIf extends Interpreter {
 
@@ -58,59 +64,82 @@ public class InterpreterIf extends Interpreter {
     /**
      * Processes the if tag.
      *
-     * @see Interpreter
+     * @see Interpreter#processTag(Node, Environment)
      */
-    protected void processTag(Node tagNode, Environment env) throws Exception {
-	// TODO: divide into some private methods
-
+    protected void processTag(Node tagNode, Environment env) 
+    	throws BadTemplateException, UnsupportedCallException {
+        
 	// Evaluate condition
 	NamedNodeMap attributes = tagNode.getAttributes();
 	Object returnValue = callDataSource("cond", attributes, env);
-	if (!(returnValue instanceof Boolean))
+	if (!(returnValue instanceof Boolean)) {
 	    throw new BadTemplateException("The condition did not evaluate "
-					   + "to a Boolean.");
-		
-	NodeList ifChildren = tagNode.getChildNodes();
-		
-	// Find then and else nodes
-	// TODO: What should happen if we have several "then" or several "else"
-	Node thenNode = null;
-	Node elseNode = null;
-	for (int i = 0; i < ifChildren.getLength(); i++) {
-	    if (isNodeNamed(ifChildren.item(i), "then"))
-		thenNode = ifChildren.item(i);
-	    else if (isNodeNamed(ifChildren.item(i), "else"))
-		elseNode = ifChildren.item(i);
+	                                   + "to a Boolean.");
 	}
-						
+		
 	// Decide what part of the sub tree (if any) shall be used
 	NodeList resultChildren;
 	if (((Boolean) returnValue).booleanValue()) {
+	    Node thenNode = findNode(tagNode.getChildNodes(), "then");
 	    if (thenNode == null)
-		resultChildren = ifChildren;
+		resultChildren = tagNode.getChildNodes();
 	    else
 		resultChildren = thenNode.getChildNodes();
 	}
 	else {
-	    if (elseNode == null)
+	    Node elseNode = findNode(tagNode.getChildNodes(), "else");
+	    if (elseNode == null) {
 		resultChildren = null;
-	    else
+	    } else {
 		resultChildren = elseNode.getChildNodes();
+	    }
 	}
 		
-	// Attach the result to parent and remove if tag
-	Node ifParent = tagNode.getParentNode();
-	if (!(resultChildren == null || resultChildren.getLength() == 0)) { 
-	    Node resultParent = resultChildren.item(0).getParentNode();
-	    Vector resultVector = getVector(resultChildren);
-	    for (int i = 0; i < resultVector.size(); i++) {
-		Node child = (Node) resultVector.get(i);
-		resultParent.removeChild(child);
-		ifParent.insertBefore(child, tagNode);
-	    }
-	    recurse(resultVector, env);
-	}
-	ifParent.removeChild(tagNode);
+	attachResult(tagNode, env, resultChildren);
+    }
+
+    /**
+     * Return the child node with a given name.<p>
+     * 
+     * This returns the first found node with the name.
+     * 
+     * @param children where to search for the node.
+     * @param nodeName The name to search from.
+     * @return The found node (or <tt>null</tt> if not found).
+     */
+    private Node findNode(NodeList children, String nodeName) {
+        for (int i = 0; i < children.getLength(); i++) {
+            if (isNodeNamed(children.item(i), nodeName)) {
+        	return children.item(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Attach the result to parent and remove if tag
+     * 
+     * @param tagNode the node that we are removing.
+     * @param env The contect we are in.
+     * @param resultChildren The result of the if.
+     * @throws BadTemplateException when the input file is syntactically wrong.
+     * @throws UnsupportedCallException when the input triggers invalid calls.
+     */
+    private void attachResult(Node tagNode, Environment env, 
+            		      NodeList resultChildren) 
+    	throws BadTemplateException, UnsupportedCallException {
+        
+        Node ifParent = tagNode.getParentNode();
+        if (!(resultChildren == null || resultChildren.getLength() == 0)) { 
+            Node resultParent = resultChildren.item(0).getParentNode();
+            Vector resultVector = getVector(resultChildren);
+            for (int i = 0; i < resultVector.size(); i++) {
+        	Node child = (Node) resultVector.get(i);
+        	resultParent.removeChild(child);
+        	ifParent.insertBefore(child, tagNode);
+            }
+            recurse(resultVector, env);
+        }
+        ifParent.removeChild(tagNode);
     }
 }
-	

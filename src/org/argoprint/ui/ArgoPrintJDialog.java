@@ -38,20 +38,19 @@ package org.argoprint.ui;
  * Created on den 17 november 2003, 14:38
  */
 
-import org.argoprint.uml_interface.*;
-import org.argoprint.engine.*;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import org.argouml.util.SuffixFilter;
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.util.*;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
-
-import javax.swing.*;
-import javax.swing.filechooser.*;
+import org.argoprint.engine.Main;
+import org.argouml.util.SuffixFilter;
 
 /**
  *
@@ -113,7 +112,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 
 
 	getContentPane().add( jUIPanel );
-	getContentPane().add( jButtonPanel, bl.SOUTH );
+	getContentPane().add( jButtonPanel, BorderLayout.SOUTH );
 
 
 	/** Init UI Panel */

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="argoprint" default="run" basedir=".">
+<project name="argoprint" default="package" basedir=".">
 
   <!-- =================================================================== -->
   <!-- Initialization target                                               -->

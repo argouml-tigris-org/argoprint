@@ -31,9 +31,11 @@
 //THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.argoprint.engine.interpreters;
+
 import java.util.Vector;
 
 import org.argoprint.ArgoPrintDataSource;
+import org.argoprint.UnsupportedCallException;
 import org.argoprint.engine.Environment;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,9 +49,11 @@ public class InterpreterDefault extends Interpreter {
     /**
      * Only needs to recurse on the children.
      * 
-     * @see Interpreter#processTag
+     * @see Interpreter#processTag(Node, Environment)
      */
-    protected void processTag(Node tagNode, Environment env) throws Exception {
+    protected void processTag(Node tagNode, Environment env) 
+    	throws BadTemplateException, UnsupportedCallException {
+        
 	NodeList children = tagNode.getChildNodes();
 	if (children.getLength() > 0) {
 	    Vector childrenVector = getVector(children);

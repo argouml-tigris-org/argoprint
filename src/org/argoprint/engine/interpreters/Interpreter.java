@@ -34,33 +34,38 @@
 package org.argoprint.engine.interpreters;
 
 import java.util.Vector;
-import org.w3c.dom.*;
+
 import org.argoprint.ArgoPrintDataSource;
-import org.argoprint.engine.*;
+import org.argoprint.UnsupportedCallException;
+import org.argoprint.engine.ArgoPrintIterator;
+import org.argoprint.engine.Environment;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Superclass for the interpreters.
  */
 public abstract class Interpreter {
     protected static final String PREFIX = "ap";
-    private String _tagName;
+    private String tagName;
     private Interpreter _nextHandler;
-    protected Interpreter _firstHandler;
+    protected Interpreter firstHandler;
     protected ArgoPrintDataSource _dataSource;
     
     public Interpreter() {
     }
     
     /**
-     * @param tagName The name of the tag that this Interpreter can process.
-     * @param dataSource The ArgoPrintDataSource that this Interpreter
+     * @param name The name of the tag that this Interpreter can process.
+     * @param source The ArgoPrintDataSource that this Interpreter
      * should fetch data from.
      */
-    public Interpreter(String tagName, ArgoPrintDataSource dataSource) {
-    	_tagName = tagName;
-    	_dataSource = dataSource;
+    public Interpreter(String name, ArgoPrintDataSource source) {
+    	tagName = name;
+    	_dataSource = source;
     	_nextHandler = null;
-    	_firstHandler = null;
+    	firstHandler = null;
     }
     
     /**
@@ -75,10 +80,10 @@ public abstract class Interpreter {
     /**
      * Specifies the first Interpreter in the chain of responsibility.
      * 
-     * @param firstHandler The first Interpreter.
+     * @param handler The first Interpreter.
      */
-    public void setFirstHandler(Interpreter firstHandler) {
-	_firstHandler = firstHandler;
+    public void setFirstHandler(Interpreter handler) {
+	firstHandler = handler;
     }
     
     /**
@@ -86,19 +91,23 @@ public abstract class Interpreter {
      *  
      * @param tagNode The Node to handle.
      * @param env The environment in which the Node is to be processed.
-     * @throws Exception if anything goes wrong, either in the datasource or 
-     * in the parsing of the template.
+     * @throws BadTemplateException when the input file is syntactically wrong.
+     * @throws UnsupportedCallException when the input triggers invalid calls.
      */
-    public void handleTag(Node tagNode, Environment env)
-	throws Exception {
-	if (canHandle(tagNode))
+    public void handleTag(Node tagNode, Environment env) 
+    	throws BadTemplateException, UnsupportedCallException {
+        
+	if (canHandle(tagNode)) {
 	    processTag(tagNode, env);
-	else
-	    if (_nextHandler == null)
-		throw new Exception("The last Interpreter in the chain "
-				    + "could not handle the Node.");
-	    else
-		_nextHandler.handleTag(tagNode, env);	
+	} else {
+	    if (_nextHandler == null) {
+		throw new BadTemplateException("The last Interpreter "
+		        		       + "in the chain could not "
+		        		       + "handle the Node.");
+	    } else {
+		_nextHandler.handleTag(tagNode, env);
+	    }
+	}
     }
 
 
@@ -107,10 +116,11 @@ public abstract class Interpreter {
      *
      * @param tagNode is the node to process
      * @param env is the environment that the node has.
-     * @throws Exception if anything goes wrong.
+     * @throws BadTemplateException when the input file is syntactically wrong.
+     * @throws UnsupportedCallException when the input triggers invalid calls.
      */
-    protected abstract void processTag(Node tagNode, Environment env)
-	throws Exception;
+    protected abstract void processTag(Node tagNode, Environment env) 
+    	throws BadTemplateException, UnsupportedCallException;
 
     /**
      * Checks if this Interpreter can handle this Node.
@@ -120,7 +130,7 @@ public abstract class Interpreter {
      */
     protected boolean canHandle(Node tagNode) {
 	return (tagNode.getNodeType() == Node.ELEMENT_NODE
-		&& tagNode.getLocalName().equals(_tagName)
+		&& tagNode.getLocalName().equals(tagName)
 		&& tagNode.getPrefix().equals(PREFIX));
     }
     
@@ -132,27 +142,34 @@ public abstract class Interpreter {
      * @param attributes A NamedNodeMap of map of attributes that must
      * contain at least the attribute what.
      * @param env The Environment in which to process the call.
-     * @return The Object as returned from the data source.
+     * @return The Object as returned from the data source. Depending on the 
+     *         context it could be a Collection or object, a Boolean or 
+     * 	       something that is converted to a String using 
+     * 	       {@link Object#toString()}.
      * @throws BadTemplateException if the correct attributes are not found.
-     * @throws Exception if the DataSource throws Exceptions.
+     * @throws BadTemplateException when the input file is syntactically wrong.
+     * @throws UnsupportedCallException when the input triggers invalid calls.
      */
     protected Object callDataSource(String callAttr,
 				    NamedNodeMap attributes, Environment env) 
-	throws BadTemplateException, Exception {
+    	throws BadTemplateException, UnsupportedCallException {
+        
 	Node callAttrNode = attributes.getNamedItem(callAttr);
-	if (callAttrNode == null)
-	    throw new BadTemplateException(_tagName + " tag contains no "
+	if (callAttrNode == null) {
+	    throw new BadTemplateException(tagName + " tag contains no "
 					   + callAttr + " attribute.");
+	}
 	Object returnValue;
 	Node iteratorAttribute = attributes.getNamedItem("iterator");
-	if (iteratorAttribute == null)
+	if (iteratorAttribute == null) {
 	    returnValue = _dataSource.caller(callAttrNode.getNodeValue());
-	else {
-	    if (!env.existsIterator(iteratorAttribute.getNodeValue()))
+	} else {
+	    if (!env.existsIterator(iteratorAttribute.getNodeValue())) {
 		throw new BadTemplateException(
-	                "Value of iterator in " + _tagName + 
+	                "Value of iterator in " + tagName + 
 			" tag does not correspond to a valid iterator. "
 			+ iteratorAttribute.getNodeValue());
+	    }
 	    
 	    ArgoPrintIterator iterator =
 		env.getIterator(iteratorAttribute.getNodeValue());
@@ -183,9 +200,11 @@ public abstract class Interpreter {
 	return vector;
     }
 	
-    protected void recurse(Vector nodes, Environment env) throws Exception {
+    protected void recurse(Vector nodes, Environment env)
+    	throws BadTemplateException, UnsupportedCallException {
+        
 	for (int i = 0; i < nodes.size(); i++) {
-	    _firstHandler.handleTag((Node) nodes.get(i), env);
+	    firstHandler.handleTag((Node) nodes.get(i), env);
 	}
     }
 }

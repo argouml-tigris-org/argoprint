@@ -38,6 +38,7 @@ import java.util.TreeMap;
 import java.util.Iterator;
 
 import org.argoprint.ArgoPrintDataSource;
+import org.argoprint.UnsupportedCallException;
 import org.argoprint.engine.ArgoPrintIterator;
 import org.argoprint.engine.Environment;
 import org.w3c.dom.*;
@@ -51,17 +52,17 @@ public class InterpreterIterate extends Interpreter {
     /**
      * Processes the iterate tag.
      *
-     * @see Interpreter#processTag
+     * @see Interpreter#processTag(Node, Environment)
      */
-    protected void processTag(Node tagNode, Environment env) throws Exception {
+    protected void processTag(Node tagNode, Environment env) throws BadTemplateException, UnsupportedCallException {
 	NamedNodeMap attributes = tagNode.getAttributes();
 		
 	// Get the collection
 	Object callReturnValue = callDataSource("what", attributes, env);
 	if (!(callReturnValue instanceof Collection)
 	    && !(callReturnValue instanceof Object)) {
-	    throw new Exception("The object returned from the call "
-				+ "to the data source is not a collection.");
+	    throw new UnsupportedCallException("The object returned from the call "
+					       + "to the data source is not a collection.");
 	} else if (!(callReturnValue instanceof Collection)
 		   && (callReturnValue instanceof Object)) {
 	    ArrayList tmpCollection = new ArrayList();
@@ -100,7 +101,7 @@ public class InterpreterIterate extends Interpreter {
 	    for (int i = 0; i < children.getLength(); i++) {
 		newNode = children.item(i).cloneNode(true);
 		parentNode.insertBefore(newNode, tagNode);
-		_firstHandler.handleTag(newNode, env);
+		firstHandler.handleTag(newNode, env);
 	    }
 	}
 	env.removeIterator(iteratorname);
@@ -115,10 +116,10 @@ public class InterpreterIterate extends Interpreter {
      * @param sortvalue The call that will be applied to each object
      * providing a value to sort on.
      * @return A sorted Collection.
-     * @throws Exception
+     * @throws UnsupportedCallException when the input triggers invalid calls.
      */
-    private Collection sortCollection(Collection collection, String sortvalue)
-	throws Exception {
+    private Collection sortCollection(Collection collection, String sortvalue) 
+    	throws UnsupportedCallException {
 
 	Iterator iterator = collection.iterator();
 	TreeMap sortedMap = new TreeMap();
@@ -130,8 +131,9 @@ public class InterpreterIterate extends Interpreter {
 	    if (returned == null)
 		returned = "null";
 	    else if (!(returned instanceof String))
-		throw new Exception("The sortvalue function did not "
-				    + "return a String.");
+		throw new UnsupportedCallException("The sortvalue function "
+		        			   + "did not return "
+		        			   + "a String.");
 	    sortedMap.put(returned, object);
 	}
 	return sortedMap.values();

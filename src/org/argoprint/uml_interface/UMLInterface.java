@@ -32,44 +32,37 @@
 
 package org.argoprint.uml_interface;
 
-import org.argoprint.*;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
+import org.argoprint.ArgoPrintDataSource;
+import org.argoprint.UnsupportedCallException;
 import org.argouml.kernel.Project;
 import org.argouml.kernel.ProjectManager;
-
-import org.argouml.ui.ArgoDiagram;
-import org.argouml.ui.ProjectBrowser;
-
-import org.argouml.uml.diagram.ui.*;
-
-import org.argouml.util.FileFilters;
-import org.argouml.util.SuffixFilter;
-
 import org.argouml.model.ModelFacade;
 import org.argouml.model.uml.UmlFactory;
 import org.argouml.model.uml.foundation.core.CoreHelper;
-import org.argouml.application.api.*;
-
+import org.argouml.ui.ArgoDiagram;
+import org.argouml.ui.ProjectBrowser;
+import org.argouml.uml.diagram.ui.UMLDiagram;
+import org.argouml.util.FileFilters;
+import org.argouml.util.SuffixFilter;
 import org.tigris.gef.base.CmdSaveGIF;
 import org.tigris.gef.base.CmdSaveGraphics;
 import org.tigris.gef.base.Diagram;
 import org.tigris.gef.util.Util;
-
-import java.util.*;
-import java.io.*;
-
-import java.lang.reflect.*;
-
-import org.tigris.gef.base.*;
-import org.tigris.gef.persistence.*;
 
 /** 
  * The class ArgoPrint uses to interface to the ArgoUML model.
@@ -189,12 +182,13 @@ public class UMLInterface
     }
     
     /**
+     * @see ArgoPrintDataSource#caller(String, Object)
+     * 
      * Calls method named call in ModelFacade 
      * returns Object, which often is String or Collection
      * iteratorObject is the argument for the method 
      */
-    public Object caller(String call, Object iteratorObject)
-	throws Exception {
+    public Object caller(String call, Object iteratorObject) {
 	//_log.info("Arg call: " + call + " Arg: " + 
 	//	  _classes.getName(iteratorObject)); 
 	Iterator iter = _classes.iterator();
@@ -245,7 +239,7 @@ public class UMLInterface
      * be on of the default. ex. calledMethodName(model) and not an
      * iteratorObject
      */
-    public Object caller(String call) throws Exception {
+    public Object caller(String call) throws UnsupportedCallException {
 	
 	Iterator iter = _classes.iterator();
 
@@ -319,16 +313,20 @@ public class UMLInterface
 		}
  
 		for (int i = 0; i < theMethods.length; i++) {
-		    if (callName.equals(theMethods[i].getName())) {
-			try {	
-			    //_log.info("Call hit: " + arg + " " + callName);
-			    //Object args[] = new Object[1];
-			    //args[0] = _project.getModel(); 
-			    return theMethods[i].invoke(thisObject, 
-							args);
-			} catch (Exception e) {
-			    throw e;
-			}
+		    if (callName.equals(theMethods[i].getName())) {	
+		        //_log.info("Call hit: " + arg + " " + callName);
+		        //Object args[] = new Object[1];
+		        //args[0] = _project.getModel(); 
+		        try {
+		            return theMethods[i].invoke(thisObject, 
+		                    args);
+		        } catch (IllegalArgumentException e) {
+		            throw new UnsupportedCallException(e);
+		        } catch (IllegalAccessException e) {
+		            throw new UnsupportedCallException(e);
+		        } catch (InvocationTargetException e) {
+		            throw new UnsupportedCallException(e);
+		        }
 		    }	    
 		}
 
@@ -336,7 +334,7 @@ public class UMLInterface
 	    }
 	}
 
-	throw new Exception("Illegal method call: " + call);
+	throw new UnsupportedCallException("Illegal method call: " + call);
 	//return "Illegal method call";
     }
     

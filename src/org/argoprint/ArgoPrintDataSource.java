@@ -34,12 +34,32 @@
 
 package org.argoprint;
 
+import org.argoprint.UnsupportedCallException;
+
 /**
  * An interface that should be implemented by a class that acts as a data 
  * source for ArgoPrint.
  */
 public interface ArgoPrintDataSource {
-    Object caller(String call, Object iteratorObject) throws Exception;
+    /**
+     * Call a method on an iterator object.
+     * 
+     * @param call The method to call.
+     * @param iteratorObject The iterator object.
+     * @return The result of the call, either a String, a Boolean,
+     *         or a Collection (or Object).
+     * @throws UnsupportedCallException if the call cannot be made.
+     */
+    Object caller(String call, Object iteratorObject) 
+    	throws UnsupportedCallException;
     
-    Object caller(String call) throws Exception;
+    /**
+     * Call a method without an argument.
+     * 
+     * @param call The method to call.
+     * @return The result of the call, either a String or an iterator.
+     * @throws UnsupportedCallException if the call cannot be made.
+     */
+    Object caller(String call)     	
+    	throws UnsupportedCallException;
 }
