@@ -6,7 +6,7 @@ import java.util.*;
  * The environment or scope for argoprint. Used for storing iterators.
  */
 public class Environment{
-    Environment instance;
+    private Environment instance;
 
     private Hashtable iteratorTable;
 
@@ -48,9 +48,9 @@ public class Environment{
 	return true;
     }
 
-    public Iterator getIterator(String name){	
+    public ArgoPrintIterator getIterator(String name){	
 	try{
-	    return (Iterator)iteratorTable.get(name);
+	    return (ArgoPrintIterator)iteratorTable.get(name);
 	}
 	catch(Exception e){
 	    return null;

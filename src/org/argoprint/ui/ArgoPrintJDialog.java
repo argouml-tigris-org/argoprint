@@ -225,7 +225,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 	
 	
 	//Iterator for testing of Environment
-	Iterator iter;
+	//Iterator iter;
 
 	//testing "simulated" template
 	Object args[] = new Object[1];
@@ -235,7 +235,8 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 	
 	if(response instanceof Collection){
 	    //Iterator elementIterator = ((Collection) response).iterator();
-	    iter = ((Collection) response).iterator();
+	    ArgoPrintIterator iter =
+		new ArgoPrintIterator(((Collection) response).iterator());
 	    env.addIterator(new String("element"), iter);
 	    
 	    //while(elementIterator.hasNext()){
@@ -257,7 +258,9 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 			umlIf.caller(new String("getOperations"), args);
 		    
 		    if(response3 instanceof Collection){
-			iter = ((Collection) response3).iterator();
+			iter = 
+			    new ArgoPrintIterator(((Collection) 
+						   response3).iterator());
 			//Iterator operationIterator = 
 			//((Collection) response3).iterator(); 
 			env.addIterator(new String("operation"), iter);
