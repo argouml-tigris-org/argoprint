@@ -108,7 +108,7 @@ public class Main {
     public void initializeSystem(Settings settings) 
 	throws SAXException, IOException {
 
-	((UMLInterface) dataSource).initialize();
+	dataSource.initialize();
 	outputFile = settings.getOutputFile();
 	// TODO: set outputDir of interface
 	// ((UMLInterface)dataSource).setOutputPath(settings.getOutputDir);

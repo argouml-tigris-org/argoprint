@@ -9,17 +9,14 @@ import junit.framework.TestSuite;
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
-import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.DataSourceStub;
 import org.argoprint.ui.Settings;
-import org.w3c.dom.NodeList;
 
 public class IntegrationTest extends TestCase {
-    private Main _main = null;
-    private Settings _settings = null;
-    private ArgoPrintDataSource _uml_interface = null;
+    private Main main = null;
+    private Settings settings = null;
 
-    private final String t_dir = "IntegrationTestTemplates/";
+    private static final String T_DIR = "tests/IntegrationTestTemplates/";
 
     public IntegrationTest(String s) {
         super(s);
@@ -31,21 +28,22 @@ public class IntegrationTest extends TestCase {
     }
 
     private void performIntegrationTest(String name) throws Exception {
-        _settings = new Settings(t_dir+name+".xml",
-                                 t_dir+name+"Result.xml",
-                                 t_dir);
+        settings =
+            new Settings(T_DIR + name + ".xml",
+                         T_DIR + name + "Result.xml",
+                         T_DIR);
 
-        _main.initializeSystem(_settings);
+        main.initializeSystem(settings);
         try {
-            _main.go();
+            main.go();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw e;
         }
 
-        assertTrue(name+"-test did not generate expected output.",
-                    filesEqual(_settings.getOutputFile(),
-                               t_dir+name+"Expected.xml"));
+        assertTrue(name + "-test did not generate expected output.",
+                    filesEqual(settings.getOutputFile(),
+                               T_DIR + name + "Expected.xml"));
     }
 
     public void testCorrectBind() throws Exception {
@@ -81,120 +79,120 @@ public class IntegrationTest extends TestCase {
     }
 
     public void testIncorrectBind() throws Exception {
-        boolean exception_caught = false;
+        boolean exceptionCaught = false;
         try {
             performIntegrationTest("IncorrectBind");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            exception_caught = true;
+            exceptionCaught = true;
         }
 
-        assertTrue("No expection thrown!", exception_caught);
+        assertTrue("No expection thrown!", exceptionCaught);
     }
 
     public void testIncorrectBindNoAttrName() throws Exception {
-        boolean exception_caught = false;
+        boolean exceptionCaught = false;
         try {
             performIntegrationTest("IncorrectBindNoAttrName");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            exception_caught = true;
+            exceptionCaught = true;
         }
 
-        assertTrue("No expection thrown!", exception_caught);
+        assertTrue("No expection thrown!", exceptionCaught);
     }
 
     public void testIncorrectBindNoName() throws Exception {
-        boolean exception_caught = false;
+        boolean exceptionCaught = false;
         try {
             performIntegrationTest("IncorrectBindNoName");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            exception_caught = true;
+            exceptionCaught = true;
         }
 
-        assertTrue("No expection thrown!", exception_caught);
+        assertTrue("No expection thrown!", exceptionCaught);
     }
 
     public void testIncorrectCall() throws Exception {
-        boolean exception_caught = false;
+        boolean exceptionCaught = false;
         try {
             performIntegrationTest("IncorrectCall");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            exception_caught = true;
+            exceptionCaught = true;
         }
 
-        assertTrue("No expection thrown!", exception_caught);
+        assertTrue("No expection thrown!", exceptionCaught);
     }
 
     public void testIncorrectIf() throws Exception {
-        boolean exception_caught = false;
+        boolean exceptionCaught = false;
         try {
             performIntegrationTest("IncorrectIf");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            exception_caught = true;
+            exceptionCaught = true;
         }
 
-        assertTrue("No expection thrown!", exception_caught);
+        assertTrue("No expection thrown!", exceptionCaught);
     }
 
     public void testIncorrectIfSubtags() throws Exception {
-        boolean exception_caught = false;
+        boolean exceptionCaught = false;
         try {
             performIntegrationTest("IncorrectIfSubtags");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            exception_caught = true;
+            exceptionCaught = true;
         }
 
-        assertTrue("No expection thrown!", exception_caught);
+        assertTrue("No expection thrown!", exceptionCaught);
     }
 
     public void testIncorrectIteratorIterate() throws Exception {
-        boolean exception_caught = false;
+        boolean exceptionCaught = false;
         try {
             performIntegrationTest("IncorrectIteratorIterate");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            exception_caught = true;
+            exceptionCaught = true;
         }
 
-        assertTrue("No expection thrown!", exception_caught);
+        assertTrue("No expection thrown!", exceptionCaught);
     }
 
     public void testIncorrectMethodIterate() throws Exception {
-        boolean exception_caught = false;
+        boolean exceptionCaught = false;
         try {
             performIntegrationTest("IncorrectMethodIterate");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            exception_caught = true;
+            exceptionCaught = true;
         }
 
-        assertTrue("No expection thrown!", exception_caught);
+        assertTrue("No expection thrown!", exceptionCaught);
     }
 
     public void testIncorrectSortvalueIterate() throws Exception {
-        boolean exception_caught = false;
+        boolean exceptionCaught = false;
         try {
             performIntegrationTest("IncorrectSortvalueIterate");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            exception_caught = true;
+            exceptionCaught = true;
         }
 
-        assertTrue("No expection thrown!", exception_caught);
+        assertTrue("No expection thrown!", exceptionCaught);
     }
 
 
 
+    /**
+     * @see junit.framework.TestCase#setUp()
+     */
     protected void setUp() throws Exception {
-        _uml_interface = new DataSourceStub();
-        assertNotNull(_uml_interface);
-
-        _main = new Main(_uml_interface);
+        main = new Main(new DataSourceStub());
     }
 
     private boolean filesEqual(String left, String right) throws Exception {
@@ -212,24 +210,15 @@ public class IntegrationTest extends TestCase {
         (new XMLSerializer(lstream, of)).serialize(lparser.getDocument());
         (new XMLSerializer(rstream, of)).serialize(rparser.getDocument());
 
-        String lstring = strip_ws(lstream.toString());
-        String rstring = strip_ws(rstream.toString());
+        String lstring = stripWs(lstream.toString());
+        String rstring = stripWs(rstream.toString());
 
         return lstring.equals(rstring);
     }
 
-    private int findNode(NodeList nodes, String name, int start) {
-        for (int i = start; i < nodes.getLength(); ++i) {
-            if (nodes.item(i).getNodeName().equals(name)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private String strip_ws(String in) {
+    private String stripWs(String in) {
         StringBuffer buf = new StringBuffer(in);
-        for (int i = buf.length()-1; i >=0; --i) {
+        for (int i = buf.length() - 1; i >= 0; --i) {
             char c = buf.charAt(i);
             if (c == ' ' || c == '\n' || c == '\t') {
                 buf.deleteCharAt(i);

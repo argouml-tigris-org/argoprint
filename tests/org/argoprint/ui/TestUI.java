@@ -1,11 +1,16 @@
 package org.argoprint.ui;
 
+import java.io.FileNotFoundException;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+/**
+ * Testing the User Interface.
+ */
 public class TestUI extends TestCase {
-    private Settings _settings = null;
+    private Settings settings = null;
 
     public TestUI(String param) {
         super(param);
@@ -18,62 +23,73 @@ public class TestUI extends TestCase {
     }
 
     public void testSettingsCorrectOutputDir() {
-        String output_dir = "./";
+        String outputDir = "./";
 
-        _settings.setOutputDir(output_dir);
-        assertEquals(_settings.getOutputDir(), output_dir);
+        settings.setOutputDir(outputDir);
+        assertEquals(settings.getOutputDir(), outputDir);
     }
 
     public void testSettingsCorrectOutputFile() {
-        String output_file = "settings_destination.xml";
+        String outputFile = "settings_destination.xml";
 
-        _settings.setOutputFile(output_file);
-        assertEquals(_settings.getOutputFile(), output_file);
+        settings.setOutputFile(outputFile);
+        assertEquals(settings.getOutputFile(), outputFile);
     }
 
 
     public void testSettingsIncorrectOutputDir() {
-        String output_dir = "incorrect_dir/";
-        boolean exception_caught = false;
+        String outputDir = "incorrect_dir/";
+        boolean exceptionCaught = false;
 
+        settings.setOutputDir(outputDir);
         try {
-            _settings.setOutputDir(output_dir);
+            settings.checkCorrectness();
         } catch (Exception e) {
-            exception_caught = true;
+            exceptionCaught = true;
         }
-        if (!exception_caught) {
+        if (!exceptionCaught) {
             fail("No exception thrown by setOutputDir.");
         }
     }
 
     public void testSettingsIncorrectTemplate() {
         String template = "nonexistant_template.xml";
-        boolean exception_caught = false;
+        boolean exceptionCaught = false;
+
         try {
-            _settings.setTemplate(template);
+            settings.setTemplate(template);
+            settings.checkCorrectness();
         } catch (Exception e) {
-            exception_caught = true;
+            exceptionCaught = true;
         }
-        if (!exception_caught) {
+        if (!exceptionCaught) {
             fail("No exception thrown by setTemplate.");
         }
     }
 
     public void testSettingsIncorrectTemplateOutputFile() {
-        String output_file = "directory/that/does/not/exist/output.xml";
-        boolean exception_caught = false;
+        String outputFile = "directory/that/does/not/exist/output.xml";
+        boolean exceptionCaught = false;
+
+        settings.setOutputFile(outputFile);
         try {
-            _settings.setOutputFile(output_file);
+            settings.checkCorrectness();
         } catch (Exception e) {
-            exception_caught = true;
+            exceptionCaught = true;
         }
-        if (!exception_caught) {
+        if (!exceptionCaught) {
             fail("No exception thrown by setOutputFile.");
         }
     }
 
-    protected void setUp() {
-        _settings = new Settings();
-        assertNotNull("Could not create settings object.", _settings);
+    /**
+     * @see junit.framework.TestCase#setUp()
+     *
+     * @throws FileNotFoundException if the test case is incorrect.
+     */
+    protected void setUp() throws FileNotFoundException {
+        settings =
+            new Settings("tests/TestEngine.xml",
+                	 "tests/EngineTestResult", "tests/");
     }
 };
