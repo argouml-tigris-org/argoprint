@@ -18,7 +18,7 @@ public class ArgoPrintIterator implements Iterator{
     
     public Object next(){
 	_currentObject = _iterator.next();
-	return _iterator;
+	return _currentObject;
     }
 
     public void remove() 
