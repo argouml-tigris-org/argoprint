@@ -5,25 +5,29 @@
     </tok>
 
     <!-- Test tag for Call. -->
-    <argoprint:call what="some_function()"/>
+    <ap:call what="getString()"/>
+    <expected_ap_call_result>Return value of getString() in DataSourceStub.</expected_ap_call_result>
 
     <!-- Test tag for Iterate. -->
-    <argoprint:iterate what="some_other_function()" iterator="it">
-        Hej
-    </argoprint:iterate>
+    <ap:iterate what="getCollection()" iterator="it">
+        <ap:call what="getString()"/>
+    </ap:iterate>
+    <expected_ap_iterate_result>
+        Return value of getString() in DataSourceStub.Return value of getString() in DataSourceStub.Return value of getString() in DataSourceStub.Return value of getString() in DataSourceStub.Return value of getString() in DataSourceStub.
+    </expected_ap_iterate_result>
 
     <!-- Test tag for If. -->
-    <argoprint:if cond="false">
-        <argoprint:then>
+    <ap:if cond="false">
+        <ap:then>
             Then.
-        </argoprint:then>
-        <argoprint:else>
+        </ap:then>
+        <ap:else>
             Else.
-        </argoprint:else>
-    </argoprint:if>
+        </ap:else>
+    </ap:if>
 
     <!-- Test tag for Bind. -->
-    <argoprint:bind what="img">
-        <argoprint:attr name="src">Hoj</argoprint:attr>
-    </argoprint:bind>
+    <ap:bind what="img">
+        <ap:attr name="src">Hoj</ap:attr>
+    </ap:bind>
 </root>
