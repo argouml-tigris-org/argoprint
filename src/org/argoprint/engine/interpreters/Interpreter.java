@@ -1,33 +1,30 @@
 package org.argoprint.engine.interpreters;
 
 import org.w3c.dom.Node;
+import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.engine.*;
-import org.argoprint.uml_interface.UMLInterface;
 
 /**
  * Superclass for the interpreters.
  */
 abstract public class Interpreter{
-    static private String _TagName;
+    private String _tagName;
     private Interpreter _nextHandler;
     protected Interpreter _firstHandler;
-    // TODO this should be changed when the interface is defined later
-	// processTag uses calls to Interface
-    private UMLInterface _umlInterface;
+    protected ArgoPrintDataSource _dataSource;
     
     public Interpreter() {
-    	_nextHandler = null;
-    }
+    	}
     
     /**
 	 * @param tagName The name of the tag that this Interpreter can process.
-	 * @param prefix The namespace prefix of the tag that this Interpreter can process.
-	 * @param umlInterface The interface that this Interpreter should make calls to.
-	 * @param main The Main object. 
+	 * @param dataSource The ArgoPrintDataSource that this Interpreter should fetch data from.
 	 */
-	public Interpreter(String tagName, UMLInterface umlInterface) {
-    	_TagName = tagName;
-    	_umlInterface = umlInterface;
+	public Interpreter(String tagName, ArgoPrintDataSource dataSource) {
+    	_tagName = tagName;
+    	_dataSource = dataSource;
+    	_nextHandler = null;
+    	_firstHandler = null;
     }
     
     /**
@@ -74,9 +71,11 @@ abstract public class Interpreter{
 	 * @return
 	 */
 	protected boolean canHandle(Node tagNode){
-    	if (tagNode.getNodeType() == Node.ELEMENT_NODE && tagNode.getLocalName() == _TagName && tagNode.getPrefix() == "argoprint")
-			return true;
-		else
+	    	if (tagNode.getNodeType() == Node.ELEMENT_NODE && tagNode.getLocalName().equals(_tagName) && tagNode.getPrefix().equals("argoprint")) {
+    		return true;
+		}
+		else {
 			return false;
+		}
     } 
 }
