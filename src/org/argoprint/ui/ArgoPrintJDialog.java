@@ -137,9 +137,9 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 
         jTemplateBrowseButton.setText("Browse");
         jTemplateBrowseButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTemplateBrowseButtonActionPerformed(evt);
-            }
+		public void actionPerformed(java.awt.event.ActionEvent evt) {
+		    jTemplateBrowseButtonActionPerformed(evt);
+		}
         });
 
 	jUIPanel.add(jTemplateBrowseButton);
@@ -269,79 +269,27 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
          * (Not in the comment ofcourse!)
          ******************************************************/
         
-	UMLInterface umlIf = new UMLInterface();
-	Environment env = new Environment();
+//  	UMLInterface umlIf = new UMLInterface();
+//  	Environment env = new Environment();
 
-	//setting argopprint for current project
-	ProjectBrowser pb = ProjectBrowser.getInstance();
-	Project p =  ProjectManager.getManager().getCurrentProject();
+//  	//setting argopprint for current project
+//  	ProjectBrowser pb = ProjectBrowser.getInstance();
+//  	Project p =  ProjectManager.getManager().getCurrentProject();
 	
-	umlIf.setLog(log);
-	umlIf.setProject(p);
-	umlIf.setProjectBrowser(pb);
-	umlIf.setOutputDir( jOutputDirTextField.getText() );
+//  	umlIf.setLog(log);
+//  	umlIf.setProject(p);
+//  	umlIf.setProjectBrowser(pb);
+//  	umlIf.setOutputDir( jOutputDirTextField.getText() );
 	
-	//testing "simulated" template
-	Object args[] = new Object[1];
-	args[0] = p.getModel();
+//  	try{
+//  	    log.info("Proj name: " + 
+//  		     umlIf.caller(new String("getName(project)")) + 
+//  		     " " + umlIf.caller(new String("getName(project)")));
+//  	}catch(Exception e){
+//  	    JOptionPane.showMessageDialog( this, e.getMessage()); 
+//  	}
 	
-	try{
-	    log.info("Test simulated template");
-	    Object response = 
-		umlIf.caller(new String("getOwnedElements(model)"));	  
 
-	    if(response instanceof Collection){		
-		ArgoPrintIterator iter =
-		    new ArgoPrintIterator(((Collection) response).iterator());
-		
-		env.addIterator(new String("element"), iter);
-		
-		while(iter.hasNext()){
-		    
-		    Object element = iter.next();
-		    args[0] = element; 
-
-//		        Object response2 = 
-//  			umlIf.caller(new String("isAClass()"), element);   
-		    	    
-//  		    if((response2 instanceof Boolean) && 
-//  		       (((Boolean)response2).booleanValue())){
-			
-//  			log.info("Class name: " + 
-//  				 ModelFacade.getFacade().getName(element));
-			
-//  			Object response3 = 
-//  			    umlIf.caller(new String("getOperations()"), 
-//  					 element);
-			
-//  			if(response3 instanceof Collection){
-//  			    iter = 
-//  				new ArgoPrintIterator(((Collection) 
-//  						       response3).iterator());
-			    
-//  			    env.addIterator(new String("operation"), iter);
-//  			    while(iter.hasNext()){
-//  				Object operation = iter.next();
-//  				log.info("operation name: "+ 
-//  					 ModelFacade.getFacade().getName(operation));
-//  			    }
-			    
-//  			    env.removeIterator(new String("operation"));
-//  			    iter = env.getIterator(new String("element"));
-//  			}
-//  		    } else{
-		    log.info("Element name: " + 
-			     ModelFacade.getFacade().getName(element));
-//		    }
-		}
-		env.removeIterator(new String("element"));
-	    }
-	    
-	    
-	} catch(Exception e){
-	    log.info("Gui crash");
-	}
-	
 	Settings settings = new Settings(jTemplateTextField.getText(),
 					 jOutputFileTextField.getText(),
 					 jOutputDirTextField.getText());
@@ -353,7 +301,7 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
 	}
 	catch(Exception e){
 	    JOptionPane.showMessageDialog( this, e.getMessage());   
-	    e.printStackTrace();
+	    //e.printStackTrace();
 	    return;
 	}
 	
