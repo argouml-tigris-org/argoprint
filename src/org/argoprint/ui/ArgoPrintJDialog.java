@@ -6,6 +6,24 @@ package org.argoprint.ui;
  * Created on den 17 november 2003, 14:38
  */
 
+import org.argoprint.uml_interface.*;
+import org.argoprint.engine.*;
+
+import org.argouml.kernel.Project;
+import org.argouml.kernel.ProjectManager;
+import org.argouml.ui.ProjectBrowser;
+
+import org.argouml.model.ModelFacade;
+
+import java.awt.*;
+import java.awt.event.*;
+//import java.lang.reflect.*;
+import java.lang.*;
+
+import java.util.*;
+
+import org.apache.log4j.Logger;
+
 import javax.swing.*;
 import javax.swing.filechooser.*;
 import java.awt.*;
@@ -15,6 +33,13 @@ import java.awt.*;
  * @author  margy626
  */
 public class ArgoPrintJDialog extends javax.swing.JDialog {
+
+    private Logger log;
+    
+    /**
+     * Sets the logger (log) to logger
+     */
+    public void setLog(Logger logger){ log = logger; }
     
     /** Creates new form JDialog */
     public ArgoPrintJDialog(java.awt.Frame parent, boolean modal) {
@@ -186,8 +211,71 @@ public class ArgoPrintJDialog extends javax.swing.JDialog {
          * (Not in the comment ofcourse!)
          ******************************************************/
         
-        JOptionPane.showMessageDialog( this, "Output generation complete!");
+	UMLInterface umlIf = new UMLInterface();
+	Environment env = new Environment();
 
+	//setting argopprint for current project
+	ProjectBrowser pb = ProjectBrowser.getInstance();
+	Project p =  ProjectManager.getManager().getCurrentProject();
+	
+	umlIf.setLog(log);
+	umlIf.setProject(p);
+	umlIf.setProjectBrowser(pb);
+	umlIf.setOutputPath( jTextField3.getText() );
+	
+	
+	//Iterator for testing of Environment
+	Iterator iter;
+
+	//testing "simulated" template
+	Object args[] = new Object[1];
+	args[0] = p.getModel();
+	
+	Object response = umlIf.caller(new String("getOwnedElements"), args);
+	
+	if(response instanceof Collection){
+	    //Iterator elementIterator = ((Collection) response).iterator();
+	    iter = ((Collection) response).iterator();
+	    env.addIterator(new String("element"), iter);
+	    
+	    //while(elementIterator.hasNext()){
+	    while(iter.hasNext()){
+	    
+		//Object element = elementIterator.next();
+		Object element = iter.next();
+		args[0] = element;
+		Object response2 = 
+		    umlIf.caller(new String("isAClass"), args);
+		
+		if((response2 instanceof Boolean) && 
+		   (((Boolean)response2).booleanValue())){
+		    
+		    log.info("Class name: " + 
+			     ModelFacade.getFacade().getName(element));
+		    
+		    Object response3 = 
+			umlIf.caller(new String("getOperations"), args);
+		    
+		    if(response3 instanceof Collection){
+			iter = ((Collection) response3).iterator();
+			//Iterator operationIterator = 
+			//((Collection) response3).iterator(); 
+			env.addIterator(new String("operation"), iter);
+			while(iter.hasNext()){
+			    //while(operationIterator.hasNext()){
+			    //Object operation = operationIterator.next();
+			    Object operation = iter.next();
+			    log.info("operation name: " + 
+				     ModelFacade.getFacade().getName(operation));
+			}
+			env.removeIterator(new String("operation"));
+			iter = env.getIterator(new String("element"));
+		    }
+		}
+	    }
+	    env.removeIterator(new String("element"));
+	}
+        JOptionPane.showMessageDialog( this, "Output generation complete!");
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
