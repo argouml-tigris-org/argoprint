@@ -12,6 +12,7 @@
 
     <property name="argo.root" value="../argouml"/>
     <property name="argo.build.dir" value="${argo.root}/build"/>
+    <property name="argo.tools.dir" value="${argo.root}/tools"/>
 
     <property name="ant.xml-libs" value="${ANT_HOME}/lib/jaxp.jar:${ANT_HOME}/lib/parser.jar"/>
 
@@ -78,6 +79,28 @@
       <fileset dir="${module.build.dest}" includes="argoprint.jar"/>
     </copy>
   </target>
+
+  <!-- =================================================================== -->
+  <!-- Run checkstyle with the ArgoUML settings.                           -->
+  <!-- =================================================================== -->
+  <target name="checkstyle" depends="init"
+          description="Run checkstyle on all source.">
+    <java classname="com.puppycrawl.tools.checkstyle.Main" failonerror="false" fork="true" maxmemory="32M">
+      <sysproperty key="checkstyle.header.file" value="tools/checkstyle/java.header"/>
+      <classpath>
+        <fileset dir="${argo.tools.dir}/checkstyle-3.0">
+	  <include name="*.jar"/>
+	</fileset>
+        <pathelement location="${argo.tools.dir}/ant-1.4.1/lib/xerces-1.2.3.jar"/>
+      </classpath>
+      <arg value="-c"/>
+      <arg value="${argo.tools.dir}/checkstyle/checkstyle_argouml.xml"/>
+      <arg value="-r"/>
+      <arg value="src"/>
+    </java>
+  </target>
+
+
 
 </project>
 
