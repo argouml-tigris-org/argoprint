@@ -1,35 +1,34 @@
-//$Id$
-// Copyright (c) 2005, Linus Tolke
-//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
-//Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
-//Mattias Sidebäck.
-//All rights reserved.
+// $Id$
+// Copyright (c) 2003-2005, Mikael Albertsson, Mattias Danielsson, Per Engström,
+// Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson,
+// Mattias Sidebäck, Linus Tolke.
+// All rights reserved.
 //
-//Redistribution and use in source and binary forms, with or without 
-//modification, are permitted provided that the following conditions are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
 //
-//* Redistributions of source code must retain the above copyright notice, 
-//  this list of conditions and the following disclaimer.
-// 
-//* Redistributions in binary form must reproduce the above copyright 
-//  notice, this list of conditions and the following disclaimer in the 
-//  documentation and/or other materials provided with the distribution.
+// * Redistributions of source code must retain the above copyright notice,
+//   this list of conditions and the following disclaimer.
 //
-//* Neither the name of the University of Linköping nor the names of its 
-//  contributors may be used to endorse or promote products derived from 
-//  this software without specific prior written permission. 
+// * Redistributions in binary form must reproduce the above copyright
+//   notice, this list of conditions and the following disclaimer in the
+//   documentation and/or other materials provided with the distribution.
 //
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-//AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-//IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-//ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-//LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-//CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-//SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-//INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-//CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-//ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
-//THE POSSIBILITY OF SUCH DAMAGE.
+// * Neither the name of the University of Linköping nor the names of its
+//   contributors may be used to endorse or promote products derived from
+//   this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.argoprint.interfaces;
 
@@ -66,7 +65,7 @@ import org.tigris.gef.base.CmdSaveGraphics;
 import org.tigris.gef.base.Diagram;
 import org.tigris.gef.util.Util;
 
-/** 
+/**
  * The class ArgoPrint uses to interface to the ArgoUML model.
  * It primarily communicates with Model subsystem Facade using reflection
  * To save diagrams gef is used. TODO: fix bug that causes only
@@ -74,10 +73,13 @@ import org.tigris.gef.util.Util;
  *
  * @author matda701, Mattias Danielsson
  */
-public class UMLInterface 
+public class UMLInterface
     implements ArgoPrintDataSource {
+    /**
+     * Logger.
+     */
     private static final Logger LOG = Logger.getLogger(UMLInterface.class);
-    
+
     /**
      * The ArgoUML project that ArgoPrint is applied to. Must be
      * set prior to use by using the setProject(..) method
@@ -89,23 +91,23 @@ public class UMLInterface
      * set prior to use by using the setProjectBrowser(..) method
      */
     private ProjectBrowser projectBrowser;
-    
+
     /**
      * Classes to search for methods.
      */
-    private Map classes; 
+    private Map classes;
 
     /**
-     * The ArgoPrint output dir. Used when saving diagrams as pictures. 
+     * The ArgoPrint output dir. Used when saving diagrams as pictures.
      * Must be set prior to use.
      */
     private String outputDir;
 
     ////////////////////////////////////////////////////////////////
     // constructors
-    
+
     /**
-     * Constructor
+     * Constructor.
      */
     public UMLInterface() {
 	classes = new HashMap();
@@ -123,7 +125,7 @@ public class UMLInterface
     }
 
     /**
-     * Initializes fields prior to usage. Can be used instead of the 
+     * Initializes fields prior to usage. Can be used instead of the
      * individual setters.
      */
     public void initialize() {
@@ -136,79 +138,74 @@ public class UMLInterface
 
     /**
      * Sets the projectBrowswer.
-     * 
+     *
      * @param browser The browser.
      */
     public void setProjectBrowser(ProjectBrowser browser) {
 	projectBrowser = browser;
     }
-    
+
     /**
      * Sets the project.
-     * 
+     *
      * @param proj The project.
      */
-    public void setProject(Project proj) { 
-        project = proj; 
+    public void setProject(Project proj) {
+        project = proj;
     }
 
     /**
      * Sets the outputPath.
-     * 
+     *
      * @param dir The path.
      */
-    public void setOutputDir(String dir) { 
-        outputDir = dir; 
+    public void setOutputDir(String dir) {
+        outputDir = dir;
     }
 
     ////////////////////////////////////////////////////////////////
     // main methods
-        
+
     /**
      * @see ArgoPrintDataSource#caller(String, Object)
-     * 
-     * Calls method named call in one of the ArgoUML subsystem objects. 
+     *
+     * Calls method named call in one of the ArgoUML subsystem objects.
      * returns Object, which often is String or Collection
-     * iteratorObject is the argument for the method 
+     * iteratorObject is the argument for the method
      */
     public Object caller(String call, Object iteratorObject) {
-	//_log.info("Arg call: " + call + " Arg: " + 
-	//	  _classes.getName(iteratorObject)); 
+	//_log.info("Arg call: " + call + " Arg: " +
+	//	  _classes.getName(iteratorObject));
 	Iterator iter = classes.entrySet().iterator();
 	while (iter.hasNext()) {
 	    Map.Entry entry = (Entry) iter.next();
 	    Class c = (Class) entry.getKey();
-	    Method[] theMethods = c.getMethods();   
-	
-	    Object args[] = new Object[1];
+	    Method[] theMethods = c.getMethods();
+
+	    Object[] args = new Object[1];
 	    args[0] = iteratorObject;
 
 	    if (call.endsWith("()")) {
 		int callLength = call.length() - 2;
-	    
+
 		String callName = new String(call.substring(0, callLength));
 		for (int i = 0; i < theMethods.length; i++) {
-		
+
 		    if (callName.equals(theMethods[i].getName())) {
 			try {
 			    return theMethods[i].invoke(entry.getValue(), args);
-			}
-			catch (IllegalAccessException e) {
+			} catch (IllegalAccessException e) {
+			    LOG.info("Crash" + e.getMessage());
+			} catch (IllegalArgumentException e) {
+			    LOG.info("Crash" + e.getMessage());
+			} catch (InvocationTargetException e) {
+			    LOG.info("Crash" + e.getMessage());
+			} catch (NullPointerException e) {
+			    LOG.info("Crash" + e.getMessage());
+			} catch (ExceptionInInitializerError e) {
 			    LOG.info("Crash" + e.getMessage());
 			}
-			catch (IllegalArgumentException e) {
-			    LOG.info("Crash" + e.getMessage());
-			}
-			catch (InvocationTargetException e) {
-			    LOG.info("Crash" + e.getMessage());
-			}
-			catch (NullPointerException e) {
-			    LOG.info("Crash" + e.getMessage());
-			}
-			catch (ExceptionInInitializerError e) {
-			    LOG.info("Crash" + e.getMessage());
-			}		   
-		    }	    
+		    }
 		}
 	    }
 	}
@@ -216,20 +213,20 @@ public class UMLInterface
 	return "Not a known method";
     }
 
-    
+
     /**
      * @see org.argoprint.ArgoPrintDataSource#caller(java.lang.String)
      *
      * Calls method named call Model subsystem. Used when argument is to
      * be one of the default. ex. calledMethodName(model) and not an
      * iteratorObject.
-     * 
+     *
      * @param call The string to call.
      * @return The result of the operation.
      * @throws UnsupportedCallException if the call was incorrectly made.
      */
     public Object caller(String call) throws UnsupportedCallException {
-	
+
 	Iterator iter = classes.entrySet().iterator();
 	while (iter.hasNext()) {
 	    Map.Entry entry = (Entry) iter.next();
@@ -247,46 +244,41 @@ public class UMLInterface
 		for (int i = 0; i < theMethods.length; i++) {
 		    if (callName.equals(theMethods[i].getName())) {
 			try {
-			    System.out.println("Trying: " 
+			    System.out.println("Trying: "
 					       + c + "." + callName + "()");
 			    return theMethods[i].invoke(entry.getValue(), null);
-			}
-			catch (IllegalAccessException ignore ) {
+			} catch (IllegalAccessException ignore) {
 			    System.out.println("IllegalAccessException: "
 					       + ignore);
 			    ignore.printStackTrace();
-			}
-			catch (IllegalArgumentException ignore ) {
+			} catch (IllegalArgumentException ignore) {
 			    System.out.println("IllegalArgumentException: "
 					       + ignore);
 			    ignore.printStackTrace();
-			}
-			catch (InvocationTargetException ignore ) {
+			} catch (InvocationTargetException ignore) {
 			    System.out.println("InvocationTargetException: "
 					       + ignore);
 			    ignore.printStackTrace();
-			}
-			catch (NullPointerException ignore ) {
+			} catch (NullPointerException ignore) {
 			    System.out.println("NullPointerException: "
 					       + ignore);
 			    ignore.printStackTrace();
-			}
-			catch (ExceptionInInitializerError ignore ) {
+			} catch (ExceptionInInitializerError ignore) {
 			    System.out.println("ExceptionInInitializerError: "
 					       + ignore);
 			    ignore.printStackTrace();
-			}		   
-		    }	    
+			}
+		    }
 		}
 	    } else if (call.endsWith(")")) {
 
 		Method[] theMethods = c.getMethods();
 		int callLength = call.indexOf('(') + 1;
-	    
+
 		String callName = new String(call.substring(0, callLength - 1));
-		String arg = 
+		String arg =
 		    new String(call.substring(callLength, call.length() - 1));
-		Object args[] = new Object[1];  
+		Object[] args = new Object[1];
 		Object thisObject = null;
 
 		if (arg.equals("model")) {
@@ -300,14 +292,14 @@ public class UMLInterface
 		    theMethods = new Method[vectorLen];
 		    theMethods = c.getMethods();
 		}
- 
+
 		for (int i = 0; i < theMethods.length; i++) {
-		    if (callName.equals(theMethods[i].getName())) {	
+		    if (callName.equals(theMethods[i].getName())) {
 		        //_log.info("Call hit: " + arg + " " + callName);
 		        //Object args[] = new Object[1];
-		        //args[0] = _project.getModel(); 
+		        //args[0] = _project.getModel();
 		        try {
-		            return theMethods[i].invoke(thisObject, 
+		            return theMethods[i].invoke(thisObject,
 		                    args);
 		        } catch (IllegalArgumentException e) {
 		            throw new UnsupportedCallException(e);
@@ -316,7 +308,7 @@ public class UMLInterface
 		        } catch (InvocationTargetException e) {
 		            throw new UnsupportedCallException(e);
 		        }
-		    }	    
+		    }
 		}
 
 		//return null;
@@ -326,22 +318,22 @@ public class UMLInterface
 	throw new UnsupportedCallException("Illegal method call: " + call);
 	//return "Illegal method call";
     }
-    
+
     /**
      * Saves a diagram as gif in the directory specified by _outputDir.
      * Returns a String with the path to the saved gif file.
-     * TODO: Solve same Bug as in trySaveAllDiagrams() and implement 
+     * TODO: Solve same Bug as in trySaveAllDiagrams() and implement
      * better control for overwrite of old files.
-     * 
+     *
      * @param diagram The diagram to save.
      * @return The name of the file created.
-     * @throws IOException if there is some problem with the creation 
+     * @throws IOException if there is some problem with the creation
      *         of the files.
      * @throws UnsupportedCallException if we cannot construct the diagram.
      */
-    public String saveDiagram(UMLDiagram diagram) 
+    public String saveDiagram(UMLDiagram diagram)
     	throws IOException, UnsupportedCallException {
-        
+
 	//Todo: fix bug mentioned i trySaveAllDiagrams
 
 	if (diagram != null) {
@@ -351,52 +343,52 @@ public class UMLInterface
 	    project.setActiveDiagram(diagram);
 	    LOG.info("active diagram"
 	             + project.getActiveDiagram().getName());
-	    
+
 	    defaultName = Util.stripJunk(defaultName);
-	    
+
 	    LOG.info("diagram name " + defaultName);
-	    
-	    File defFile = 
-		new File(outputDir 
+
+	    File defFile =
+		new File(outputDir
 			 + defaultName + "."
 			 + FileFilters.GIF_FILTER.getSuffix());
-		
+
 	    LOG.info("diagram filename " + defaultName + "."
 		      + FileFilters.GIF_FILTER.getSuffix());
 
 	    if (defFile != null) {
 		String path = defFile.getParent();
-		LOG.info("diagram path " + path); 
-		    
+		LOG.info("diagram path " + path);
+
 		String name = defFile.getName();
 		LOG.info("diagram name " + name);
-		    
+
 		String extension = SuffixFilter.getExtension(defFile);
 		LOG.info("diagram ext " + extension);
-		    
-		CmdSaveGraphics cmd = null;
-			
-		cmd = new CmdSaveGIF();
-			    
 
-		if ( !path.endsWith( "/" ) ) {
+		CmdSaveGraphics cmd = null;
+
+		cmd = new CmdSaveGIF();
+
+
+		if (!path.endsWith("/")) {
 		    path += "/";
 		}
-			
-		projectBrowser.showStatus( "Writing " + path + name + "..." );
-		LOG.info( "Writing " + path + name + "..." );    
 
-		FileOutputStream fo = new FileOutputStream( defFile );
+		projectBrowser.showStatus("Writing " + path + name + "...");
+		LOG.info("Writing " + path + name + "...");
+
+		FileOutputStream fo = new FileOutputStream(defFile);
 		cmd.setStream(fo);
 		cmd.doIt();
 		fo.close();
-		projectBrowser.showStatus( "Wrote " + path + name );
-		LOG.info( "Wrote " + path + name + "..." );
+		projectBrowser.showStatus("Wrote " + path + name);
+		LOG.info("Wrote " + path + name + "...");
 		//return true;
 		return path + name;
 	    }
 	}
-	
+
 	throw new UnsupportedCallException("Not a valid diagram");
     }
 } /* end class UMLInteface */

@@ -1,7 +1,6 @@
+<!--
 // $Id$
-// Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström,
-// Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson,
-// Mattias Sidebäck.
+// Copyright (c) 2005, Linus Tolke.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -29,50 +28,11 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
+-->
 
-package org.argoprint.engine.interpreters;
-
-import org.argoprint.ArgoPrintDataSource;
-import org.argoprint.UnsupportedCallException;
-import org.argoprint.engine.Environment;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-/**
- * Handles the call tag.
- *
- * A call looks like this:
- * <ap:call what="EXPRESSION"></ap:call>
- */
-public class InterpreterCall extends Interpreter {
-
-    /**
-     * Constructor for this interpreter.
-     *
-     * @param dataSource
-     */
-    public InterpreterCall(ArgoPrintDataSource dataSource) {
-	super("call", dataSource);
-    }
-
-    /**
-     * Processes the call tag.
-     *
-     * @see Interpreter#processTag(Node, Environment)
-     */
-    protected void processTag(Node tagNode, Environment env)
-    	throws BadTemplateException, UnsupportedCallException {
-
-	NamedNodeMap attributes = tagNode.getAttributes();
-	Object returnValue = callDataSource("what", attributes, env);
-        if (returnValue == null) {
-            returnValue = "null";
-        }
-	Document document = tagNode.getOwnerDocument();
-	Node parentNode = tagNode.getParentNode();
-	Node fetchedData = document.createTextNode(returnValue.toString());
-	parentNode.replaceChild(fetchedData, tagNode);
-    }
-}
-
+<HEAD>
+  <TITLE>The org.argoprint.engine.interpreters package</TITLE>
+</HEAD>
+<BODY>
+This package packages contains interpreters for the different ArgoPrint tags.
+</BODY>

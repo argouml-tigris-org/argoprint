@@ -1,34 +1,34 @@
-//$Id$
-//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
-//Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
-//Mattias Sidebäck.
-//All rights reserved.
+// $Id$
+// Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström,
+// Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson,
+// Mattias Sidebäck.
+// All rights reserved.
 //
-//Redistribution and use in source and binary forms, with or without 
-//modification, are permitted provided that the following conditions are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
 //
-//* Redistributions of source code must retain the above copyright notice, 
-//  this list of conditions and the following disclaimer.
-// 
-//* Redistributions in binary form must reproduce the above copyright 
-//  notice, this list of conditions and the following disclaimer in the 
-//  documentation and/or other materials provided with the distribution.
+// * Redistributions of source code must retain the above copyright notice,
+//   this list of conditions and the following disclaimer.
 //
-//* Neither the name of the University of Linköping nor the names of its 
-//  contributors may be used to endorse or promote products derived from 
-//  this software without specific prior written permission. 
+// * Redistributions in binary form must reproduce the above copyright
+//   notice, this list of conditions and the following disclaimer in the
+//   documentation and/or other materials provided with the distribution.
 //
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-//AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-//IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-//ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-//LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-//CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-//SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-//INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-//CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-//ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
-//THE POSSIBILITY OF SUCH DAMAGE.
+// * Neither the name of the University of Linköping nor the names of its
+//   contributors may be used to endorse or promote products derived from
+//   this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.argoprint.engine.interpreters;
 
@@ -40,24 +40,25 @@ import org.w3c.dom.NodeList;
 
 /**
  * The default interpreter.<p>
- * 
+ *
  * This interpreter traverses recursively.
  */
 public class InterpreterDefault extends Interpreter {
 
     /**
      * Constructor for this interpreter.
-     * 
+     *
      * @param dataSource The data source used.
      * @param first The first interpreter to call.
      */
-    public InterpreterDefault(ArgoPrintDataSource dataSource, Interpreter first) {
+    public InterpreterDefault(ArgoPrintDataSource dataSource,
+            Interpreter first) {
 	super("", dataSource, first);
     }
 
     /**
      * Constructor for this interpreter.
-     * 
+     *
      * @param dataSource The data source used.
      */
     public InterpreterDefault(ArgoPrintDataSource dataSource) {
@@ -66,16 +67,16 @@ public class InterpreterDefault extends Interpreter {
 
     /**
      * Only needs to recurse on the children.
-     * 
+     *
      * @see Interpreter#processTag(Node, Environment)
      */
-    protected void processTag(Node tagNode, Environment env) 
+    protected void processTag(Node tagNode, Environment env)
     	throws BadTemplateException, UnsupportedCallException {
-        
+
 	NodeList children = tagNode.getChildNodes();
 	if (children.getLength() > 0) {
 	    recurse(getVector(children), env);
-	}	
+	}
     }
 
     /**

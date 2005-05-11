@@ -1,34 +1,34 @@
-//$Id$
-//Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström, 
-//Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson, 
-//Mattias Sidebäck.
-//All rights reserved.
+// $Id$
+// Copyright (c) 2003-2004, Mikael Albertsson, Mattias Danielsson, Per Engström,
+// Fredrik Gröndahl, Martin Gyllensten, Anna Kent, Anders Olsson,
+// Mattias Sidebäck.
+// All rights reserved.
 //
-//Redistribution and use in source and binary forms, with or without 
-//modification, are permitted provided that the following conditions are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
 //
-//* Redistributions of source code must retain the above copyright notice, 
-//  this list of conditions and the following disclaimer.
-// 
-//* Redistributions in binary form must reproduce the above copyright 
-//  notice, this list of conditions and the following disclaimer in the 
-//  documentation and/or other materials provided with the distribution.
+// * Redistributions of source code must retain the above copyright notice,
+//   this list of conditions and the following disclaimer.
 //
-//* Neither the name of the University of Linköping nor the names of its 
-//  contributors may be used to endorse or promote products derived from 
-//  this software without specific prior written permission. 
+// * Redistributions in binary form must reproduce the above copyright
+//   notice, this list of conditions and the following disclaimer in the
+//   documentation and/or other materials provided with the distribution.
 //
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-//AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-//IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-//ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-//LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-//CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-//SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-//INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-//CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-//ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
-//THE POSSIBILITY OF SUCH DAMAGE.
+// * Neither the name of the University of Linköping nor the names of its
+//   contributors may be used to endorse or promote products derived from
+//   this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.argoprint.ui;
 
@@ -65,7 +65,7 @@ import org.argouml.util.SuffixFilter;
 public class ArgoPrintJDialog extends JDialog {
 
     /**
-     * Creates new form JDialog
+     * Creates new form JDialog.
      *
      * @param parent The parent of the ArgoPrint gui (should be ArgoUML's gui).
      */
@@ -73,10 +73,11 @@ public class ArgoPrintJDialog extends JDialog {
         super(parent, true);
         initComponents();
     }
-    
-    /** This method is called from within the constructor to
+
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
-     * 
+     *
      */
     private void initComponents() {
 	jUIPanel = new JPanel();
@@ -94,7 +95,7 @@ public class ArgoPrintJDialog extends JDialog {
         jGenerateButton = new JButton();
         jCancelButton = new JButton();
 
-	/** Dialog config */
+	// Dialog config
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("ArgoPrint");
         addWindowListener(new WindowAdapter() {
@@ -104,23 +105,23 @@ public class ArgoPrintJDialog extends JDialog {
         });
 
 	BorderLayout bl = new BorderLayout();
-	getContentPane().setLayout( bl );
+	getContentPane().setLayout(bl);
 
 
-	getContentPane().add( jUIPanel );
-	getContentPane().add( jButtonPanel, BorderLayout.SOUTH );
+	getContentPane().add(jUIPanel);
+	getContentPane().add(jButtonPanel, BorderLayout.SOUTH);
 
 
-	/** Init UI Panel */
-	GridLayout gl = new GridLayout( 3, 3 );
-	jUIPanel.setLayout( gl );
+	// Init UI Panel
+	GridLayout gl = new GridLayout(3, 3);
+	jUIPanel.setLayout(gl);
 
         jTemplateLabel.setText("Template file:");
-	
+
         jUIPanel.add(jTemplateLabel);
 
         jTemplateTextField.setText(templateFilename);
-	
+
         jUIPanel.add(jTemplateTextField);
 
         jTemplateBrowseButton.setText("Browse");
@@ -135,7 +136,7 @@ public class ArgoPrintJDialog extends JDialog {
         jOutputFileLabel.setText("Output file:");
         jUIPanel.add(jOutputFileLabel);
         jOutputFileTextField.setText("myOutput.xml");
-	
+
         jUIPanel.add(jOutputFileTextField);
 
         jOutputFileBrowseButton.setText("Browse");
@@ -150,7 +151,7 @@ public class ArgoPrintJDialog extends JDialog {
 
 
         jOutputDirLabel.setText("Data storage directory:");
-	
+
         jUIPanel.add(jOutputDirLabel);
 
         jOutputDirTextField.setText("myDataDirectory");
@@ -163,7 +164,7 @@ public class ArgoPrintJDialog extends JDialog {
                 jOutputDirBrowseButtonActionPerformed();
             }
         });
-	
+
         jUIPanel.add(jOutputDirBrowseButton);
 
         jGenerateButton.setText("Generate");
@@ -203,39 +204,39 @@ public class ArgoPrintJDialog extends JDialog {
     private void jOutputDirBrowseButtonActionPerformed() {
 
         JFileChooser chooser = new JFileChooser();
-        
-        chooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
-        int returnVal = chooser.showOpenDialog( this );
+
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int returnVal = chooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-	    jOutputDirTextField.setText( chooser.getSelectedFile().getPath() );
+	    jOutputDirTextField.setText(chooser.getSelectedFile().getPath());
         }
     }
 
     /**
-     * Open file browser
+     * Open file browser.
      */
     private void jOutputFileBrowseButtonActionPerformed() {
-        
+
         JFileChooser chooser = new JFileChooser();
-        
-        int returnVal = chooser.showOpenDialog( this );
+
+        int returnVal = chooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
 	    jOutputFileTextField.setText(chooser.getSelectedFile().getPath());
         }
     }
 
     /**
-     * Open file browser
+     * Open file browser.
      */
     private void jTemplateBrowseButtonActionPerformed() {
 
         JFileChooser chooser = new JFileChooser(jTemplateTextField.getText());
-        
+
 	SuffixFilter filter = new SuffixFilter("xml", "An XML file.");
 	chooser.addChoosableFileFilter(filter);
 	chooser.setFileFilter(filter);
 
-        int returnVal = chooser.showOpenDialog( this );
+        int returnVal = chooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
 	    jTemplateTextField.setText(chooser.getSelectedFile().getPath());
         }
@@ -243,7 +244,7 @@ public class ArgoPrintJDialog extends JDialog {
     }
 
     /**
-     * Executes a generation
+     * Executes a generation.
      */
     private void jGenerateButtonActionPerformed() {
 	/******************************************************
@@ -251,73 +252,102 @@ public class ArgoPrintJDialog extends JDialog {
          *
          * (Not in the comment ofcourse!)
          ******************************************************/
-        
+
 //  	UMLInterface umlIf = new UMLInterface();
 //  	Environment env = new Environment();
 
 //  	//setting argopprint for current project
 //  	ProjectBrowser pb = ProjectBrowser.getInstance();
 //  	Project p =  ProjectManager.getManager().getCurrentProject();
-	
+
 //  	umlIf.setLog(log);
 //  	umlIf.setProject(p);
 //  	umlIf.setProjectBrowser(pb);
 //  	umlIf.setOutputDir( jOutputDirTextField.getText() );
-	
+
 //  	try{
-//  	    log.info("Proj name: " + 
-//  		     umlIf.caller(new String("getName(project)")) + 
+//  	    log.info("Proj name: " +
+//  		     umlIf.caller(new String("getName(project)")) +
 //  		     " " + umlIf.caller(new String("getName(project)")));
 //  	}catch(Exception e){
-//  	    JOptionPane.showMessageDialog( this, e.getMessage()); 
+//  	    JOptionPane.showMessageDialog( this, e.getMessage());
 //  	}
-	
+
 	try {
 	    templateFilename = jTemplateTextField.getText();
-	    Settings settings = new Settings(templateFilename,
-					     jOutputFileTextField.getText(),
-					     jOutputDirTextField.getText());
-	
+	    Settings settings =
+	        new Settings(templateFilename,
+	                jOutputFileTextField.getText(),
+	                jOutputDirTextField.getText());
+
 	    Main main = new Main();
 	    main.initializeSystem(settings);
 	    main.go();
-	}
-	catch (Exception e) {
-	    JOptionPane.showMessageDialog( this, e.getMessage());   
+	} catch (Exception e) {
+	    JOptionPane.showMessageDialog(this, e.getMessage());
 	    e.printStackTrace();
 	    return;
 	}
-	
-	JOptionPane.showMessageDialog( this, "Output generation complete!");
+
+	JOptionPane.showMessageDialog(this, "Output generation complete!");
     }
 
     /**
-     * Closes the dialog
+     * Closes the dialog.
      */
     private void closeDialog() {
         setVisible(false);
         dispose();
     }
 
-    /** main panel */
+    /**
+     * Main panel.
+     */
     private JPanel jUIPanel;
-    /** the button panel */
+
+    /**
+     * The button panel.
+     */
     private JPanel jButtonPanel;
-    /** browse directory button */
+
+    /**
+     * Browse directory button.
+     */
     private JButton jOutputDirBrowseButton;
-    /** output file button */
+
+    /**
+     * Output file button.
+     */
     private JButton jOutputFileBrowseButton;
-    /** template file button */
+
+    /**
+     * Template file button.
+     */
     private JButton jTemplateBrowseButton;
-    /** generation executor */
+
+    /**
+     * Generation executor.
+     */
     private JButton jGenerateButton;
-    /** cancel button */
+
+    /**
+     * Cancel button.
+     */
     private JButton jCancelButton;
-    /** directory text field */
+
+    /**
+     * Directory text field.
+     */
     private JTextField jOutputDirTextField;
-    /** output text field */
+
+    /**
+     * Output text field.
+     */
     private JTextField jOutputFileTextField;
-    /** template text field */
+
+    /**
+     * Template text field.
+     */
     private JTextField jTemplateTextField;
     /**
      * Remember the last file we used.
@@ -326,10 +356,18 @@ public class ArgoPrintJDialog extends JDialog {
      */
     private static String templateFilename = "myTemplate.xml";
 
-    /** output dir label */
-    private javax.swing.JLabel jOutputDirLabel;
-    /** output file label */
-    private javax.swing.JLabel jOutputFileLabel;
-    /** template label */
-    private javax.swing.JLabel jTemplateLabel;
+    /**
+     * Output dir label.
+     */
+    private JLabel jOutputDirLabel;
+
+    /**
+     * Output file label.
+     */
+    private JLabel jOutputFileLabel;
+
+    /**
+     * Template label.
+     */
+    private JLabel jTemplateLabel;
 }
