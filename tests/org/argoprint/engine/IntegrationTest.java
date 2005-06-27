@@ -1,19 +1,12 @@
 package org.argoprint.engine;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.xerces.parsers.DOMParser;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 import org.argoprint.DataSourceStub;
 import org.argoprint.XmlTestUtil;
 import org.argoprint.ui.Settings;
-import org.xml.sax.SAXException;
 
 public class IntegrationTest extends TestCase {
     private Main main = null;
