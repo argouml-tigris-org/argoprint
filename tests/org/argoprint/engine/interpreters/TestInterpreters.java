@@ -36,11 +36,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.xerces.parsers.DOMParser;
 import org.argoprint.DataSourceStub;
 import org.argoprint.UnsupportedCallException;
 import org.argoprint.XmlTestUtil;
@@ -48,6 +51,7 @@ import org.argoprint.engine.Environment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Test for the interpreters.
@@ -131,8 +135,9 @@ public class TestInterpreters extends TestCase {
         // Get the node at the same position as the call-node used to be.
         Node resultNode = nodes.item(collectPos);
 
-        assertTrue(name + "-interpreter does not give expected result.",
-                   XmlTestUtil.nodesEqual(compareNode, resultNode));
+        XmlTestUtil.assertNodesEqual(
+                name + "-interpreter does not give expected result.",
+                compareNode, resultNode);
     }
 
     /**
@@ -211,8 +216,9 @@ public class TestInterpreters extends TestCase {
 
         defaultInterpreter.handleTag(paramNode, env);
 
-        assertTrue("Default-interpreter does not give expected result.",
-                   XmlTestUtil.nodesEqual(paramNode, compNode));
+        XmlTestUtil.assertNodesEqual(
+                "Default-interpreter does not give expected result.",
+                paramNode, compNode);
     }
 
     /**
@@ -356,15 +362,21 @@ public class TestInterpreters extends TestCase {
      * @throws IOException if we cannot read the file.
      */
     private Document parseTestTemplate(String templateName) throws IOException {
-        DOMParser parser = new DOMParser();
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder parser;
         try {
-            parser.parse("tests/org/argoprint/engine/interpreters/"
-                    + templateName);
-        } catch (org.xml.sax.SAXException e) {
-            fail("Could not parse " + templateName + ": "
-                    + e.getMessage());
+            parser = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new Error("Cannot create parser.", e);
         }
-        Document document = parser.getDocument();
+        Document document;
+        try {
+            document =
+                parser.parse("tests/org/argoprint/engine/interpreters/"
+                             + templateName);
+        } catch (SAXException e) {
+            throw new Error("Error in the template", e);
+        }
         return document;
     }
 

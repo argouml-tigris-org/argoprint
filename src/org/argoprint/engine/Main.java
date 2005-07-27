@@ -35,9 +35,17 @@ package org.argoprint.engine;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.apache.xerces.parsers.DOMParser;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.UnsupportedCallException;
 import org.argoprint.engine.interpreters.BadTemplateException;
@@ -58,15 +66,22 @@ import org.xml.sax.SAXException;
  */
 public class Main {
     private Interpreter firstHandler;
-    private DOMParser parser;
+    private DocumentBuilder parser;
     // TODO: remove
     private String outputFile;
     private ArgoPrintDataSource dataSource;
 
     /**
-     * Constructor with a dummy data source.
+     * The document that we have parsed using.
      */
-    public Main() {
+    private Document parsedDocument;
+
+    /**
+     * Constructor with a dummy data source.
+     *
+     * @throws ParserConfigurationException if we cannot build the parser.
+     */
+    public Main() throws ParserConfigurationException {
         this(new UMLInterface());
     }
 
@@ -74,9 +89,14 @@ public class Main {
      * Constructor with a given data source.
      *
      * @param source The data source.
+     * @throws ParserConfigurationException if we cannot create the builder.
      */
-    public Main(ArgoPrintDataSource source) {
-	parser = new DOMParser();
+    public Main(ArgoPrintDataSource source)
+    	throws ParserConfigurationException {
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setIgnoringElementContentWhitespace(true);
+	parser = dbf.newDocumentBuilder();
         dataSource = source;
 
 	Interpreter iCall = new InterpreterCall(dataSource);
@@ -111,28 +131,47 @@ public class Main {
 	outputFile = settings.getOutputFile();
 	// TODO: set outputDir of interface
 	// ((UMLInterface)dataSource).setOutputPath(settings.getOutputDir);
-	parser.parse(new InputSource(settings.getTemplate()));
+	parsedDocument = parser.parse(new InputSource(settings.getTemplate()));
     }
 
     /**
      * Does the actual work.
      *
-     * @throws IOException If sometihing goes wrong while reading or writing
+     * @throws IOException If something goes wrong while reading or writing
      *         the files.
      * @throws BadTemplateException if the input file is incorrect.
      * @throws UnsupportedCallException if the data source calls are incorrect.
      */
     public void go()
 	throws IOException, BadTemplateException, UnsupportedCallException {
-	Document document = parser.getDocument();
+	Document document = parsedDocument;
 	firstHandler.handleTag(document, new Environment());
 	FileOutputStream outputStream = new FileOutputStream(outputFile);
-	OutputFormat outputFormat = new OutputFormat(document);
-	outputFormat.setIndent(4);
-	outputFormat.setPreserveSpace(false);
-	outputFormat.setLineWidth(80);
-	XMLSerializer serializer =
-	    new XMLSerializer(outputStream, outputFormat);
-	serializer.serialize(document);
+
+	TransformerFactory tf = TransformerFactory.newInstance();
+	Transformer serializer;
+	try {
+	    serializer = tf.newTransformer();
+	} catch (TransformerConfigurationException e) {
+	    throw new IOException("The TransformerFactory cannot initiate.");
+	}
+	serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+	try {
+	    serializer.transform(new DOMSource(document),
+	            		 new StreamResult(outputStream));
+	} catch (TransformerException e) {
+	    throw new Error("Shouldn't happen.", e);
+	}
+
+	outputStream.close();
+
+//	OutputFormat outputFormat = new OutputFormat(document);
+//	outputFormat.setIndent(4);
+//	outputFormat.setPreserveSpace(false);
+//	outputFormat.setLineWidth(80);
+//	XMLSerializer serializer =
+//	    new XMLSerializer(outputStream, outputFormat);
+//	serializer.serialize(document);
     }
 }

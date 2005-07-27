@@ -151,8 +151,7 @@ public abstract class Interpreter {
      */
     protected boolean canHandle(Node tagNode) {
 	return (tagNode.getNodeType() == Node.ELEMENT_NODE
-		&& tagNode.getLocalName().equals(tagName)
-		&& tagNode.getPrefix().equals(PREFIX));
+		&& isNodeNamed(tagNode, PREFIX, tagName));
     }
 
     /**
@@ -210,12 +209,9 @@ public abstract class Interpreter {
      * @return <code>true</code> if the name matches.
      */
     protected boolean isNodeNamed(Node node, String prefix, String localName) {
-	if ((node.getLocalName() == null) || node.getPrefix() == null) {
-	    return false;
-	} else {
-	    return (node.getLocalName().equals(localName)
-		    && node.getPrefix().equals(prefix));
-	}
+        return (localName.equals(node.getLocalName())
+                && prefix.equals(node.getPrefix()))
+	       || node.getNodeName().equals(prefix + ":" + localName);
     }
 
     /**

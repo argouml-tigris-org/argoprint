@@ -34,16 +34,23 @@
 package org.argoprint;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.File;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import junit.framework.TestCase;
 
-import org.apache.xerces.parsers.DOMParser;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
-import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
+import org.w3c.dom.NodeList;
 
 /**
  * Collected some utility methods that are common to several test cases.
@@ -61,50 +68,87 @@ public final class XmlTestUtil extends TestCase {
      *
      * @param filename The filename to read.
      * @return The contents of the file as a String.
-     * @throws SAXException If the file is not correct XML.
-     * @throws IOException If we cannot open the file.
      */
-    public static String fileToString(String filename)
-    	throws SAXException, IOException {
-        OutputFormat of = new OutputFormat();
-        of.setIndent(4);
-        of.setPreserveSpace(false);
-        of.setLineWidth(80);
+    public static String fileToString(String filename) {
+        Source source = new StreamSource(new File(filename));
 
-        DOMParser rparser = new DOMParser();
-        rparser.parse(filename);
-        ByteArrayOutputStream rstream = new ByteArrayOutputStream();
-        (new XMLSerializer(rstream, of)).serialize(rparser.getDocument());
-
-        return stripWs(rstream.toString());
+        return sourceToString(source);
     }
 
 
     /**
-     * Compare two {@link Node}s.
-     *
-     * @param left The correct Node.
-     * @param right The Node to test.
-     * @return <code>true</code> if they are similar.
+     * @param source A Source with XML.
+     * @return The String generated from the source.
      */
-    public static boolean nodesEqual(Node left, Node right) {
-        ByteArrayOutputStream lstream = new ByteArrayOutputStream();
-        ByteArrayOutputStream rstream = new ByteArrayOutputStream();
-        OutputFormat of = new OutputFormat();
-        of.setIndent(4);
-        of.setPreserveSpace(false);
-        of.setLineWidth(80);
+    private static String sourceToString(Source source) {
+        TransformerFactory transformerFactory =
+            TransformerFactory.newInstance();
+        Transformer transformer;
         try {
-            (new XMLSerializer(lstream, of)).serialize((Element) left);
-            (new XMLSerializer(rstream, of)).serialize((Element) right);
-        } catch (IOException e) {
-            fail("Could not serialize. Shouldn't happen:" + e);
+            transformer = transformerFactory.newTransformer();
+        } catch (TransformerConfigurationException e) {
+            throw new Error("Incorrectly configured transformer.", e);
+        }
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+        ByteArrayOutputStream rstream = new ByteArrayOutputStream();
+        Result result = new StreamResult(rstream);
+        try {
+            transformer.transform(source, result);
+        } catch (TransformerException e) {
+            throw new Error("Shouldn't happen: Identitity transformer fails.",
+                    	    e);
         }
 
-        String lstring = stripWs(lstream.toString());
-        String rstring = stripWs(rstream.toString());
+        return stripWs(rstream.toString());
+    }
 
-        return lstring.equals(rstring);
+    /**
+     * Compare two {@link Node}s.
+     *
+     * @param mess The string message to give when an error is seen.
+     * @param left The correct Node.
+     * @param right The Node to test.
+     */
+    public static void assertNodesEqual(String mess, Node left, Node right) {
+        assertEquals(mess + " Type differs.",
+                left.getNodeType(), right.getNodeType());
+        assertEquals(mess + " Name differs.",
+                left.getNodeName(), right.getNodeName());
+        assertEquals(mess + " Not both have attributes.",
+                left.getAttributes() == null,
+                right.getAttributes() == null);
+
+        assertEquals(mess + " Not both have values.",
+                left.getNodeValue() == null,
+                right.getNodeValue() == null);
+
+        if (left.getNodeValue() == null) {
+            assertEquals(mess + " Values.",
+                    left.getNodeValue(),
+                    right.getNodeValue());
+        }
+
+        if (left.getAttributes() != null) {
+            NamedNodeMap lmap = left.getAttributes();
+            NamedNodeMap rmap = right.getAttributes();
+
+            for (int i = 0; i < lmap.getLength(); i++) {
+                assertNodesEqual(mess + " Attribute(" + i + ")",
+                        lmap.item(i),
+                        rmap.item(i));
+            }
+        }
+
+        NodeList lchildren = left.getChildNodes();
+        NodeList rchildren = right.getChildNodes();
+
+        for (int i = 0; i < lchildren.getLength(); i++) {
+            assertNodesEqual(mess + " Child(" + i + ")",
+                    lchildren.item(i),
+                    rchildren.item(i));
+        }
     }
 
     /**
@@ -117,8 +161,14 @@ public final class XmlTestUtil extends TestCase {
         StringBuffer buf = new StringBuffer(in);
 
         int pos;
-        while ((pos = buf.indexOf("&#xa;")) > -1) {
-            buf.replace(pos, pos + 5, "\n");
+        final String xlf = "&#xa;";
+        while ((pos = buf.indexOf(xlf)) > -1) {
+            buf.replace(pos, pos + xlf.length(), "\n");
+        }
+
+        final String dlf = "&#10;";
+        while ((pos = buf.indexOf(dlf)) > -1) {
+            buf.replace(pos, pos + dlf.length(), "\n");
         }
 
         for (int i = buf.length() - 1; i >= 0; --i) {
