@@ -32,7 +32,9 @@
 
 package org.argoprint.engine.interpreters;
 
-import org.apache.xpath.NodeSet;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.argoprint.ArgoPrintDataSource;
 import org.argoprint.UnsupportedCallException;
 import org.argoprint.engine.ArgoPrintIterator;
@@ -231,9 +233,25 @@ public abstract class Interpreter {
      * @return The newly created NodeList.
      */
     protected static NodeList getVector(NodeList nodeList) {
-        NodeSet set = new NodeSet(nodeList);
-        set.setShouldCacheNodes(true);
-        return set;
+        class MyNodeList implements NodeList {
+            List contents;
+            
+            MyNodeList(NodeList list) {
+                contents = new ArrayList(list.getLength());
+                for (int i = 0; i < list.getLength(); i++) {
+                    contents.add(list.item(i));
+                }
+            }
+
+            public Node item(int arg0) {
+                return (Node) contents.get(arg0);
+            }
+
+            public int getLength() {
+                return contents.size();
+            }
+        };
+        return new MyNodeList(nodeList);
     }
 
     /**
