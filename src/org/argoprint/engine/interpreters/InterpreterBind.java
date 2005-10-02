@@ -42,27 +42,34 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This Interpreter handle the bind tag.
+ * This Interpreter handle the bind tag.<p>
  *
  * The bind tag looks like this:
- * <ap:bind name="NAME"><ap:attr name="NAME">blabla</ap:attr>...</ap:bind>
+ * <pre>
+ * &lt;ap:bind name="NAME"&gt;
+ *   &lt;ap:attr name="NAME"&gt;blabla&lt;/ap:attr&gt;
+ *   ...
+ * &lt;/ap:bind&gt;
+ * </pre>
  *
  * TODO:
  * Suggested new version of this tag to allow:
- * <ap:bind name="NAME">
- *   <ap:attr>
- *     <ap:name>blabla</ap:name>
- *     <ap:value>blabla</ap:value>
- *   </ap:attr>
- *   <ap:attr>
- *     <ap:name>blabla</ap:name>
- *     <ap:value>blabla</ap:value>
- *   </ap:attr>
+ * <pre>
+ * &lt;ap:bind name="NAME"&gt;
+ *   &lt;ap:attr&gt;
+ *     &lt;ap:name&gt;blabla&lt;/ap:name&gt;
+ *     &lt;ap:value&gt;blabla&lt;/ap:value&gt;
+ *   &lt;/ap:attr&gt;
+ *   &lt;ap:attr&gt;
+ *     &lt;ap:name&gt;blabla&lt;/ap:name&gt;
+ *     &lt;ap:value&gt;blabla&lt;/ap:value&gt;
+ *   &lt;/ap:attr&gt;
  *   ...
- *   <ap:contents>
+ *   &lt;ap:contents&gt;
  *     blabla
- *   </ap:contents>
- * </ap:bind>
+ *   &lt;/ap:contents&gt;
+ * &lt;/ap:bind&gt;
+ * </pre>
  */
 public class InterpreterBind extends Interpreter {
 

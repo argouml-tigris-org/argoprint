@@ -43,14 +43,15 @@ import org.w3c.dom.Node;
  * Handles the call tag.
  *
  * A call looks like this:
- * <ap:call what="EXPRESSION"></ap:call>
+ * &lt;ap:call what="EXPRESSION"&gt;&lt;/ap:call&gt;
  */
 public class InterpreterCall extends Interpreter {
 
     /**
      * Constructor for this interpreter.
      *
-     * @param dataSource
+     * @param dataSource The ArgoPrintDataSource that this Interpreter
+     * should fetch data from.
      */
     public InterpreterCall(ArgoPrintDataSource dataSource) {
 	super("call", dataSource);
