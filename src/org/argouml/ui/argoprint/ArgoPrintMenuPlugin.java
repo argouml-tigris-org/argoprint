@@ -52,9 +52,15 @@ import org.argouml.uml.ui.UMLAction;
  */
 public class ArgoPrintMenuPlugin extends UMLAction
     implements ModuleInterface {
-    private static final Logger LOG = 
+    /**
+     * Logger.
+     */
+    private static final Logger LOG =
         Logger.getLogger(ArgoPrintMenuPlugin.class);
 
+    /**
+     * The menu item.
+     */
     private JMenuItem menuItem;
 
     /**
@@ -62,7 +68,7 @@ public class ArgoPrintMenuPlugin extends UMLAction
      */
     public ArgoPrintMenuPlugin() {
 	super("Plugin ArgoPrintMenu entry", false);
-	
+
         menuItem = new JMenuItem("ArgoPrint");
 	menuItem.addActionListener(this);
     }
@@ -79,7 +85,7 @@ public class ArgoPrintMenuPlugin extends UMLAction
 	LOG.info("Starting ArgoPrint");
 
 	// This is where the ArgoPrint GUI frame is created and displayed
-	ArgoPrintJDialog argoPrintDialog = 
+	ArgoPrintJDialog argoPrintDialog =
 	    new ArgoPrintJDialog(new JFrame());
 	LOG.info("Setting Gui Log");
 	LOG.info("Showing ArgoPrint Dialog");
@@ -90,17 +96,11 @@ public class ArgoPrintMenuPlugin extends UMLAction
     /**
      * @see org.argouml.moduleloader.ModuleInterface#enable()
      */
-    public boolean enable() throws Exception {
-	try {
-	    // Register into the Tools menu.
-	    GenericArgoMenuBar menubar =
-		(GenericArgoMenuBar) ProjectBrowser.getInstance().getJMenuBar();
-	    menubar.getTools().add(menuItem);
-	} catch (Throwable e) {
-	    LOG.debug("Some problem when adding the module.", e);
-	    disable();
-	    return false;
-	}
+    public boolean enable() {
+        // Register into the Tools menu.
+        GenericArgoMenuBar menubar =
+            (GenericArgoMenuBar) ProjectBrowser.getInstance().getJMenuBar();
+        menubar.getTools().add(menuItem);
 	return true;
     }
 
@@ -131,7 +131,7 @@ public class ArgoPrintMenuPlugin extends UMLAction
         case AUTHOR:
             return "Mattias Danielsson";
         case VERSION:
-            return "0.0.1";    
+            return "0.0.1";
         default:
             return null;
         }
