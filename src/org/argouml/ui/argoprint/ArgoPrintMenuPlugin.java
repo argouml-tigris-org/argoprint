@@ -89,7 +89,7 @@ public class ArgoPrintMenuPlugin extends UMLAction
 	    new ArgoPrintJDialog(new JFrame());
 	LOG.info("Setting Gui Log");
 	LOG.info("Showing ArgoPrint Dialog");
-	argoPrintDialog.show();
+	argoPrintDialog.setVisible(true);
     }
 
 
