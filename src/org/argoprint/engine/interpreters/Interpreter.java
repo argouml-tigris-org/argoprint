@@ -234,8 +234,13 @@ public abstract class Interpreter {
      */
     protected static NodeList getVector(NodeList nodeList) {
         class MyNodeList implements NodeList {
-            List contents;
-            
+            private List contents;
+
+            /**
+             * The constructor.
+             *
+             * @param list A NodeList.
+             */
             MyNodeList(NodeList list) {
                 contents = new ArrayList(list.getLength());
                 for (int i = 0; i < list.getLength(); i++) {
@@ -250,7 +255,7 @@ public abstract class Interpreter {
             public int getLength() {
                 return contents.size();
             }
-        };
+        }
         return new MyNodeList(nodeList);
     }
 

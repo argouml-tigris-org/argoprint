@@ -247,11 +247,13 @@ public class ArgoPrintJDialog extends JDialog {
      * Executes a generation.
      */
     private void jGenerateButtonActionPerformed() {
-	/******************************************************
+	/*
+         ******************************************************
          * This is where Engine is invoked!!!!!
          *
          * (Not in the comment ofcourse!)
-         ******************************************************/
+         ******************************************************
+         */
 
 //  	UMLInterface umlIf = new UMLInterface();
 //  	Environment env = new Environment();
@@ -370,4 +372,9 @@ public class ArgoPrintJDialog extends JDialog {
      * Template label.
      */
     private JLabel jTemplateLabel;
+
+    /**
+     * The UID.
+     */
+    private static final long serialVersionUID = -4676868538847093218L;
 }

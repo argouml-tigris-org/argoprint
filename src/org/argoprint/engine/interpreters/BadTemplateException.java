@@ -44,4 +44,9 @@ public class BadTemplateException extends Exception {
     public BadTemplateException(String message) {
         super(message);
     }
+
+    /**
+     * The UID.
+     */
+    private static final long serialVersionUID = -23041207240045745L;
 }
