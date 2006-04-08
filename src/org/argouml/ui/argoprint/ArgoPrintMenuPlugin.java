@@ -33,6 +33,7 @@
 package org.argouml.ui.argoprint;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -42,15 +43,14 @@ import org.argoprint.ui.ArgoPrintJDialog;
 import org.argouml.moduleloader.ModuleInterface;
 import org.argouml.ui.ProjectBrowser;
 import org.argouml.ui.cmd.GenericArgoMenuBar;
-import org.argouml.uml.ui.UMLAction;
 
 
 /**
  * @author Mattias Danielsson
  * @since  0.0.1
  */
-public class ArgoPrintMenuPlugin extends UMLAction
-    implements ModuleInterface {
+public class ArgoPrintMenuPlugin
+    implements ModuleInterface, ActionListener {
     /**
      * Logger.
      */
@@ -66,8 +66,6 @@ public class ArgoPrintMenuPlugin extends UMLAction
      * The constructor.
      */
     public ArgoPrintMenuPlugin() {
-	super("Plugin ArgoPrintMenu entry", false);
-
         menuItem = new JMenuItem("ArgoPrint");
 	menuItem.addActionListener(this);
     }
