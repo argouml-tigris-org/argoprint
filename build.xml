@@ -18,7 +18,7 @@
 
     <property name="debug" value="on"/>
     <property name="optimize" value="on"/>
-    <property name="deprecation" value="off"/>
+    <property name="deprecation" value="on"/>
 
     <property name="module.build.dest" value="build"/>
 
