@@ -50,26 +50,35 @@ import org.w3c.dom.NodeList;
 /**
  * This Interpreter processes the iterate tag.<p>
  *
- * The iterate tag looks like this:<ul>
- * <li>&lt;ap:iterate
+ * The iterate tag looks like this:
+ * <pre>
+ * &lt;ap:iterate
  *           what="expression1" iteratorname="name" sortvalue="expression"&gt;
  *       Tags processed one time for each value of <code>expression1</code>
  *       while <code>name</code> is bound to them one at the time.
- *     &lt;/ap:iterate&gt;
- * </ul>
+ * &lt;/ap:iterate&gt;
+ * </pre>
  *
- * TODO: Suggested new syntax to make it easier if the expression1 is empty:<ul>
- * <li>&lt;ap:iterate
+ * TODO: Suggested new syntax to make it easier if the expression1 is empty:
+ * <pre>
+ * &lt;ap:iterate
  *           what="expression1" iteratorname="name" sortvalue="expression"&gt;
- *       &lt;ap:do&gt;
+ *     &lt;ap:do-first&gt;
+ *         Tags processed before do if <code>expression1</code> is not empty.
+ *     &lt;/ap:do-first&gt;
+ *     &lt;ap:do&gt;
  *         Tags processed one time for each value of <code>expression1</code>
  *         while <code>name</code> is bound to them one at the time.
- *       &lt;/ap:do&gt;
- *       &lt;ap:else&gt;
+ *     &lt;/ap:do&gt;
+ *     &lt;ap:do-last&gt;
+ *         Tags processed after do if <code>expression1</code> is not empty.
+ *     &lt;/ap:do-last&gt;
+ *     &lt;ap:else&gt;
  *         Tags processed if <code>expression1</code> is empty.
- *       &lt;/ap:else&gt;
- *     &lt;/ap:iterate&gt;
- * </ul>
+ *     &lt;/ap:else&gt;
+ * &lt;/ap:iterate&gt;
+ * </pre>
+ * See issue 5.
  */
 public class InterpreterIterate extends Interpreter {
 
