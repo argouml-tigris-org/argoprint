@@ -42,16 +42,23 @@ import org.w3c.dom.NodeList;
 /**
  * This Interpreter processes the if tag.<p>
  *
- * The if tag looks like this:<ul>
- * <li>&lt;ap:if cond="VALUE"&gt;blabla&lt;/ap:if&gt;,
- * <li>&lt;ap:if cond="VALUE"&gt;
- *       &lt;ap:then&gt;blabla&lt;/ap:then&gt;
- *     &lt;/ap:if&gt;, or
- * <li>&lt;ap:if cond="VALUE"&gt;
- *       &lt;ap:then&gt;blabla&lt;/ap:then&gt;
- *       &lt;ap:else&gt;blabla&lt;/ap:else&gt;
- *     &lt;/ap:if&gt;
- * </ul>
+ * The if tag looks like this:
+ * <pre>
+ * &lt;ap:if cond="VALUE"&gt;blabla&lt;/ap:if&gt;
+ * </pre>
+ * or
+ * <pre>
+ * &lt;ap:if cond="VALUE"&gt;
+ *     &lt;ap:then&gt;blabla&lt;/ap:then&gt;
+ * &lt;/ap:if&gt;
+ * </pre>
+ * or
+ * <pre>
+ * &lt;ap:if cond="VALUE"&gt;
+ *     &lt;ap:then&gt;blabla&lt;/ap:then&gt;
+ *     &lt;ap:else&gt;blabla&lt;/ap:else&gt;
+ * &lt;/ap:if&gt;
+ * </pre>
  */
 public class InterpreterIf extends Interpreter {
 
