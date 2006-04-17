@@ -378,3 +378,4 @@ public class ArgoPrintJDialog extends JDialog {
      */
     private static final long serialVersionUID = -4676868538847093218L;
 }
+mer text i filen
