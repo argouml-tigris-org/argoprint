@@ -1,0 +1,85 @@
+<html>
+<head>
+<title>Template Language Evaluation</title>
+</head>
+<body>
+<h1>Template Language Evaluation</h1>
+
+<p>
+This is Linus' idea on how to conduct the template language evaluation.
+</p>
+
+<p>
+This is an evaluation of the template language.
+For that reason we can assume that all trivial access methods
+exists and have the obvious names (the same names all the time).
+We don't have any complex access methods meaning that the
+template language should take care of all the control, selection,
+and comparison.
+</p>
+
+<ol>
+  <li>For each template language, create a template that creates either
+      html or docbook or both that
+    <ul>
+      <li>Shows a subset of classes based on the name of the containing
+          package in chapter 1.
+      <li>For each of these classes,
+          shows all the names and types of the attributes.
+          For those classes that doesn't have attributes include instead
+          the text "No attributes."
+
+      <li>Shows a subset of classes based on the name of one of
+          the stereotypes in chapter 2.
+      <li>For each of these classes,
+          shows the signature of all the operations including
+	  return value,
+          direction, name, and type of each parameter.
+          Each method as a bullet in a bulleted list.
+
+      <li>Show a subset of classes based on the existance of a parameter
+          named "something" in any of the operations in the class in chapter 3.
+      <li>For each of these classes,
+          if they contain operations other than the one named "something",
+          show these in a table with one operation on each line with 
+          the operation name in the first column and then one column per
+          distinct type for all parameters with the names of the parameters
+	  filled in the table.
+	  For those classes that doesn't have any other operations,
+          include instead the text "No other operations."
+
+      <li>Show all use case diagrams in chapter 4
+      <li>Under each use case diagram, a list of actors and a list of use cases
+          both with their explanations.
+	  
+      <li>Show the use cases that are linked to
+          a requirement (requirements fetched from some other tool than
+	  argouml indexed on the use case names) in chapter 5.
+      <li>Under each use case, show the requirement text.
+    </ul>
+
+  <li>Create a template that creates a html site with two frames.
+      One tree on the left with all actors, use cases, classes, attributes,
+      operations,
+      and then one page per actor, class, use case.
+
+  <li>Compare these templates with the following criteria
+    <ul>
+      <li>Length
+      <li>Complexity (i.e. how complex control structures were needed
+          to achieve this).
+      <li>How error prone they are
+      <li>How easy it is to spot and fix an error in them.
+    </ul>
+
+  <li>Check what editors are available with that template engine,
+      its license and extendability.
+      How well do the editor help in error spotting and fixing,
+      handling the length and complexity.
+</ol>
+
+<address>
+<a href="mailto:linus@tigris.org">Linus Tolke</a>
+</address>
+</body>
+</html>
