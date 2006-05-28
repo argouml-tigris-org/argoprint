@@ -1,0 +1,36 @@
+<html><head><title>Activity Log</title></head>
+<body>
+
+<p>
+This is Ion's activity log for the SoC work on ArgoPrint.
+</p>
+
+<p>
+<b>27/05/06</b>
+Read Velocity User Guide at [1]. The language seems to
+have the same problems like StringTemplate. A unified model is
+required for multiple data sources and sorting and filtering have to
+be backed up with specific code.  
+<ul>
+<li>[1]
+http://jakarta.apache.org/velocity/docs/user-guide.html</li> </ul>
+</p>
+
+<p>
+<b>26/05/06</b>
+Read the StringTemplate 2.2 documentation [1] and Terence Parr's
+article on MVC separation [2] and installed the library and made some
+simple tests. The implementation is nice (a couple of Smalltalk-like
+constructs) but it does not allow fitering, sorting and multiple data
+sources from within the template (violation of functional requirements
+F-3.2, F-3.3). I could not find an editor to know about StringTemplate
+([3] is a relatively recent thread supporting this).
+
+<ul>
+<li>[1] http://www.stringtemplate.org/doc/doc.tml</li>
+<li>[2] http://www.cs.usfca.edu/~parrt/papers/mvc.templates.pdf</li>
+<li>[3] http://www.antlr.org:8080/pipermail/stringtemplate-interest/2006-March/000304.html</li>
+</ul>
+</p>
+
+</body></html>

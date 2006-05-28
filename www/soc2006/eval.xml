@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<TemplateEvalution>
+
+<Template name="StringTemplate">
+ <Filtering type="code" />
+ <Sorting type="code" />
+ <Iteration type="template" />
+ <Engine name="StringTemplate">
+  <License>BSD License</License>
+ </Engine>
+</Template>
+
+<Template name="Velocity Template Language (VTL)">
+ <Filtering type="?" />
+ <Sorting type="?" />
+ <Iteration type="?" />
+ <Engine name="Velocity 1.4">
+  <License>Apache License v2.0</License>
+ </Engine>
+</Template>
+
+<Template name="XSLT">
+ <Filtering type="template" />
+ <Sorting type="template" />
+ <Iteration type="template" />
+ <Engine name="Apache Xalan">
+  <License>Apache License v2.0</License>
+ </Engine>
+</Template>
+
+</TemplateEvalution>
+
