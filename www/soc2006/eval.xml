@@ -11,12 +11,20 @@
 </Template>
 
 <Template name="Velocity Template Language (VTL)">
- <Filtering type="?" />
- <Sorting type="?" />
- <Iteration type="?" />
+ <Filtering type="template" />
+ <Sorting type="code" />
+ <Iteration type="template" />
  <Engine name="Velocity 1.4">
   <License>Apache License v2.0</License>
  </Engine>
+ <Editor name="Velocity Plugin for Eclipse"
+  <License>Common Public License</License>
+  <HomePage>http://veloedit.sf.net</HomePage>
+ </Editor>
+ <Editor name="JEdit"
+  <License>GPL</License>
+  <HomePage>http://www.jedit.org</HomePage>
+ </Editor>
 </Template>
 
 <Template name="XSLT">
