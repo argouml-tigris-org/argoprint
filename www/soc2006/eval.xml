@@ -27,6 +27,11 @@
  </Editor>
 </Template>
 
+<Template name="JET">
+ <Editor name="Eclipse plugin">
+ </Editor>
+</Template>
+
 <Template name="XSLT">
  <Filtering type="template" />
  <Sorting type="template" />
