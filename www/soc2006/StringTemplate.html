@@ -3,9 +3,33 @@
 <h1>StringTemplate Evaluation</h1>
 
 <h2>Overview</h2>
-<p>StringTemplate is a library to be used in java code to generate output based on a file with "attributes" in it. The java code is responsable for reading the template, associating to each attribute a value and writting the result to a stream.</p>
+<p>StringTemplate is a library to be used in java programs in order to fill data into template strings. The java code is responsable for reading the template, associating a value to each attribute and writting the result to a stream.</p>
 <p>The language does not allow side-effect meaning that the value of the attributes can't be changed in the template and the order of the statements does not influence the result.</p>
 <p>Reflection is used to extract information from objects either by calling getter methods or directly accesing public fields. The value of the attributes in the template is the result of calling <i>toString()</i> on the referred object.</p>
+
+<h2>Developement model</h2>
+<p><ol>
+ <li>Create a StringTemplate object by passing a string to the constructor or reading it from a file (suppose the object is stp)</li>
+ <li>Associate objects to template-attributes using:
+  <pre>
+  stp.setAttribute("packages", Model.getFactory().getAllPackages());
+  stp.setAttribute("packages_byname", ...);</pre>
+ </li>
+ <li>From within the template you can access public fields by using:
+  <pre>
+  stp.fieldName
+  </pre>
+ </li>
+ <li>or you can call isSomething or getSomething methods on the objects that are binded to the attributes (parameters can't be passed):
+  <pre>
+  $packages.size$ will send the message getSize() to the object bind to packages
+  $packages.empty$ will send the message isEmpty() to the object bind to packages
+  </pre>
+ </li>
+ <li>stp.toString() will return the result of filling in the attributes</li>
+</ol>
+
+</p>
 
 <h2>Conditionals</h2>
 <p>The conditional operator:
