@@ -1,0 +1,185 @@
+<html><head><title>StringTemplate Evaluation</title></head>
+<body>
+<h1>StringTemplate Evaluation</h1>
+
+<h2>Overview</h2>
+<p>StringTemplate is a library to be used in java code to generate output based on a file with "attributes" in it. The java code is responsable for reading the template, associating to each attribute a value and writting the result to a stream.</p>
+<p>The language does not allow side-effect meaning that the value of the attributes can't be changed in the template and the order of the statements does not influence the result.</p>
+<p>Reflection is used to extract information from objects either by calling getter methods or directly accesing public fields. The value of the attributes in the template is the result of calling <i>toString()</i> on the referred object.</p>
+
+<h2>Conditionals</h2>
+<p>The conditional operator:
+<pre>
+$if(expr)$
+$else$
+$endif$
+</pre>
+evaluates <i>expr</i> and if the value evaluates to Boolean true or to an non-empty string than the <i>if-block</i> is evaluated otherwise the <i>else-block</i> is evaluated. No parameters can be passed to the method hance requiring individual methods implemented for each test (e.g. isClassInPackageUtils(), isClassInPackageUI etc.)
+</p>
+
+<h2>Iteration</h2>
+<p>Iteration is implemented with a syntax similar to Smalltalk:</p>
+<pre>
+ actors:{actor|$actor.Name$}
+</pre>
+
+<h2>Sorting</h2>
+<p>Sorting has to be done in the java code (e.g. getListSortedByName, getListSortedByAddress).</p>
+
+<h2>Multiple data sources</h2>
+<p>The program that uses the StringTemplate library is responsible for combining multiple data sources and providing the template author the name of the attributes to use. If two data sources are used to use each one independenly on model for each must be provided. When cobining the two sources a new model must be provided in addition to the two.</p>
+
+<h2>Tools</h2>
+<p>The template engine is licensed under the BSD License and no StringTemplate-capable editor could be found.</p>
+
+<h2>Code</h2>
+    <ul>
+      <li>Shows a subset of classes based on the name of the containing
+          package in chapter 1.
+      <li>For each of these classes,
+          shows all the names and types of the attributes.
+          For those classes that doesn't have attributes include instead
+          the text "No attributes."
+	  <pre>
+	  &lt;h1&gt;Chapter 1&lt;h1&gt;
+
+	  $packages:{package| 
+	   &lt;h2&gt;$package.name$&lt;/h2&gt;
+	   &lt;ul&gt; $package.classes:{class|
+	    &lt;li&gt;$class.name$
+             &lt;ul&gt;
+	      &lt;li&gt
+	       $if(class.attributes)$ &lt;! test if getAttributes returns null !&gt;
+	         $class.attributes:{attr| $attr.name$ $attr.type$}$
+	       $else$
+	         No Attributes
+	       $endif$}$
+	      &lt;/li&gt;
+             &lt;/ul&gt;
+	    &lt;/li&gt;
+	  &lt;/ul&gt;
+	  </pre>
+	  </li>
+
+      <li>Shows a subset of classes based on the name of one of
+          the stereotypes in chapter 2.
+
+      <li>For each of these classes,
+          shows the signature of all the operations including
+	  return value,
+          direction, name, and type of each parameter.
+          Each method as a bullet in a bulleted list.
+
+	  <p>
+	  <i><b>Note:</b>Another solution is similar to the above but supposes that
+	  a stereotype know all classes that use it.</i>
+	  <pre>
+	   $stereotypes:{stereotype|
+	    $classes:{class|
+	     $if(class.(stereotype$stereotype.name$))$ &lt;! calls class.isStereotype&lt;name&gt;() !&gt;
+	      $class.name$
+	      &lt;ul&gt;
+	      $class.methods:{method|
+	        &lt;ul&gt;
+		 &lt;li&gt;Name: $method.name$&lt;/li&gt;
+		 &lt;li&gt;Returns: $method.returnType$&lt;/li&gt;
+		 &lt;li&gt;Visiblility: $method.visibility$&lt;/li&gt;
+		 &lt;ul&gt;
+		 $method.parameters:{paramenter|
+		  &lt;li&gt;$parameter.name$: $parameter.type$&lt;/li&gt;
+		 }$
+		 &lt;/ul&gt;
+		&lt;/ul&gt;
+	      }$
+	      &lt;/ul&gt;
+	     $else$ &lt;! do nothing !&gt;
+	     $endif$
+	    }$
+	   }$
+	  </pre>
+	  </p>
+
+      <li>Show a subset of classes based on the existance of a parameter
+          named "something" in any of the operations in the class in chapter 3.
+      <li>For each of these classes,
+          if they contain operations other than the one named "something",
+          show these in a table with one operation on each line with 
+          the operation name in the first column and then one column per
+          distinct type for all parameters with the names of the parameters
+	  filled in the table.
+	  For those classes that doesn't have any other operations,
+          include instead the text "No other operations."
+
+	  <p><i> Not possible. No parameters can be pushed to the model so the only
+	  solution would be for each method to have is&lt;Something&gt;Available().
+	  Calling the methods would not be a problem $method.($something$Available)$
+	  but is unlikely that these methods will be available. With a message passing
+	  mechanism like in Smalltalk this would not be a problem but in java the object
+	  can't intercept the message that it does not define.
+	  </i></p>
+
+      <li>Show all use case diagrams in chapter 4
+      <li>Under each use case diagram, a list of actors and a list of use cases
+          both with their explanations.
+
+	  <pre>
+	  &lt;h1&gt;Chapter 4&lt;h1&gt;
+
+	  &lt;! naming convention assumed and the model takes care of creating the images !&gt;
+	  $usecase_diagrams:{diagram|
+	    &lt;img src="$diagram.name$.png" alt="$diagram.name$"/&gt;
+	    &lt;h3&gt;Actors&lt;/h3&gt;
+	     &lt;ul&gt
+	     $diagram.actors:{actor|
+	      &lt;li&gt;$actor.name$ - $actor.expanation$&lt;/li&gt;
+	     }$	    
+	     &lt;/ul&gt    
+	    &lt;h3&gt;Usecases&lt;/h3&gt;
+	     &lt;ul&gt
+	     $diagram.usecases:{usecase|
+	      &lt;li&gt;$usecase.name$ - $usecase.expanation$&lt;/li&gt;
+	     }$	    
+	     &lt;/ul&gt    
+	  }$
+	  </pre>
+	  
+      <li>Show the use cases that are linked to
+          a requirement (requirements fetched from some other tool than
+	  argouml indexed on the use case names) in chapter 5.
+      <li>Under each use case, show the requirement text.
+      <p><i><b>Note:</b>The Java model is responsible for combining the two sources;
+      inside the template there is a single model</i>
+      <pre>
+	   $usecases:{usecase|
+	    $usecase.name$
+	    &lt;ul&gt;
+	    $requirements:{requirement|
+	     $if(usecase.(LinkedTo$requirement.name$))$ &lt;!calls usecase.isLinkedTo&lt;name&gt;()!&gt;
+	      &lt;li&gt;$requirement.text$&lt;/li&gt;
+	     $else$ &lt;! do nothing !&gt;
+	     $endif$
+	    }$
+	    &lt;/ul&gt;
+	   }$
+      </pre>
+      </p>
+  <li>Create a template that creates a html site with two frames.
+      One tree on the left with all actors, use cases, classes, attributes,
+      operations,
+      and then one page per actor, class, use case.
+      <p><i><b>Note:</b>The code combinining the two frames is static. The tree frame is generated
+      using a single template, the detailed frames are generated by applying templates specific for
+      actor/usecase/class etc. Calling the template and writing the file for each item must be done
+      in code.</i>
+      <pre>
+      </p>
+  </ul>
+
+<h2>Notes</h2>
+<ul>
+ <li>Length - easy to learn by non-programmers provided all required java code in the model is available</li>
+ <li>Complexity - high - java code must be build in order to perform simple tests because no parameters can be passed to the calls in the model</li>
+ <li>Error prone - if the java code is not build correctly side-effect can be introduced in the code; using $ as a delimiter is confusing as you can't easily tell if it an opening or closing delimiter. &lt; and &gt; delimiters can't be used in SGML type output</li>
+ <li>Error spoting - if the template is complex error spotting could be hard without a proper tool
+</ul>
+</body>
