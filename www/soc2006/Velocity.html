@@ -1,0 +1,276 @@
+<body>
+<h1>Velocity Evaluation</h1>
+
+<h2>Overview</h2>
+<p>Just like StringTemplate, Velocity is a library to be used in java programs in order to fill data into template strings. The java code is responsable for reading the template, associating a value to each attribute and writting the result to a stream.</p>
+<p>Unlike StringTemplate, method calls are allowed to take arguments hence side-effects are possible (See the section on multiple source combination)</p>
+<p>Reflection is used to extract information from objects either by calling getter methods or directly accesing public fields for properties, and parametrized method calls. The value of the attributes in the template is the result of calling <i>toString()</i> on the referred object.</p>
+
+<h2>Conditionals</h2>
+<p>The conditional operator:
+<pre>
+#if(expr)
+ ## if block
+#elseif (expr)
+ ## else-if block
+#else
+ ## else block
+#end
+</pre>
+<i>Expr</i> is evaluated and if the result is the boolean true or non-null then the <i>if-block</i> is evaluated. Equivalents tests, logical NOT, AND, OR and numerical comparisons are allowed.
+</p>
+
+<h2>Iteration</h2>
+<p>Iteration is implemented with a syntax similar to the new for loop in Java:</p>
+<pre>
+#foreach($item in $itemList)
+#end
+</pre>
+
+<h2>Sorting</h2>
+<p>Parametrized methods in the model or in the template with complexity added</p>
+
+<h2>Multiple data sources</h2>
+<p>Multiple source can be combined by using code similar to this one:
+<pre>
+public class Model {
+    private VelocityContext context;
+
+    public Model() {
+	context = new VelocityContext();
+	// the default model that is used to add datasources
+	context.put("model", this);
+    }
+
+    // binds and attribute to another object (datasource)
+    public void bind(String key, String pluginName, String altPath) {
+        /* gets the plugin from the list of registered ones or by loading
+	it from the alternate path */
+
+	context.put(key, plugin);
+    }
+    
+    public VelocityContext getContext() {
+	return context;
+    }
+
+    public static void main(String [] args) throws Exception {
+	Velocity.init();
+	StringWriter sw = new StringWriter();
+	Model master = new Model();
+	
+	Velocity.mergeTemplate("test.vm", master.getContext(), sw);
+	System.out.println(sw.toString());
+    }
+}
+</pre>
+The test.vm template:
+<pre>
+$model.bind("dataSource1", "argouml", "somePath")
+$model.bind("dataSource2", "reqrtool", "somePath")
+
+## calls to methods for the two datasource-objects are valid here
+</pre>
+</p>
+
+<h2>Tools</h2>
+<p>The library comes under Apache License 2.0. An Eclipse plugin (http://velocitywebedit.sourceforge.net/) is available under the GPL, another one does not seem to be maintained (http://sourceforge.net/projects/veloedit). Modes for Emacs, JEdit, UltraEdit, TextPad are available.</p>
+
+<h2>Code</h2>
+    <ul>
+      <li>Shows a subset of classes based on the name of the containing
+          package in chapter 1.
+      <li>For each of these classes,
+          shows all the names and types of the attributes.
+          For those classes that doesn't have attributes include instead
+          the text "No attributes."
+<pre>
+#foreach($package in $packages)
+ &lt;h2&gt;$package.getName()&lt;/h2&gt;
+ &lt;ul&gt;
+ #foreach($class in $package.getClasses())
+ &lt;li&gt;$class.getName()
+  #set($attrs = $class.getAttributes())
+  #if(attrs)
+   #for($attr in $attrs)
+    $attr.getName() $attr.getType()
+   #end
+  #else
+   No attributes.
+  #end
+  &lt;/li&gt;
+ #end
+ &lt;/ul&gt;
+#end
+</pre>
+	 </li>
+
+      <li>Shows a subset of classes based on the name of one of
+          the stereotypes in chapter 2.
+
+      <li>For each of these classes,
+          shows the signature of all the operations including
+	  return value,
+          direction, name, and type of each parameter.
+          Each method as a bullet in a bulleted list.
+
+	  <p>
+<pre>
+#foreach($stereotype in $stereotypeList)
+ &lt;h2&gt;$stereotype.getName()&lt;/h2&gt;
+ #foreach($class in $classList)
+  &lt;ul&gt;
+  #if ($class.hasStereotype($stereotype.getName()))
+   &lt;li&gt;
+    Class: $class.getName();
+    &lt;ul&gt;
+    #foreach($operation in $class.getOperations())
+     &lt;li&gt;
+     Name: $operation.getName()
+     Type: $operation.getType()
+     Parameters: 
+     #foreach($parameter in operation.getParameters())
+      $parameter.getName():$parameter.getType()
+     #end
+     &lt;/li&gt;
+    #end
+    &lt;/ul&gt;
+   &lt;/li&gt;
+  #end
+  &lt;/ul&gt;
+ #end
+#end
+</pre>
+	  </p>
+
+      <li>Show a subset of classes based on the existance of a parameter
+          named "something" in any of the operations in the class in chapter 3.
+<pre>
+#foreach($class in $classList)
+ #set( $found = false )
+ #foreach($operation in $class.getOperations())
+  #foreach($parameter in $operation.getParameters())
+   #if($parameter.getName() == something)
+    #set( $found = true)
+   #end
+  #end
+ #end
+ #if($found)
+  $class.getName()
+ #end
+#end
+</pre>
+      <li>For each of these classes,
+          if they contain operations other than the one named "something",
+          show these in a table with one operation on each line with 
+          the operation name in the first column and then one column per
+          distinct type for all parameters with the names of the parameters
+	  filled in the table.
+	  For those classes that doesn't have any other operations,
+          include instead the text "No other operations."
+<pre>
+#foreach($class in $classList)
+ #set( $found = false )
+ #set( $others = false )
+ #foreach($operation in $class.getOperations())
+  #foreach($parameter in $operation.getParameters())
+   #if($parameter.getName() == something)
+    #set( $found = true)
+   #else
+    #set( $others = true)
+   #end
+  #end
+ #end
+ #if($found)
+  $class.getName()
+  #if(others)
+   &lt;table&gt;
+   #foreach($operation in $class.getOperations())
+    &lt;tr&gt;
+    &lt;td&gt;$operation.getName()&lt;td&gt;
+    #foreach($parameter in $operation.getParameters())
+     &lt;td&gt;$parameter.getName():$parameter.getType()&lt;td&gt;
+    #end
+    &lt;/tr&gt;
+   #end
+   &lt;/table&gt;
+  #else
+   No other operations 
+  #end
+ #end
+#end
+</pre>
+
+      <li>Show all use case diagrams in chapter 4
+      <li>Under each use case diagram, a list of actors and a list of use cases
+          both with their explanations.
+
+<pre>
+## naming convention assumed and the model takes care of creating the images
+
+#foreach($diagram in diagramList)
+  &lt;img src="${diagram.getName()}.png" alt="${diagram.getName()}"/&gt;
+  &lt;h3&gt;Actors&lt;/h3&gt;
+   &lt;ul&gt
+   #foreach($actor in $actorList)
+    &lt;li&gt;$actor.getName() - $actor.getExplenation()&lt;/li&gt;
+   #end
+   &lt;/ul&gt    
+  &lt;h3&gt;Usecases&lt;/h3&gt;
+   &lt;ul&gt
+   #foreach($usecase in $usecaseList)
+    &lt;li&gt;$usecase.getName() - $usecase.getExplenation()&lt;/li&gt;
+   #end
+   &lt;/ul&gt    
+#end
+</pre>
+	  
+      <li>Show the use cases that are linked to
+          a requirement (requirements fetched from some other tool than
+	  argouml indexed on the use case names) in chapter 5.
+      <li>Under each use case, show the requirement text.
+       <i>Note: it is assumed that a plugin is registered or that a serialized model is provided
+       at the indicated path.</i>
+<pre>
+$model.bind("requiremetsSource", "identifierForPlugin", "orPathToPlugin")
+
+#foreach($usecase in usecaseList)
+ $usecase.getName()
+ &lt;ul&gt;
+ #foreact($requirement in requiremetsSource.getRequirementList())
+  #if(usecase.getName() == requirement.getName())
+   &lt;li&gt;$requirement.getText()&lt;/li&gt;
+  #end
+ #end
+ &lt;/ul&gt;
+#end
+
+
+</pre>
+      </p>
+  <li>Create a template that creates a html site with two frames.
+      One tree on the left with all actors, use cases, classes, attributes,
+      operations,
+      and then one page per actor, class, use case.
+      <p><i><b>Note:</b>The code combinining the two frames is static. The tree frame is generated
+      using a single template, the detailed frames are generated by applying templates specific for
+      actor/usecase/class etc. Calling the template and writing the file for each item must be done
+      in code.</i>
+      <pre>
+      </p>
+  </ul>
+
+<h2>Notes</h2>
+<ul>
+ <li>Length - easy to learn</li>
+ <li>Complexity - the template author must be aware of the interfaces of the models as most is done through method calls; imperative language.
+ <li>Error prone
+  <ul>
+   <li>attributes that are not bind are copied as plain-text in the result</li>
+   <li>floating point paramters seem to confuse the parser</li>
+  </ul>
+ </li>
+ <li>Error spoting - large amount of code might make errors hard to spot
+</ul>
+</body>
+</html>
