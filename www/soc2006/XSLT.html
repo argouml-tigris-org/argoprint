@@ -1,0 +1,289 @@
+<html><head><title>XSLT Evaluation</title></head>
+<body>
+<h1>XSLT Evaluation</h1>
+
+<h2>Overview</h2>
+<p>XSLT uses XML as input and can output both XML and non-XML. Templates are matched against XML elements in the input that are selected using XPath expressions. It's moslty declarative as opposed to the other languages that are imperative and it does not require direct interaction with the inner-works of the models, the author works just with XML data. In order for a tool to be used with ArgoPrint/XSLT an XML representation of the data must be available.</p>
+
+<h2>Conditionals</h2>
+<pre>
+&lt;xsl:if test="expr"&gt;
+
+&lt;/xsl:if&gt;
+</pre>
+<p>evaluates <i>expr</i> and if the value evaluates to boolean true or to an non-empty string than the content of the element is evaluated.
+</p>
+
+<pre>
+&lt;xsl:choose&gt;
+ &lt;xsl:when test="expr1"&gt;
+ &lt;/xsl:when&gt;
+ &lt;xsl:when test="expr2"&gt;
+ &lt;/xsl:when&gt;
+ ...
+ &lt;xsl:otherwise&gt;
+ &lt;/xsl:otherwise&gt;
+&lt;/xsl:choose&gt;
+</pre>
+<p>Is equivalent to a case statement and can be used to implement if-then-else constructs.</p>
+
+<h2>Iteration</h2>
+<pre>
+&lt;xsl:foreach select="expr"&gt;
+ ...
+&lt;/xsl:foreach&gt;
+</pre>
+<p>For all elements that match the <i>select</i> expression the content of the element is exaluated.</p>
+
+<h2>Sorting</h2>
+<pre>
+&lt;xsl:apply-templates select="..."&gt;
+ &lt;xsl:sort select="..."&gt;
+ ...
+&lt;/xsl:apply-templates&gt;
+
+or
+
+&lt;xsl:for-each select="..."&gt;
+ &lt;xsl:sort select="..."&gt;
+ ...
+&lt;/xsl:for-each&gt;
+</pre>
+
+<p>The sort element must be a child of <i>for-each</i> or <i>apply-templates</i>. The order (ascending/descending), comparison type (as string/as number) and the case order (uppercase first/lower case first) can be specified.</p>
+
+<h2>Multiple data sources</h2>
+<p>Combination of multiple XML sources can be done by using the document() function that takes as an argument the XML's filename. In order to specify elements in the other XML files besides the input, XPath expressions are prefixed with <i>document(fileName)</i>.</p>
+
+<h2>Tools</h2>
+<p>A list with XSLT tools is available at <a href="http://www.xslt.com/resources.html">http://www.xslt.com/resources.html</a> most of them are non-free. Xalan-J is a free implementation from Apache released under Apache License 2.0.</p>
+
+<h2>Code</h2>
+    <ul>
+      <li>Shows a subset of classes based on the name of the containing
+          package in chapter 1.
+      <li>For each of these classes,
+          shows all the names and types of the attributes.
+          For those classes that doesn't have attributes include instead
+          the text "No attributes."
+<pre>
+&lt;xsl:stylesheet
+     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+     version="1.0"&gt;
+  &lt;xsl:output method="html"/&gt;
+
+&lt;xsl:template match="/"&gt;
+ &lt;html&gt;&lt;head&gt;&lt;title&gt;Test&lt;/title&gt;&lt;/head&gt;&lt;body&gt;
+  &lt;xsl:apply-templates select="argouml"/&gt;
+ &lt;/body&gt;&lt;/html&gt;
+&lt;/xsl:template&gt;
+
+&lt;xsl:template match="argouml/package"&gt;
+ &lt;xsl:variable name="current" select="@name"/&gt;
+
+ &lt;h2&gt;Package &lt;xsl:value-of select="@name"/&gt;&lt;/h2&gt;
+ &lt;xsl:for-each select="/argouml/class[@package=$current]"&gt;
+  &lt;h3&gt;Class &lt;xsl:value-of select="@name"/&gt;&lt;/h3&gt;
+  &lt;ul&gt;
+  &lt;xsl:choose&gt;
+   &lt;xsl:when test="attr"&gt;
+    &lt;xsl:for-each select="attr"&gt;
+	&lt;li&gt;
+	 &lt;xsl:value-of select="@name"/&gt;:
+	 &lt;xsl:value-of select="@type"/&gt;
+	&lt;/li&gt;
+    &lt;/xsl:for-each&gt;
+   &lt;/xsl:when&gt;
+   &lt;xsl:otherwise&gt;
+	&lt;li&gt;No attributes&lt;/li&gt;
+   &lt;/xsl:otherwise&gt;
+  &lt;/xsl:choose&gt;
+  &lt;/ul&gt;
+ &lt;/xsl:for-each&gt;
+&lt;/xsl:template&gt;
+
+&lt;/xsl:stylesheet&gt;
+</pre>
+
+      <li>Shows a subset of classes based on the name of one of
+          the stereotypes in chapter 2.
+
+      <li>For each of these classes,
+          shows the signature of all the operations including
+	  return value,
+          direction, name, and type of each parameter.
+          Each method as a bullet in a bulleted list.
+
+<pre>
+&lt;xsl:template match="argouml/stereotype"&gt;
+ &lt;xsl:variable name="current" select="@name"/&gt;
+
+ &lt;h2&gt;Stereotype &lt;xsl:value-of select="@name"/&gt;&lt;/h2&gt;
+ &lt;xsl:for-each select="/argouml/class[stereotype/@name=$current]"&gt;
+  &lt;h3&gt;Class &lt;xsl:value-of select="@name"/&gt;&lt;/h3&gt;
+  &lt;ul&gt;
+  &lt;xsl:choose&gt;
+   &lt;xsl:when test="operation"&gt;
+    &lt;xsl:for-each select="operation"&gt;
+	&lt;li&gt;
+	 &lt;xsl:value-of select="@name"/&gt;
+	 &lt;xsl:if test="@return_type|@return_type!='void'"&gt;
+		:&lt;xsl:value-of select="@return_type"/&gt;
+	 &lt;/xsl:if&gt;
+	 &lt;ul&gt;
+	 &lt;xsl:for-each select="parameter"&gt;
+	  &lt;li&gt;
+	   &lt;xsl:value-of select="@name"/&gt;:
+	   &lt;xsl:value-of select="@type"/&gt;
+	  &lt;/li&gt;
+	 &lt;/xsl:for-each&gt;
+	 &lt;/ul&gt;
+	&lt;/li&gt;
+    &lt;/xsl:for-each&gt;
+   &lt;/xsl:when&gt;
+   &lt;xsl:otherwise&gt;
+	&lt;li&gt;No operation.&lt;/li&gt;
+   &lt;/xsl:otherwise&gt;
+  &lt;/xsl:choose&gt;
+  &lt;/ul&gt;
+ &lt;/xsl:for-each&gt;
+&lt;/xsl:template&gt;
+</pre>
+
+      <li>Show a subset of classes based on the existance of a parameter
+          named "something" in any of the operations in the class in chapter 3.
+      <li>For each of these classes,
+          if they contain operations other than the one named "something",
+          show these in a table with one operation on each line with 
+          the operation name in the first column and then one column per
+          distinct type for all parameters with the names of the parameters
+	  filled in the table.
+	  For those classes that doesn't have any other operations,
+          include instead the text "No other operations."
+
+<pre>
+&lt;xsl:template match="argouml/class"&gt;
+  &lt;xsl:choose&gt;
+   &lt;xsl:when test="operation[parameter/@name='something']"&gt;
+	Has something.
+ 	&lt;xsl:comment&gt;are there any other operations?&lt;/xsl:comment&gt;
+	&lt;xsl:if test="operation[parameter/@name!='something']"&gt;
+	 &lt;table border="1"&gt;
+	 &lt;tr&gt;&lt;td&gt;&lt;xsl:value-of select="operation/@name"/&gt;&lt;/td&gt;
+	 &lt;xsl:for-each select="operation[parameter/@name!='something']"&gt;
+	  &lt;xsl:for-each select="parameter"&gt;
+	   &lt;td&gt;&lt;xsl:value-of select="@name"/&gt;:&lt;xsl:value-of select="@type"/&gt;&lt;/td&gt;
+	  &lt;/xsl:for-each&gt;
+ 	 &lt;/xsl:for-each&gt;
+	 &lt;/tr&gt;
+	 &lt;/table&gt;
+	&lt;/xsl:if&gt;
+   &lt;/xsl:when&gt;
+   &lt;xsl:otherwise&gt;
+	Doesn't have something.
+   &lt;/xsl:otherwise&gt;
+  &lt;/xsl:choose&gt;
+&lt;/xsl:template&gt;
+</pre>
+
+      <li>Show all use case diagrams in chapter 4
+      <li>Under each use case diagram, a list of actors and a list of use cases
+          both with their explanations.
+
+<pre>
+&lt;xsl:template match="argouml/ucdiagram"&gt;
+ &lt;xsl:element name="img"&gt;
+  &lt;xsl:attribute name="src"&gt;&lt;xsl:value-of select="concat(@name,'.png')"/&gt;&lt;/xsl:attribute&gt;
+  &lt;xsl:attribute name="alt"&gt;&lt;xsl:value-of select="concat('Diagram ', @name)"/&gt;&lt;/xsl:attribute&gt;
+ &lt;/xsl:element&gt;
+ &lt;h3&gt;Actors:&lt;/h3&gt;
+ &lt;ul&gt;
+ &lt;xsl:for-each select="actor"&gt;
+  &lt;li&gt;
+  &lt;xsl:value-of select="@name"/&gt;
+  &lt;xsl:value-of select="@explenation"/&gt;
+  &lt;/li&gt;
+ &lt;/xsl:for-each&gt;
+ &lt;/ul&gt;
+ &lt;h3&gt;Usecases:&lt;/h3&gt;
+ &lt;ul&gt;
+ &lt;xsl:for-each select="usecase"&gt;
+  &lt;li&gt;
+  &lt;xsl:value-of select="@name"/&gt;
+  &lt;xsl:value-of select="@explenation"/&gt;
+  &lt;/li&gt;
+ &lt;/xsl:for-each&gt;
+ &lt;/ul&gt;
+&lt;/xsl:template&gt;
+</pre>
+	  
+      <li>Show the use cases that are linked to
+          a requirement (requirements fetched from some other tool than
+	  argouml indexed on the use case names) in chapter 5.
+      <li>Under each use case, show the requirement text.
+<pre>
+&lt;xsl:template match="argouml/ucdiagram"&gt;
+ &lt;h2&gt;
+   &lt;xsl:text&gt;Usecase Diagram &lt;/xsl:text&gt;
+   &lt;xsl:value-of select="@name"/&gt;
+ &lt;/h2&gt;
+ &lt;ul&gt;
+ &lt;xsl:for-each select="usecase"&gt;
+  &lt;li&gt;
+  &lt;xsl:variable name="current" select="@name"/&gt;
+  &lt;xsl:if test="document($reqtool)/requirements/requirement[@name=$current]"&gt;
+    &lt;xsl:value-of select="$current" /&gt;
+    &lt;xsl:text&gt; requirement:&lt;/xsl:text&gt;
+    &lt;xsl:value-of select="document($reqtool)/requirements/requirement[@name=$current]/@text"/&gt;
+  &lt;/xsl:if&gt;
+  &lt;/li&gt;
+ &lt;/xsl:for-each&gt;
+ &lt;/ul&gt;
+&lt;/xsl:template&gt;
+</pre>
+
+  <li>Create a template that creates a html site with two frames.
+      One tree on the left with all actors, use cases, classes, attributes,
+      operations,
+      and then one page per actor, class, use case.
+      <p><i><b>Note:</b>The code combinining the two frames is static.</i></p>
+<pre>
+&lt;xsl:template match="argouml"&gt;
+ &lt;h2&gt;Actors&lt;/h2&gt;
+ &lt;ul&gt;
+ &lt;xsl:for-each select="ucdiagram/actor"&gt;
+  &lt;li&gt;
+   &lt;xsl:variable name="filename" select="concat('actor_',@name,'.html')"/&gt;
+   &lt;xsl:element name="a"&gt;
+    &lt;xsl:attribute name="href"&gt;
+     &lt;xsl:value-of select="$filename" /&gt;
+    &lt;/xsl:attribute&gt;
+    @name
+   &lt;/xsl:element&gt;
+   &lt;redirect:write select="$filename"&gt;
+    &lt;xsl:comment&gt;Write the details of each actor&lt;/xsl:comment&gt;
+   &lt;/redirect:write&gt;
+  &lt;/li&gt;
+ &lt;/xsl:for-each&gt;
+ &lt;/ul&gt;
+
+ &lt;xsl:for-each select="ucdiagram/usecase"&gt; 
+  &lt;xsl:comment&gt;similar to above&lt;/xsl:comment&gt;
+ &lt;/xsl:for-each&gt;
+
+ &lt;xsl:for-each select="class"&gt;
+  &lt;xsl:comment&gt;similar to above&lt;/xsl:comment&gt;
+ &lt;/xsl:for-each&gt;
+
+&lt;/xsl:template&gt;
+</pre>
+  </ul>
+
+<h2>Notes</h2>
+<ul>
+ <li>Length - easy to learn, only the XPath specifications differ for various sources
+ <li>Complexity - simple rules for XPath, declarative language
+ <li>Error prone - ?
+ <li>Error spoting - ? 
+</ul>
+</body></html>
