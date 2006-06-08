@@ -1,0 +1,113 @@
+<html><head><title>JET Evaluation</title></head>
+<body>
+<h1>JET Evaluation</h1>
+
+<h2>Overview</h2>
+<p>JET is different from the other implementations seen so far in the sense that it requires an intermediary step: the template is used to generate an "Implementation class" that is used to fill the template with data from the model and for getting the actual output - this is java code that is generated on each template modification (and that requires compilation).</p>
+
+<p>JET is similar to JSP - embedded java code - no other language construct is available</p>
+
+<h2>Developement model</h2>
+<p><i>Note: this example is taken from the JET Tutorial available at: <a href="http://www.eclipse.org/articles/Article-JET/jet_tutorial1.html">http://www.eclipse.org/articles/Article-JET/jet_tutorial1.html</a></i></p>
+
+<p> The template has on the first line a directive that tells to the engine to generate an "implementation class" in the package "hello" with the name "HelloWorldTemplate"
+
+<pre>
+<%@ jet package="hello" class="HelloWorldTemplate" %>
+ Hello, world!
+</pre>
+
+<p> The template is used to generate the following implementation class:
+
+<pre>
+package hello;
+
+public class HelloWorldTemplate
+{
+  protected static String nl;
+  public static synchronized HelloWorldTemplate create(String lineSeparator)
+  {
+    nl = lineSeparator;
+    HelloWorldTemplate result = new HelloWorldTemplate();
+    nl = null;
+    return result;
+  }
+
+  protected final String NL = nl == null ? (System.getProperties().getProperty("line.separator")) : nl;
+  protected final String TEXT_1 = " ";
+  protected final String TEXT_2 = NL + " Hello, world!" + NL;
+  protected final String TEXT_3 = NL;
+
+  public String generate(Object argument)
+  {
+    StringBuffer stringBuffer = new StringBuffer();
+    stringBuffer.append(TEXT_1);
+    stringBuffer.append(TEXT_2);
+    stringBuffer.append(TEXT_3);
+    return stringBuffer.toString();
+  }
+}
+</pre>
+
+<p> In order to generate the actual output you must compile the code above and create an instance of the generated class to which you send the "generate" message with the model as argument. The method will return the result in the form of a string. The inconveniece is that if the template is changed the "implementation class" must be generated an compiled again each time.
+
+<h2>Conditionals</h2>
+<h2>Iteration</h2>
+<h2>Sorting</h2>
+<h2>Multiple data sources</h2>
+
+<h2>Tools</h2>
+<p>The JET tutorial explains working with JET from within Eclipse. At the time I haven't tried to use it outside Eclipse.</p>
+
+<h2>Code</h2>
+    <ul>
+      <li>Shows a subset of classes based on the name of the containing
+          package in chapter 1.
+      <li>For each of these classes,
+          shows all the names and types of the attributes.
+          For those classes that doesn't have attributes include instead
+          the text "No attributes."
+	  </li>
+
+      <li>Shows a subset of classes based on the name of one of
+          the stereotypes in chapter 2.
+
+      <li>For each of these classes,
+          shows the signature of all the operations including
+	  return value,
+          direction, name, and type of each parameter.
+          Each method as a bullet in a bulleted list.
+
+      <li>Show a subset of classes based on the existance of a parameter
+          named "something" in any of the operations in the class in chapter 3.
+      <li>For each of these classes,
+          if they contain operations other than the one named "something",
+          show these in a table with one operation on each line with 
+          the operation name in the first column and then one column per
+          distinct type for all parameters with the names of the parameters
+	  filled in the table.
+	  For those classes that doesn't have any other operations,
+          include instead the text "No other operations."
+
+      <li>Show all use case diagrams in chapter 4
+      <li>Under each use case diagram, a list of actors and a list of use cases
+          both with their explanations.
+	  
+      <li>Show the use cases that are linked to
+          a requirement (requirements fetched from some other tool than
+	  argouml indexed on the use case names) in chapter 5.
+      <li>Under each use case, show the requirement text.
+  <li>Create a template that creates a html site with two frames.
+      One tree on the left with all actors, use cases, classes, attributes,
+      operations,
+      and then one page per actor, class, use case.
+  </ul>
+
+<h2>Notes</h2>
+<ul>
+ <li>Length - same as Java plus minor embedding syntax
+ <li>Complexity - high - requires Java knowledge, code compilation
+ <li>Error prone - ?
+ <li>Error spoting - ?
+</ul>
+</body></html>
