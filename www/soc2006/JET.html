@@ -51,10 +51,34 @@ public class HelloWorldTemplate
 
 <p> In order to generate the actual output you must compile the code above and create an instance of the generated class to which you send the "generate" message with the model as argument. The method will return the result in the form of a string. The inconveniece is that if the template is changed the "implementation class" must be generated an compiled again each time.
 
+<p> The code that uses the implementation class:
+<p><i>Note: if the name of the class on the first line in the template changes the code that uses the implementation class to generate the output will be broken and will need modifications.</i>
+<pre>
+HelloWorldTemplate helloworld = new HelloWorldTemplate();
+String result = helloworld.generate(null);
+System.out.println(result);
+</pre>
+
 <h2>Conditionals</h2>
+<pre>
+<% if (cond) { %>
+     something
+<% } else { %>
+     something else
+<% } %>
+</pre>
 <h2>Iteration</h2>
+<p>If classes are to be used from packages other than java.lang they must be specified in the Jet directive on the first line. Elements between <% and %> are called scriptlets and the result of their evaluation is not added to the output string and the elements between <%= and %> are called expression and the result of their evaluation is added to the output string.
+<pre>
+<% jet ... import=java.util.* ... %>
+<% for ( Iterator i = ((List)argument).iterator(); i.hasNext(); ) { %>
+ <%= i.next().toString() %>
+<% } %>
+</pre>
 <h2>Sorting</h2>
+-
 <h2>Multiple data sources</h2>
+-
 
 <h2>Tools</h2>
 <p>The JET tutorial explains working with JET from within Eclipse. At the time I haven't tried to use it outside Eclipse.</p>
@@ -107,7 +131,7 @@ public class HelloWorldTemplate
 <ul>
  <li>Length - same as Java plus minor embedding syntax
  <li>Complexity - high - requires Java knowledge, code compilation
- <li>Error prone - ?
+ <li>Error prone - if the classname or package name changes in the template the code that uses the "implementation class" will brake
  <li>Error spoting - ?
 </ul>
 </body></html>
