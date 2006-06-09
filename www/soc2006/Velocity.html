@@ -201,6 +201,61 @@ $model.bind("dataSource2", "reqrtool", "somePath")
 #end
 </pre>
 
+<table bgcolor="#CCFFFF">
+<tr><th>Linus attempt at this</th></tr>
+<tr><td>
+<pre>
+#foreach($class in $classList)
+ #set( $found = false )
+ #set( $others = false )
+ #set( $types = emptyset )
+ #foreach($operation in $class.getOperations())
+  #foreach($parameter in $operation.getParameters())
+   #if($parameter.getName() == something)
+    #set( $found = true)
+   #else
+    #set( $others = true)
+    #foreach(parameter in $operation.getParameters())
+     #set( $types = union($types, createOneElementSet($parameter) ) )
+    #end
+   #end
+  #end
+ #end
+ #if($found)
+  $class.getName()
+  #if(others)
+   &lt;table&gt;
+   &lt;tr&gt;
+   &lt;th&gt;Operation&lt;/th&gt;
+   #foreach($type in $types)
+    &lt;th&gt;$type.getName()&lt;/th&gt;
+   #end
+   &lt;/tr&gt;
+   #foreach($operation in $class.getOperations())
+    &lt;tr&gt;
+    &lt;td&gt;$operation.getName()&lt;/td&gt;
+    #foreach($type in $types)
+     &lt;td&gt;
+     #foreach($parameter in $operation.getParameters())
+      #if ($parameter.getType() == $type)
+        $parameter.getName()
+      #end
+     #end
+     &lt;/td&gt;
+    #end
+    &lt;/tr&gt;
+   #end
+   &lt;/table&gt;
+  #else
+   No other operations 
+  #end
+ #end
+#end
+</pre>
+</td></tr>
+</table>
+
+
       <li>Show all use case diagrams in chapter 4
       <li>Under each use case diagram, a list of actors and a list of use cases
           both with their explanations.
