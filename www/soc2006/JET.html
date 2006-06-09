@@ -13,7 +13,7 @@
 <p> The template has on the first line a directive that tells to the engine to generate an "implementation class" in the package "hello" with the name "HelloWorldTemplate"
 
 <pre>
-<%@ jet package="hello" class="HelloWorldTemplate" %>
+&lt;%@ jet package="hello" class="HelloWorldTemplate" %&gt;
  Hello, world!
 </pre>
 
@@ -61,19 +61,19 @@ System.out.println(result);
 
 <h2>Conditionals</h2>
 <pre>
-<% if (cond) { %>
+&lt;% if (cond) { %&gt;
      something
-<% } else { %>
+&lt;% } else { %&gt;
      something else
-<% } %>
+&lt;% } %&gt;
 </pre>
 <h2>Iteration</h2>
 <p>If classes are to be used from packages other than java.lang they must be specified in the Jet directive on the first line. Elements between <% and %> are called scriptlets and the result of their evaluation is not added to the output string and the elements between <%= and %> are called expression and the result of their evaluation is added to the output string.
 <pre>
-<% jet ... import=java.util.* ... %>
-<% for ( Iterator i = ((List)argument).iterator(); i.hasNext(); ) { %>
- <%= i.next().toString() %>
-<% } %>
+&lt;% jet ... import=java.util.* ... %&gt;
+&lt;% for ( Iterator i = ((List)argument).iterator(); i.hasNext(); ) { %&gt;
+ &lt;%= i.next().toString() %&gt;
+&lt;% } %&gt;
 </pre>
 <h2>Sorting</h2>
 -
