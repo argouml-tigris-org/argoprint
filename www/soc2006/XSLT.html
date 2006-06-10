@@ -163,26 +163,60 @@ or
 
 <pre>
 &lt;xsl:template match="argouml/class"&gt;
-  &lt;xsl:choose&gt;
-   &lt;xsl:when test="operation[parameter/@name='something']"&gt;
-	Has something.
- 	&lt;xsl:comment&gt;are there any other operations?&lt;/xsl:comment&gt;
-	&lt;xsl:if test="operation[parameter/@name!='something']"&gt;
-	 &lt;table border="1"&gt;
-	 &lt;tr&gt;&lt;td&gt;&lt;xsl:value-of select="operation/@name"/&gt;&lt;/td&gt;
-	 &lt;xsl:for-each select="operation[parameter/@name!='something']"&gt;
-	  &lt;xsl:for-each select="parameter"&gt;
-	   &lt;td&gt;&lt;xsl:value-of select="@name"/&gt;:&lt;xsl:value-of select="@type"/&gt;&lt;/td&gt;
-	  &lt;/xsl:for-each&gt;
- 	 &lt;/xsl:for-each&gt;
-	 &lt;/tr&gt;
-	 &lt;/table&gt;
-	&lt;/xsl:if&gt;
-   &lt;/xsl:when&gt;
-   &lt;xsl:otherwise&gt;
-	Doesn't have something.
-   &lt;/xsl:otherwise&gt;
-  &lt;/xsl:choose&gt;
+ &lt;xsl:if test="operation[parameter/@name='something']"&gt;
+  &lt;h2&gt;Class &lt;xsl:value-of select="@name" /&gt; &lt;/h2&gt;
+
+   &lt;xsl:comment&gt;test if other operations exist&lt;/xsl:comment&gt;
+   &lt;xsl:if test="operation[parameter/@name!='something']"&gt;
+    &lt;xsl:comment&gt;
+     creates a list of parameters with unique type
+    &lt;/xsl:comment&gt;
+    &lt;xsl:variable
+     name="uniqueTypes"
+     select="operation[not(parameter/@name='something')]
+/parameter[not(@type=../preceding::operation[not(parameter/@name='something')]
+/parameter/@type
+or
+@type=preceding-sibling::parameter/@type)]" /&gt;
+
+    &lt;table border="1"&gt;
+     &lt;xsl:comment&gt;
+        creates the header by iterating on that list
+     &lt;/xsl:comment&gt;
+      &lt;tr&gt;
+       &lt;td&gt;Operation&lt;/td&gt;
+
+        &lt;xsl:for-each select="$uniqueTypes"&gt;
+         &lt;td&gt;&lt;xsl:value-of select="@type" /&gt;&lt;/td&gt;
+        &lt;/xsl:for-each&gt;
+      &lt;/tr&gt;
+
+     &lt;xsl:comment&gt;
+        for each operation start a new row and for each unique type iterate through the parameter list of the method and add the
+name of the parameter to the cell of the current unique type
+     &lt;/xsl:comment&gt;
+
+     &lt;xsl:for-each select="operation[parameter/@name!='something']"&gt;
+      &lt;xsl:variable name="currentOperation" select="." /&gt;
+       &lt;tr&gt;
+        &lt;td&gt;
+         &lt;xsl:value-of select="$currentOperation/@name" /&gt;
+        &lt;/td&gt;
+        &lt;xsl:for-each select="$uniqueTypes"&gt;
+         &lt;xsl:variable name="currentType" select="@type" /&gt;
+          &lt;td&gt;
+           &lt;xsl:for-each select="$currentOperation/parameter[@type=$currentType]"&gt;
+            &lt;xsl:text&gt; &lt;/xsl:text&gt;
+             &lt;xsl:value-of select="@name" /&gt;
+            &lt;/xsl:for-each&gt;
+          &lt;/td&gt;
+
+        &lt;/xsl:for-each&gt;
+       &lt;/tr&gt;
+     &lt;/xsl:for-each&gt;
+    &lt;/table&gt;
+   &lt;/xsl:if&gt;
+  &lt;/xsl:if&gt;
 &lt;/xsl:template&gt;
 </pre>
 
