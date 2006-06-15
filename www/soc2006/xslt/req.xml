@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<argoreq>
+ <requirement name="UC1" text="requirement for UC1"/>
+ <requirement name="UC2" text="requirement for UC2"/>
+ <requirement name="UC3" text="requirement for UC3"/>
+ <requirement name="UC4" text="requirement for UC4"/>
+ <requirement name="UC5" text="requirement for UC5"/>
+ <requirement name="UC6" text="requirement for UC6"/>
+ <requirement name="UC7" text="requirement for UC7"/>
+</argoreq>
