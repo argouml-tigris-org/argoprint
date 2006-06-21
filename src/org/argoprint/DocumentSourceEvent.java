@@ -1,4 +1,4 @@
-// $Id$
+// $Id DocumentSourceEvent.java,v 0.1 2006/06/21 17:26 comp_ Exp $
 // Copyright (c) 2006 The Regents of the University of California. All
 // Rights Reserved. Permission to use, copy, modify, and distribute this
 // software and its documentation without fee, and without a written
