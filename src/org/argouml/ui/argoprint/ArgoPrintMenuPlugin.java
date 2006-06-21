@@ -39,7 +39,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 
 import org.apache.log4j.Logger;
-import org.argoprint.ui.ArgoPrintJDialog;
+import org.argoprint.ui.ArgoPrintDialog;
 import org.argouml.moduleloader.ModuleInterface;
 import org.argouml.ui.ProjectBrowser;
 import org.argouml.ui.cmd.GenericArgoMenuBar;
@@ -82,8 +82,8 @@ public class ArgoPrintMenuPlugin
 	LOG.info("Starting ArgoPrint");
 
 	// This is where the ArgoPrint GUI frame is created and displayed
-	ArgoPrintJDialog argoPrintDialog =
-	    new ArgoPrintJDialog(new JFrame());
+	ArgoPrintDialog argoPrintDialog =
+	    new ArgoPrintDialog(new JFrame());
 	LOG.info("Setting Gui Log");
 	LOG.info("Showing ArgoPrint Dialog");
 	argoPrintDialog.setVisible(true);

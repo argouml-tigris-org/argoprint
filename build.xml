@@ -53,6 +53,8 @@
                 <include name="gef.jar" />
                 <include name="xerces.jar" />
             </fileset>
+	    <pathelement location="${argo.build.dir}/classes" />
+	    <pathelement location="${argo.root}/lib/gef-0.11.3M9.jar" />
         </classpath>
      </javac>
   </target>
@@ -66,6 +68,9 @@
           tofile="${module.build.dest}/classes/org/manifest.mf"
 	  filtering="on"
 	  overwrite="on"/>
+    <copy todir="${module.build.dest}/classes/org/argoprint/Images">
+      <fileset dir="src/org/argoprint/Images" excludes="CVS/**" includes="**/**"/>
+    </copy>
     <jar jarfile="${module.build.dest}/argoprint.jar"
          basedir="${module.build.dest}/classes"
          includes="org/**"
