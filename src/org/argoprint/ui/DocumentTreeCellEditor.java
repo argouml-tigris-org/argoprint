@@ -47,6 +47,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 /** Custom CellEditor for DOM Trees. */
 
@@ -55,6 +56,8 @@ class DocumentTreeCellEditor
 
     /** The component that is used for editing */
     private JPanel component;
+    private JPanel componentElement;
+    private JPanel componentText;
 
     /** The value (Node) that is subject to editing */
     private Node value;
@@ -62,32 +65,78 @@ class DocumentTreeCellEditor
     /** The number of clicks required to start editing */
     private static final int CLICK_COUNT = 2;
 
+    private JButton
+	buttonAddAtt,
+	buttonAcceptAttMod,
+	buttonAcceptAttAdd;
+
     private JComboBox
 	tagCombo,
 	attCombo;
 
     private JTextField
-	attField;
+	attNameField,
+	attValueField,
+	fieldText;
 
     private AbstractAction
-	actionChangeTag;
+	actionAcceptAttModification,
+	actionAcceptNewAtt,
+	actionAcceptTextModification,
+	actionAppendAtt;
 
     public DocumentTreeCellEditor() {
-	component = new JPanel();
 	initializeActions();
-	initializeComponent();
+	initializeComponents();
     }
 
     private void initializeActions() {
-	actionChangeTag = new AbstractAction() {
+	actionAcceptAttModification = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
+		    String newAttValue, attName;
+
+		    attName = (String)attCombo.getSelectedItem();
+		    newAttValue = attValueField.getText();
+		    // TODO: validate the new value
+		    ((Element)value).getAttributeNode(attName).setValue(newAttValue);
 		}
 	    };
-	actionChangeTag.putValue(AbstractAction.NAME, "Change tag");
+	actionAcceptAttModification.putValue(AbstractAction.NAME, "Modify");
+
+	actionAcceptNewAtt = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    String attName = attNameField.getText(),
+			attValue = attValueField.getText();
+		    ((Element)value).setAttribute(attName, attValue);
+
+		    setComponentElementForMod();
+		}
+	    };
+	actionAcceptNewAtt.putValue(AbstractAction.NAME, "Add");
+
+	actionAcceptTextModification = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    ((Text)value).replaceWholeText(fieldText.getText());
+		    stopCellEditing();
+		}
+	    };
+
+	actionAppendAtt = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    setComponentElementForAdd();
+		}
+	    };
+	actionAppendAtt.putValue(AbstractAction.NAME, "+");
     }
 
-    private void initializeComponent() {
-	component.setLayout(new FlowLayout());
+    private void initializeComponents() {
+	initializeElementComponent();
+	initializeTextComponent();
+    }
+
+    private void initializeElementComponent() {
+	componentElement = new JPanel();
+	componentElement.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
 
 	tagCombo = new JComboBox();
 	tagCombo.addItemListener(new ItemListener() {
@@ -100,29 +149,33 @@ class DocumentTreeCellEditor
 		    if (ItemEvent.SELECTED == e.getStateChange()) {
 			String attName = (String)e.getItem();
 			String attValue = ((Attr)value.getAttributes().getNamedItem(attName)).getValue();
-			attField.setText(attValue);
+			attValueField.setText(attValue);
 		    }
 		}
 	    });
-	attField = new JTextField(15);
+	attNameField = new JTextField(10);
+	attValueField = new JTextField(15);
 
-	component.add(new JLabel("tag:"));
-	component.add(tagCombo);
-	component.add(new JButton("+"));
-	component.add(new JLabel("attribute:"));
-	component.add(attCombo);
-	component.add(attField);
-	component.add(new JButton("A"));
-	component.add(new JButton("C"));
-	
-// 	tagCombo.addItem("template");
-// 	tagCombo.addItem("for-each");
-// 	tagCombo.addItem("choose");
-// 	tagCombo.addItem("if");
-	
-// 	attCombo.addItem("match");
-// 	attCombo.addItem("test");
+	componentElement.add(new JLabel("tag:"));
+	componentElement.add(tagCombo);
+	componentElement.add(new JLabel("attribute:"));
+	componentElement.add(attCombo);
+	componentElement.add(attNameField);
+	componentElement.add(attValueField);
 
+	componentElement.add(buttonAcceptAttAdd = new JButton(actionAcceptNewAtt));
+	buttonAcceptAttAdd.setVisible(false);
+	componentElement.add(buttonAcceptAttMod = new JButton(actionAcceptAttModification));
+	componentElement.add(buttonAddAtt = new JButton(actionAppendAtt));
+    }
+
+    private void initializeTextComponent() {
+	componentText = new JPanel();
+	componentText.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
+
+	componentText.add(fieldText = new JTextField(15));
+	fieldText.getKeymap().addActionForKeyStroke(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0),
+						    actionAcceptTextModification);
     }
 
     public Component getTreeCellEditorComponent(JTree tree,
@@ -131,24 +184,64 @@ class DocumentTreeCellEditor
 						boolean expanded,
 						boolean leaf,
 						int row) {
+	this.value = (Node)value;
 	if (value instanceof Element) {
-	    this.value = (Node)value;
-	    fillComponentDataForElement((Node)value);
-	    return component;
-	}
-	return new JTextField(15);
+	    setComponentElement((Node)value);
+	    component = componentElement;
+	} else if (value instanceof Text) {
+	    setComponentText((Node)value);
+	    component = componentText;
+	} else
+	    return new JTextField(((Node)value).getNodeName());
 
+	return component;
     }
 
-    public void fillComponentDataForElement(Node value) {
-	tagCombo.removeAllItems();
+    private void updateAttCombo() {
 	attCombo.removeAllItems();
 
-	tagCombo.addItem(((Element)value).getTagName());
-       
 	NamedNodeMap atts = value.getAttributes();
 	for (int i = 0; i < atts.getLength(); i++)
 	    attCombo.addItem(((Attr)atts.item(i)).getName());
+    }
+
+    private void setComponentElementForMod() {
+	updateAttCombo();
+
+	buttonAddAtt.setVisible(true);
+	buttonAcceptAttMod.setVisible(true);
+	buttonAcceptAttAdd.setVisible(false);
+
+	attCombo.setVisible(true);
+	attNameField.setVisible(false);
+	attValueField.setVisible(true);
+
+	componentElement.setSize(componentElement.getLayout().preferredLayoutSize(componentElement));
+    }
+
+    private void setComponentElementForAdd() {
+	buttonAddAtt.setVisible(false);
+	buttonAcceptAttMod.setVisible(false);
+	buttonAcceptAttAdd.setVisible(true);
+
+	attCombo.setVisible(false);
+	attNameField.setVisible(true);
+	attValueField.setVisible(true);
+	
+	attNameField.setText("");
+	attValueField.setText("");
+
+	componentElement.setSize(componentElement.getLayout().preferredLayoutSize(componentElement));
+    }
+
+    public void setComponentElement(Node value) {
+	tagCombo.removeAllItems();
+	tagCombo.addItem(((Element)value).getTagName());
+	setComponentElementForMod();
+    }
+    
+    public void setComponentText(Node value) {
+	fieldText.setText(((Text)value).getWholeText());
     }
 
     public void addCellEditorListener(CellEditorListener l) {
