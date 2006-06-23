@@ -33,6 +33,7 @@ import java.awt.event.ActionEvent;
 import java.util.EventObject;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -44,10 +45,13 @@ import javax.swing.tree.TreeCellEditor;
 import javax.swing.event.CellEditorListener;
 
 import org.w3c.dom.Attr;
+import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+
+import org.argoprint.ArgoPrintResources;
 
 /** Custom CellEditor for DOM Trees. */
 
@@ -68,22 +72,26 @@ class DocumentTreeCellEditor
     private JButton
 	buttonAddAtt,
 	buttonAcceptAttMod,
-	buttonAcceptAttAdd;
+	buttonAcceptAttAdd,
+	buttonRemoveAtt;
 
     private JComboBox
-	tagCombo,
-	attCombo;
+	comboTag,
+	comboAtt;
 
     private JTextField
-	attNameField,
-	attValueField,
+	fieldAttName,
+	fieldAttValue,
+	fieldTag,
 	fieldText;
 
     private AbstractAction
 	actionAcceptAttModification,
 	actionAcceptNewAtt,
 	actionAcceptTextModification,
-	actionAppendAtt;
+	actionAppendAtt,
+	actionRemoveAtt,
+	actionSetTag;
 
     public DocumentTreeCellEditor() {
 	initializeActions();
@@ -91,42 +99,81 @@ class DocumentTreeCellEditor
     }
 
     private void initializeActions() {
+	// Attribute modification action
 	actionAcceptAttModification = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    String newAttValue, attName;
 
-		    attName = (String)attCombo.getSelectedItem();
-		    newAttValue = attValueField.getText();
+		    attName = (String)comboAtt.getSelectedItem();
+		    newAttValue = fieldAttValue.getText();
 		    // TODO: validate the new value
 		    ((Element)value).getAttributeNode(attName).setValue(newAttValue);
 		}
 	    };
-	actionAcceptAttModification.putValue(AbstractAction.NAME, "Modify");
+	actionAcceptAttModification.putValue(AbstractAction.SMALL_ICON,
+					     new ImageIcon(ArgoPrintResources
+							   .getResource(ArgoPrintResources.ICON_CONFIRM)));
+	actionAcceptAttModification.putValue(AbstractAction.SHORT_DESCRIPTION,
+					     "Confirm attribute modification.");
 
+	// New attribute action
 	actionAcceptNewAtt = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-		    String attName = attNameField.getText(),
-			attValue = attValueField.getText();
+		    String attName = fieldAttName.getText(),
+			attValue = fieldAttValue.getText();
 		    ((Element)value).setAttribute(attName, attValue);
 
 		    setComponentElementForMod();
 		}
 	    };
-	actionAcceptNewAtt.putValue(AbstractAction.NAME, "Add");
+	actionAcceptNewAtt.putValue(AbstractAction.SMALL_ICON,
+				    new ImageIcon(ArgoPrintResources
+						  .getResource(ArgoPrintResources.ICON_CONFIRM)));
+	actionAcceptNewAtt.putValue(AbstractAction.SHORT_DESCRIPTION,
+				    "Confirm new attribute.");
+				    
 
 	actionAcceptTextModification = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-		    ((Text)value).replaceWholeText(fieldText.getText());
-		    stopCellEditing();
+		    ((CharacterData)value).setData(fieldText.getText());
 		}
 	    };
 
+	// Append action
 	actionAppendAtt = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    setComponentElementForAdd();
 		}
 	    };
-	actionAppendAtt.putValue(AbstractAction.NAME, "+");
+	actionAppendAtt.putValue(AbstractAction.SMALL_ICON,
+				 new ImageIcon(ArgoPrintResources
+					       .getResource(ArgoPrintResources.ICON_ADD)));
+	actionAppendAtt.putValue(AbstractAction.SHORT_DESCRIPTION,
+				 "Append attribute.");
+
+	// Remove action
+	actionRemoveAtt = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    String attName = (String)comboAtt.getSelectedItem();
+		    ((Element)value).removeAttribute(attName);
+
+		    setComponentElementForMod();
+		}
+	    };
+	actionRemoveAtt.putValue(AbstractAction.SMALL_ICON,
+				 new ImageIcon(ArgoPrintResources
+					       .getResource(ArgoPrintResources.ICON_REMOVE)));
+	actionRemoveAtt.putValue(AbstractAction.SHORT_DESCRIPTION,
+				 "Remove attribute.");
+
+	// Action set tag
+	actionSetTag = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    String newTag = fieldTag.getText();
+		    value.getOwnerDocument().renameNode(value, null, newTag);
+		}
+	    };
+	
     }
 
     private void initializeComponents() {
@@ -138,35 +185,45 @@ class DocumentTreeCellEditor
 	componentElement = new JPanel();
 	componentElement.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
 
-	tagCombo = new JComboBox();
-	tagCombo.addItemListener(new ItemListener() {
+	comboTag = new JComboBox();
+	comboTag.addItemListener(new ItemListener() {
 		public void itemStateChanged(ItemEvent e) {
 		}
 	    });
-	attCombo = new JComboBox();
-	attCombo.addItemListener(new ItemListener() {
+
+	fieldTag = new JTextField(15);
+	fieldTag.getKeymap()
+	    .addActionForKeyStroke(javax.swing.KeyStroke
+				   .getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0),
+				   actionSetTag);
+
+	comboAtt = new JComboBox();
+	comboAtt.addItemListener(new ItemListener() {
 		public void itemStateChanged(ItemEvent e) {
 		    if (ItemEvent.SELECTED == e.getStateChange()) {
 			String attName = (String)e.getItem();
 			String attValue = ((Attr)value.getAttributes().getNamedItem(attName)).getValue();
-			attValueField.setText(attValue);
+			fieldAttValue.setText(attValue);
 		    }
 		}
 	    });
-	attNameField = new JTextField(10);
-	attValueField = new JTextField(15);
+	fieldAttName = new JTextField(10);
+	fieldAttValue = new JTextField(15);
 
 	componentElement.add(new JLabel("tag:"));
-	componentElement.add(tagCombo);
+	componentElement.add(fieldTag);
+	componentElement.add(comboTag);
+	comboTag.setVisible(false);
+	componentElement.add(buttonAddAtt = new JButton(actionAppendAtt));
+	componentElement.add(buttonRemoveAtt = new JButton(actionRemoveAtt));
 	componentElement.add(new JLabel("attribute:"));
-	componentElement.add(attCombo);
-	componentElement.add(attNameField);
-	componentElement.add(attValueField);
+	componentElement.add(comboAtt);
+	componentElement.add(fieldAttName);
+	componentElement.add(fieldAttValue);
 
 	componentElement.add(buttonAcceptAttAdd = new JButton(actionAcceptNewAtt));
 	buttonAcceptAttAdd.setVisible(false);
 	componentElement.add(buttonAcceptAttMod = new JButton(actionAcceptAttModification));
-	componentElement.add(buttonAddAtt = new JButton(actionAppendAtt));
     }
 
     private void initializeTextComponent() {
@@ -174,8 +231,10 @@ class DocumentTreeCellEditor
 	componentText.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
 
 	componentText.add(fieldText = new JTextField(15));
-	fieldText.getKeymap().addActionForKeyStroke(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0),
-						    actionAcceptTextModification);
+	fieldText.getKeymap()
+	    .addActionForKeyStroke(javax.swing.KeyStroke
+				   .getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0),
+				   actionAcceptTextModification);
     }
 
     public Component getTreeCellEditorComponent(JTree tree,
@@ -198,23 +257,31 @@ class DocumentTreeCellEditor
     }
 
     private void updateAttCombo() {
-	attCombo.removeAllItems();
+	comboAtt.removeAllItems();
 
 	NamedNodeMap atts = value.getAttributes();
 	for (int i = 0; i < atts.getLength(); i++)
-	    attCombo.addItem(((Attr)atts.item(i)).getName());
+	    comboAtt.addItem(((Attr)atts.item(i)).getName());
     }
 
     private void setComponentElementForMod() {
 	updateAttCombo();
 
-	buttonAddAtt.setVisible(true);
-	buttonAcceptAttMod.setVisible(true);
-	buttonAcceptAttAdd.setVisible(false);
+	if (((Element)value).hasAttributes()) {
+	    buttonRemoveAtt.setVisible(true);
+	    comboAtt.setVisible(true);
+	    fieldAttValue.setVisible(true);
+	    buttonAcceptAttMod.setVisible(true);
+	} else {
+	    buttonRemoveAtt.setVisible(false);
+	    comboAtt.setVisible(false);
+	    fieldAttValue.setVisible(false);
+	    buttonAcceptAttMod.setVisible(false);
+	}
 
-	attCombo.setVisible(true);
-	attNameField.setVisible(false);
-	attValueField.setVisible(true);
+	buttonAddAtt.setVisible(true);
+	buttonAcceptAttAdd.setVisible(false);
+	fieldAttName.setVisible(false);
 
 	componentElement.setSize(componentElement.getLayout().preferredLayoutSize(componentElement));
     }
@@ -224,19 +291,21 @@ class DocumentTreeCellEditor
 	buttonAcceptAttMod.setVisible(false);
 	buttonAcceptAttAdd.setVisible(true);
 
-	attCombo.setVisible(false);
-	attNameField.setVisible(true);
-	attValueField.setVisible(true);
+	comboAtt.setVisible(false);
+	fieldAttName.setVisible(true);
+	fieldAttValue.setVisible(true);
 	
-	attNameField.setText("");
-	attValueField.setText("");
+	fieldAttName.setText("");
+	fieldAttValue.setText("");
 
 	componentElement.setSize(componentElement.getLayout().preferredLayoutSize(componentElement));
     }
 
     public void setComponentElement(Node value) {
-	tagCombo.removeAllItems();
-	tagCombo.addItem(((Element)value).getTagName());
+	comboTag.removeAllItems();
+	comboTag.addItem(((Element)value).getTagName());
+
+	fieldTag.setText(((Element)value).getTagName());
 	setComponentElementForMod();
     }
     
@@ -254,7 +323,9 @@ class DocumentTreeCellEditor
     }
     public boolean isCellEditable(EventObject anEvent) {
 	if (anEvent instanceof java.awt.event.MouseEvent)
-	    return ((java.awt.event.MouseEvent)anEvent).getClickCount() == DocumentTreeCellEditor.CLICK_COUNT;
+	    return
+		(((java.awt.event.MouseEvent)anEvent).getClickCount()
+		 == DocumentTreeCellEditor.CLICK_COUNT);
 	return false;
     }
 
