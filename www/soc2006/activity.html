@@ -6,14 +6,24 @@
 This is Ion's activity log for the SoC work on ArgoPrint.
 </p>
 
-<p><b>22/06/02</b> Solved the resources-from-jar issue, edited some icons,
+<p><b>-29/06/06</b> Work on the template-management GUI part; it took two
+rewrites and lots of tests because of the strange depedencies between components.
+Still not complete but it seems to be going in the right direction. I was unable
+to figure out why the SplitPane doesn't split the space between the components
+according to the specified ratio.
+
+<p><b>26/06/06</b> Looked into Schemas, DTDs and Relax NG to be used for
+the completion/validation operations for the editor. Discovered the xmloperator
+editor which is very similar to what I had in mind for the ArgoPrint editor.
+
+<p><b>22/06/06</b> Solved the resources-from-jar issue, edited some icons,
 completed basic attribute manipulation functions.
 
-<p><b>21/06/02</b> Work on the CellEditor/Renderer. Considered the posibility
+<p><b>21/06/06</b> Work on the CellEditor/Renderer. Considered the posibility
 of implementing a system similar to ArgoUML critics for the ArgoPrint editor.
 Still couldn't solve the issue with the access to the resources.
 
-<p><b>20/06/02</b> The editor has now basic functionality: tree representation
+<p><b>20/06/06</b> The editor has now basic functionality: tree representation
 of XML content, new/save/load functions implemented, basic tree manipulation 
 (adding nodes/removing subtrees). I've experimented with various custom CellEditors
 and CellRenderers that will be used as interface for altering the content of the
