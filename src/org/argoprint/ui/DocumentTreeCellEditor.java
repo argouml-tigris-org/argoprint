@@ -36,6 +36,7 @@ import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -58,8 +59,14 @@ import org.argoprint.ArgoPrintResources;
 class DocumentTreeCellEditor 
     implements TreeCellEditor {
 
+    /** Client propery key for the action to be triggered to stop editing */
+    private static final Object KEY_STOP_EDITING_ACTION = new Object();
+
+    /** Element specific action to be called when editing stops */
+    private static final Object KEY_ELEMENT_STOP_EDITING_ACTION = new Object();
+
     /** The component that is used for editing */
-    private JPanel component;
+    private JComponent component;
     private JPanel componentElement;
     private JPanel componentText;
 
@@ -86,12 +93,15 @@ class DocumentTreeCellEditor
 	fieldText;
 
     private AbstractAction
+	actionStopEditingOnElement,
+	actionStopEditingOnText,
+
 	actionAcceptAttModification,
 	actionAcceptNewAtt,
 	actionAcceptTextModification,
 	actionAppendAtt,
 	actionRemoveAtt,
-	actionSetTag;
+	actionAcceptTagModification;
 
     public DocumentTreeCellEditor() {
 	initializeActions();
@@ -99,6 +109,19 @@ class DocumentTreeCellEditor
     }
 
     private void initializeActions() {
+	actionStopEditingOnElement = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    // TODO
+		}
+	    };
+
+	actionStopEditingOnText = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    System.err.println("action stop");
+		    actionAcceptTextModification.actionPerformed(e);
+		}
+	    };
+
 	// Attribute modification action
 	actionAcceptAttModification = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
@@ -167,7 +190,7 @@ class DocumentTreeCellEditor
 				 "Remove attribute.");
 
 	// Action set tag
-	actionSetTag = new AbstractAction() {
+	actionAcceptTagModification = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    String newTag = fieldTag.getText();
 		    value.getOwnerDocument().renameNode(value, null, newTag);
@@ -184,6 +207,8 @@ class DocumentTreeCellEditor
     private void initializeElementComponent() {
 	componentElement = new JPanel();
 	componentElement.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
+	componentElement.putClientProperty(DocumentTreeCellEditor.KEY_STOP_EDITING_ACTION,
+					   actionStopEditingOnElement);
 
 	comboTag = new JComboBox();
 	comboTag.addItemListener(new ItemListener() {
@@ -192,10 +217,6 @@ class DocumentTreeCellEditor
 	    });
 
 	fieldTag = new JTextField(15);
-	fieldTag.getKeymap()
-	    .addActionForKeyStroke(javax.swing.KeyStroke
-				   .getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0),
-				   actionSetTag);
 
 	comboAtt = new JComboBox();
 	comboAtt.addItemListener(new ItemListener() {
@@ -229,12 +250,10 @@ class DocumentTreeCellEditor
     private void initializeTextComponent() {
 	componentText = new JPanel();
 	componentText.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
+	componentText.putClientProperty(DocumentTreeCellEditor.KEY_STOP_EDITING_ACTION,
+					actionStopEditingOnText);
 
 	componentText.add(fieldText = new JTextField(15));
-	fieldText.getKeymap()
-	    .addActionForKeyStroke(javax.swing.KeyStroke
-				   .getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0),
-				   actionAcceptTextModification);
     }
 
     public Component getTreeCellEditorComponent(JTree tree,
@@ -288,6 +307,7 @@ class DocumentTreeCellEditor
 
     private void setComponentElementForAdd() {
 	buttonAddAtt.setVisible(false);
+	buttonRemoveAtt.setVisible(false);
 	buttonAcceptAttMod.setVisible(false);
 	buttonAcceptAttAdd.setVisible(true);
 
@@ -326,6 +346,7 @@ class DocumentTreeCellEditor
 	    return
 		(((java.awt.event.MouseEvent)anEvent).getClickCount()
 		 == DocumentTreeCellEditor.CLICK_COUNT);
+
 	return false;
     }
 
@@ -335,9 +356,15 @@ class DocumentTreeCellEditor
     }
 
     public void cancelCellEditing() {
+	System.err.println("cancelCellEditing");
     }
     public boolean stopCellEditing() {
 	// TODO
+	System.err.println("stopCellEditing");
+	( (AbstractAction) component.getClientProperty(DocumentTreeCellEditor.KEY_STOP_EDITING_ACTION))
+	    // FIX!
+	    .actionPerformed(null);
+				    
 	return true;
     }
 }

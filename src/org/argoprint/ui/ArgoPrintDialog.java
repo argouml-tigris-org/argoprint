@@ -40,6 +40,7 @@ import javax.swing.JTree;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.argoprint.ArgoPrintEditorModel;
+import org.argoprint.ArgoPrintManagerModel;
 import org.argoprint.ui.ArgoPrintEditor;
 
 import org.w3c.dom.Document;
@@ -62,7 +63,7 @@ public class ArgoPrintDialog extends JDialog {
 	JTabbedPane pane = new JTabbedPane(JTabbedPane.TOP);
 	panel.add(pane, BorderLayout.CENTER);
 
-	pane.addTab("Templates", new JPanel());
+	pane.addTab("Templates", new ArgoPrintManager(new ArgoPrintManagerModel()));
 	pane.addTab("Editor", new ArgoPrintEditor(new ArgoPrintEditorModel()));
 
 	add(panel);

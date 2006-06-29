@@ -27,6 +27,13 @@ package org.argoprint;
 import java.net.URL;
 
 public class ArgoPrintResources {
+
+    // File Icons
+    public static final String ICON_NEW = "/org/argoprint/Images/new.png";
+    public static final String ICON_OPEN = "/org/argoprint/Images/open.png";
+    public static final String ICON_SAVE = "/org/argoprint/Images/save.png";
+   
+    // Cell Editor Icons
     public static final String ICON_ADD = "/org/argoprint/Images/add.png";
     public static final String ICON_CONFIRM = "/org/argoprint/Images/confirm.png";
     public static final String ICON_REMOVE = "/org/argoprint/Images/remove.png";

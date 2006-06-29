@@ -25,6 +25,7 @@
 package org.argoprint.ui;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 
@@ -41,35 +42,11 @@ import javax.swing.JToolBar;
 import org.argoprint.ArgoPrintEditorModel;
 import org.argoprint.DocumentSourceEvent;
 import org.argoprint.DocumentSourceListener;
+import org.argoprint.ArgoPrintResources;
 
 public class ArgoPrintEditor
     extends JPanel {
 //     implements DocumentSourceListener {
-
-    // TODO - move into configuration manager
-    private static final URL ICON_DIR = ClassLoader
-	.getSystemResource("org/argouml/Images/plaf/javax/swing/plaf/metal/" +
-			   "MetalLookAndFeel/toolbarButtonGraphics/general/");
-
-    private static final URL ICON_NEW;
-    private static final URL ICON_OPEN; 
-    private static final URL ICON_SAVE; 
-
-    private static URL urlWrap(URL context, String spec) {
-	URL result = null;
-	try {
-	    result = new URL(context, spec);
-	} catch (java.net.MalformedURLException ex) {
-	    // TODO
-	}
-	return result;
-    }
-    
-    static {
-	ICON_NEW  = urlWrap(ICON_DIR, "New.gif");
-	ICON_OPEN = urlWrap(ICON_DIR, "OpenProject.gif");
-	ICON_SAVE = urlWrap(ICON_DIR, "SaveProject.gif");
-    }
 
     private ArgoPrintEditorModel model;
     private AbstractAction
@@ -103,7 +80,9 @@ public class ArgoPrintEditor
 		    }
 		}
 	    };
-	actionNew.putValue(AbstractAction.SMALL_ICON, new ImageIcon(ArgoPrintEditor.ICON_NEW));
+	actionNew.putValue(AbstractAction.SMALL_ICON,
+			   new ImageIcon(ArgoPrintResources
+					 .getResource(ArgoPrintResources.ICON_NEW)));
 
 	actionOpen = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
@@ -123,7 +102,9 @@ public class ArgoPrintEditor
 		    }
 		}
 	    };
-	actionOpen.putValue(AbstractAction.SMALL_ICON, new ImageIcon(ArgoPrintEditor.ICON_OPEN));
+	actionOpen.putValue(AbstractAction.SMALL_ICON,
+			    new ImageIcon(ArgoPrintResources
+					  .getResource(ArgoPrintResources.ICON_OPEN)));
 
 	actionSave = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
@@ -132,7 +113,9 @@ public class ArgoPrintEditor
 			model.saveDocument(chooser.getSelectedFile());
 		}
 	    };
-	actionSave.putValue(AbstractAction.SMALL_ICON, new ImageIcon(ArgoPrintEditor.ICON_SAVE));
+	actionSave.putValue(AbstractAction.SMALL_ICON,
+			    new ImageIcon(ArgoPrintResources
+					  .getResource(ArgoPrintResources.ICON_SAVE)));
 
 	actionRemoveSubtree = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
@@ -144,13 +127,21 @@ public class ArgoPrintEditor
     private void initializeComponents() {
 	setLayout(new BorderLayout());
 
-	JToolBar toolbar = new JToolBar();
-	toolbar.add(new JButton(actionNew));
-	toolbar.add(new JButton(actionOpen));
-	toolbar.add(new JButton(actionSave));
-	toolbar.addSeparator();
-	toolbar.add(new JButton("Context"));
-	add(toolbar, BorderLayout.NORTH);
+	JPanel toolbarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+	add(toolbarPanel, BorderLayout.NORTH);
+
+	JToolBar fileToolbar = new JToolBar();
+	fileToolbar.add(new JButton(actionNew));
+	fileToolbar.add(new JButton(actionOpen));
+	fileToolbar.add(new JButton(actionSave));
+	fileToolbar.addSeparator();
+	fileToolbar.add(new JButton("Context"));
+	toolbarPanel.add(fileToolbar, BorderLayout.NORTH);
+
+	JToolBar xslToolbar = new JToolBar();
+	xslToolbar.add(new JButton("template"));
+	xslToolbar.add(new JButton("parameter"));
+	toolbarPanel.add(xslToolbar, BorderLayout.NORTH);
 
 	JTabbedPane tabbedpane = new JTabbedPane(JTabbedPane.BOTTOM);
 	DocumentTreeModel treeModel = new DocumentTreeModel(model);
