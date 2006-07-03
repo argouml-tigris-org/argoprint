@@ -315,7 +315,6 @@ public class ArgoPrintManager
 
 		/** Updates the model of this "proxy-model" */
 		private void updateModel() {
-		    System.err.println("updateModel");
 		    // TODO: ugly assumtion - last row in the other table is the
 		    //  edit row
 		    if ((tableIdentifiers.getSelectedRowCount() == 0) ||
@@ -324,7 +323,6 @@ public class ArgoPrintManager
 
 			rowCount = 0;
 		    else {
-			System.err.println("updateModel-else");
 			//TODO: remove explicit index
 			int selectedRow = tableIdentifiers.getSelectedRow();
 			String identifier = (String)tableIdentifiers
@@ -403,7 +401,7 @@ public class ArgoPrintManager
 			//TODO: parameter verification
 			switch (column) {
 			case COL_IDENTIFIER:
-			    job.setParameter((String)getValueAt(row, COL_IDENTIFIER), (String)obj);
+			    job.renameParameter((String)getValueAt(row, COL_IDENTIFIER), (String)obj);
 			    break;
 			case COL_VALUE:
 			    job.setParameter((String)getValueAt(row, COL_IDENTIFIER), (String)obj);
