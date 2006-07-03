@@ -25,6 +25,7 @@
 package org.argoprint;
 
 import java.io.File;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,6 +37,12 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+
+import org.argouml.kernel.Project;
+import org.argouml.kernel.ProjectManager;
+import org.argouml.persistence.PersistenceManager;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -140,6 +147,8 @@ public class ArgoPrintManagerModel {
 	return jobs.get(identifier);
     }
 
+
+    // IO methods
     public void fromDOMDocument(Document doc) {
 	NodeList jobNodes = doc.getDocumentElement()
 	    .getElementsByTagName("job");
@@ -263,6 +272,67 @@ public class ArgoPrintManagerModel {
 	}
 	
 	fromDOMDocument(doc);
+    }
+
+    // TODO: throw exceptions
+    public void generateOutput() {
+	Transformer transformer = null;
+	File fileXSLT = null , fileOut = null;
+	StreamSource input = null;
+
+	Iterator identifier = getIdentifiers().iterator();
+	TemplateJob job;
+	
+	while (identifier.hasNext()) {
+	    job = getJob((String)identifier.next());
+
+	    String inputParameter = job.getParameter("argouml");
+
+	    if (inputParameter == null)
+		// TODO: throw exception
+		return;
+	    else if (inputParameter.equals("model")) {
+		Project project =
+		    ProjectManager.getManager().getCurrentProject();
+
+		StringReader xmlString =
+		    new StringReader(PersistenceManager
+				     .getInstance()
+				     .getQuickViewDump(project));
+
+		input = new StreamSource(xmlString);
+	    } else {
+		// TODO: from file
+	    }
+
+	    try {
+// 		fileXSLT = new File(job.getTemplate().toURI());
+// 		fileOut = new File(job.getOutput().toURI());
+
+		fileXSLT = new File(new URL("file:/home/comp_/xmieval.xsl").toURI());
+		fileOut = new File(new URL("file:/home/comp_/out.xml").toURI());
+	    } catch (java.net.URISyntaxException ex) {
+		// TODO:
+		ex.printStackTrace();
+	    } catch (java.net.MalformedURLException ex) {
+		// TODO:
+		ex.printStackTrace();
+	    }
+	    
+	    try {
+		transformer = TransformerFactory
+		    .newInstance()
+		    .newTransformer(new StreamSource(fileXSLT));
+
+		transformer.transform(input, new StreamResult(fileOut));
+	    } catch (javax.xml.transform.TransformerConfigurationException ex) {
+		// TODO:
+		ex.printStackTrace();
+	    } catch (javax.xml.transform.TransformerException ex) {
+		// TODO:
+		ex.printStackTrace();
+	    }
+	}
     }
 }
 

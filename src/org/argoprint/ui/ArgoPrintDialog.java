@@ -57,7 +57,8 @@ public class ArgoPrintDialog extends JDialog {
     private ArgoPrintEditorModel editor;
 
     private AbstractAction
-	actionCloseDialog;
+	actionCloseDialog,
+	actionGenerateOutput;
 
     private static ArgoPrintDialog instance;
 
@@ -85,6 +86,16 @@ public class ArgoPrintDialog extends JDialog {
 	actionCloseDialog.putValue(AbstractAction.NAME, "Close");
 	actionCloseDialog.putValue(AbstractAction.SHORT_DESCRIPTION,
 				   "Close the dialog.");
+
+	actionGenerateOutput = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    manager.generateOutput();
+		}
+	    };
+	actionGenerateOutput.putValue(AbstractAction.NAME, "Generate");
+	actionGenerateOutput.putValue(AbstractAction.SHORT_DESCRIPTION,
+				      "Generate the output for the selected jobs.");
+	
     }
 
     private void initComponents() {
@@ -102,6 +113,7 @@ public class ArgoPrintDialog extends JDialog {
 
 	JPanel paneButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 	paneButtons.add(new JButton(actionCloseDialog));
+	paneButtons.add(new JButton(actionGenerateOutput));
 	panel.add(paneButtons, BorderLayout.SOUTH);
 
 	add(panel);
