@@ -24,9 +24,22 @@
 
 package org.argoprint;
 
+import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class ArgoPrintManagerModel {
     private HashMap<String, TemplateJob> jobs;
@@ -125,6 +138,131 @@ public class ArgoPrintManagerModel {
     // TODO: modify for identifier modification
     public TemplateJob getJob(String identifier) {
 	return jobs.get(identifier);
+    }
+
+    public void fromDOMDocument(Document doc) {
+	NodeList jobNodes = doc.getDocumentElement()
+	    .getElementsByTagName("job");
+	NodeList parameters;
+
+	TemplateJob job;
+	Element jobElement, parameterElement;
+
+	for (int i = 0; i < jobNodes.getLength(); i++) {
+	    jobElement = (Element)jobNodes.item(i);
+	    job = new TemplateJob(jobElement.getAttribute("identifier"));
+
+	    job.setSelected(Boolean.parseBoolean(jobElement.getAttribute("selected")));
+
+	    try {
+		job.setTemplate(new URL(jobElement.getAttribute("template")));
+		job.setOutput(new URL(jobElement.getAttribute("output")));
+	    } catch (java.net.MalformedURLException ex) {
+		//TODO
+		ex.printStackTrace();
+	    }
+	    
+	    parameters = jobElement.getElementsByTagName("parameter");
+	    for (int j = 0; j < parameters.getLength(); j++) {
+		parameterElement = (Element)parameters.item(j);
+		job.setParameter(parameterElement.getAttribute("name"),
+				 parameterElement.getAttribute("value"));
+	    }
+
+	    addJob(job);
+	}
+    }
+
+    public Document toDOMDocument() {
+	Document doc = null;
+	
+	try {
+	    doc = DocumentBuilderFactory
+		.newInstance()
+		.newDocumentBuilder()
+		.newDocument();
+	} catch (javax.xml.parsers.ParserConfigurationException ex) {
+	    //TODO:
+	    System.err.println("Should not happen.");
+	}
+	    
+	Element documentElement, elementJob, elementParameter;
+	TemplateJob currentJob;
+
+	documentElement = doc.createElement("jobs");
+	doc.appendChild(documentElement);
+	
+	Iterator<String> identifier = jobs.keySet().iterator();
+
+	while (identifier.hasNext()) {
+	    currentJob = getJob(identifier.next());
+
+	    elementJob = doc.createElement("job");
+	    elementJob.setAttribute("identifier",
+					currentJob.getIdentifier());
+	    elementJob.setAttribute("template",
+					currentJob.getTemplate()
+					.toString());
+	    elementJob.setAttribute("output",
+					currentJob.getOutput()
+					.toString());
+	    elementJob.setAttribute("selected",
+					"" + currentJob.getSelected());
+
+	    Iterator<String> parameter =
+		currentJob.getParameters().iterator();
+
+	    while (parameter.hasNext()) {
+		String name = parameter.next();
+		elementParameter = doc.createElement("parameter");
+		elementParameter.setAttribute("name", name);
+		elementParameter.setAttribute("value",
+					      currentJob.getParameter(name));
+
+		elementJob.appendChild(elementParameter);
+	    }
+
+	    documentElement.appendChild(elementJob);
+	}
+
+	return doc;
+    }
+    public void saveData(File file) {
+	Document doc = toDOMDocument();
+
+	// TODO: indentation of output
+	try {
+	    Transformer transformer = TransformerFactory
+		.newInstance()
+		.newTransformer();
+	    transformer.transform(new DOMSource(doc), new StreamResult(file));
+	} catch (javax.xml.transform.TransformerConfigurationException ex) {
+	    // TODO
+	    System.err.println(ex);
+	} catch (javax.xml.transform.TransformerException ex) {
+	    // TODO
+	    System.err.println(ex);
+	}
+    }
+    public void loadData(File file) {
+	// TODO: implement the exception handling part
+	Document doc = null;
+
+	try {
+	    doc = DocumentBuilderFactory
+		.newInstance()
+		.newDocumentBuilder()
+		.parse(file);
+	} catch (javax.xml.parsers.ParserConfigurationException ex) {
+
+	    System.err.println(ex);
+	} catch (org.xml.sax.SAXException ex) {
+	    System.err.println(ex);
+	} catch (java.io.IOException ex) {
+	    System.err.println(ex);
+	}
+	
+	fromDOMDocument(doc);
     }
 }
 

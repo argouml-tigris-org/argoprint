@@ -24,13 +24,19 @@
 
 package org.argoprint.ui;
 
-import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+
 
 import java.io.File;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -50,15 +56,35 @@ public class ArgoPrintDialog extends JDialog {
     private ArgoPrintManagerModel manager;
     private ArgoPrintEditorModel editor;
 
+    private AbstractAction
+	actionCloseDialog;
+
     private static ArgoPrintDialog instance;
 
     private ArgoPrintDialog(Frame parent) {
 	super(parent, true);
+	setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
 	manager = new ArgoPrintManagerModel();
 	editor = new ArgoPrintEditorModel();
 
+	initActions();
 	initComponents();
+
+	manager.loadData(new File("managerdata.xml"));
+    }
+
+    private void initActions() {
+	actionCloseDialog = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    // TODO: determine location from resource
+		    manager.saveData(new java.io.File("managerdata.xml"));
+		    setVisible(false);
+		}
+	    };
+	actionCloseDialog.putValue(AbstractAction.NAME, "Close");
+	actionCloseDialog.putValue(AbstractAction.SHORT_DESCRIPTION,
+				   "Close the dialog.");
     }
 
     private void initComponents() {
@@ -69,11 +95,14 @@ public class ArgoPrintDialog extends JDialog {
 	panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 	panel.setLayout(new BorderLayout());
 
-	JTabbedPane pane = new JTabbedPane(JTabbedPane.TOP);
-	panel.add(pane, BorderLayout.CENTER);
+	JTabbedPane paneTabs = new JTabbedPane(JTabbedPane.TOP);
+	paneTabs.addTab("Manager", new ArgoPrintManager(manager));
+	paneTabs.addTab("Editor", new ArgoPrintEditor(editor));
+	panel.add(paneTabs, BorderLayout.CENTER);
 
-	pane.addTab("Templates", new ArgoPrintManager(manager));
-	pane.addTab("Editor", new ArgoPrintEditor(editor));
+	JPanel paneButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+	paneButtons.add(new JButton(actionCloseDialog));
+	panel.add(paneButtons, BorderLayout.SOUTH);
 
 	add(panel);
 	pack();
