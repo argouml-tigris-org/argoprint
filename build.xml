@@ -51,7 +51,7 @@
                 <include name="antlrall.jar" />
                 <include name="log4j.jar" />
                 <include name="gef.jar" />
-                <include name="xerces.jar" />
+<!--                 <include name="xerces.jar" /> -->
             </fileset>
 	    <pathelement location="${argo.build.dir}/classes" />
 	    <pathelement location="${argo.root}/lib/gef-0.11.3M9.jar" />
@@ -106,7 +106,7 @@
         <fileset dir="${argo.tools.dir}/checkstyle-3.0">
           <include name="*.jar"/>
         </fileset>
-        <pathelement location="${argo.tools.dir}/ant-1.4.1/lib/xerces-1.2.3.jar"/>
+<!--         <pathelement location="${argo.tools.dir}/ant-1.4.1/lib/xerces-1.2.3.jar"/> -->
       </classpath>
       <arg value="-c"/>
       <arg value="${argo.tools.dir}/checkstyle/checkstyle_argouml.xml"/>
