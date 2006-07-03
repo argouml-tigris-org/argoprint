@@ -47,8 +47,17 @@ import org.w3c.dom.Document;
 
 public class ArgoPrintDialog extends JDialog {
 
-    public ArgoPrintDialog(Frame parent) {
+    private ArgoPrintManagerModel manager;
+    private ArgoPrintEditorModel editor;
+
+    private static ArgoPrintDialog instance;
+
+    private ArgoPrintDialog(Frame parent) {
 	super(parent, true);
+
+	manager = new ArgoPrintManagerModel();
+	editor = new ArgoPrintEditorModel();
+
 	initComponents();
     }
 
@@ -63,10 +72,17 @@ public class ArgoPrintDialog extends JDialog {
 	JTabbedPane pane = new JTabbedPane(JTabbedPane.TOP);
 	panel.add(pane, BorderLayout.CENTER);
 
-	pane.addTab("Templates", new ArgoPrintManager(new ArgoPrintManagerModel()));
-	pane.addTab("Editor", new ArgoPrintEditor(new ArgoPrintEditorModel()));
+	pane.addTab("Templates", new ArgoPrintManager(manager));
+	pane.addTab("Editor", new ArgoPrintEditor(editor));
 
 	add(panel);
 	pack();
+    }
+
+    public static ArgoPrintDialog getInstance(Frame parent) {
+	if (instance == null)
+	    instance = new ArgoPrintDialog(parent);
+	
+	return instance;
     }
 }
