@@ -25,9 +25,14 @@
 package org.argoprint.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Point;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.net.URL;
 
@@ -40,8 +45,10 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -52,18 +59,35 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import org.argoprint.ArgoPrintManagerModel;
 
 public class ArgoPrintManager
     extends JPanel {
 
+    private static final int IDN_COUNT = 4;
+    private static final int IDN_COL_SELECTED = 0;
+    private static final int IDN_COL_IDENTIFIER = 1;
+    private static final int IDN_COL_TEMPLATE = 2;
+    private static final int IDN_COL_OUTPUT = 3;
+
+    private static final int PAR_COUNT = 2;
+    private static final int PAR_COL_IDENTIFIER = 0;
+    private static final int PAR_COL_VALUE = 1;
+
     private ArgoPrintManagerModel model;
 
     private AbstractAction
-	actionSelectLocation;
+	actionEditTemplate,
+	actionRemoveIdentifier,
+	actionRemoveParameter,
+	actionSelectOutput,
+	actionSelectTemplate;
 
-    private JTable tableIdentifiers;
+    private JTable
+	tableIdentifiers,
+	tableParameters;
 
     private JTextField
 	fieldLocation;
@@ -76,25 +100,87 @@ public class ArgoPrintManager
     }
 
     private void initializeActions() {
-// 	final java.awt.Component parent = this;
-// 	actionSelectLocation = new AbstractAction() {
-// 		public void actionPerformed(ActionEvent e) {
-// 		    JFileChooser chooser = new JFileChooser();
-// 		    if (JFileChooser.APPROVE_OPTION == chooser.showDialog(parent, "Select")) {
-// 			try {
-// 			    // TODO: remove hardwire identifier column index
-// 			    String selectedIdentifier = (String)tableIdentifiers.getValueAt(tableIdentifiers.getSelectedRow(), 1);
-// 			    ArgoPrintManagerModel.TemplateJob job = model.getJob(selectedIdentifier);
-// 			    if (job != null)
-// 				job.setTemplateLocation(chooser.getSelectedFile().toURL());
-// 			} catch (java.net.MalformedURLException ex) {
-// 			    // TODO
-// 			    ex.printStackTrace();
-// 			}
-// 		    }
+	final Component parent = this;
+
+	actionEditTemplate = new AbstractAction() {
+		{
+		    putValue(AbstractAction.NAME, "Edit");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+		    JOptionPane.showMessageDialog(parent, "Not Implemented yet.");
+		}
+	    };
+
+	actionRemoveIdentifier = new AbstractAction() {
+		{
+		    putValue(AbstractAction.NAME, "Remove");
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+		    int row = tableIdentifiers.getSelectedRow();
+
+		    if (!isEditRow(tableIdentifiers, row)) {
+			model.removeJob(getIdentifier());
+			((AbstractTableModel)tableIdentifiers.getModel()).fireTableRowsDeleted(row, row);
+		    }
+		}
+	    };
+	actionRemoveParameter = new AbstractAction() {
+		{
+		    putValue(AbstractAction.NAME, "Remove");
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+		    int row = tableParameters.getSelectedRow();
+		    if (!isEditRow(tableParameters, row)) {
 			
-// 		}
-// 	    };
+			model.getJob(getIdentifier())
+			    .removeParameter(getParameter());
+			
+			((AbstractTableModel)tableParameters.getModel()).fireTableRowsDeleted(row, row);
+		    }
+		}
+	    };
+	actionSelectOutput = new AbstractAction() {
+		{
+		    putValue(AbstractAction.NAME, "Output");
+		}
+		public void actionPerformed(ActionEvent e) {
+		    JFileChooser chooser = new JFileChooser();
+		    if (JFileChooser.APPROVE_OPTION == chooser.showDialog(parent, "Select Output")) {
+			try {
+			    tableIdentifiers.setValueAt(chooser.getSelectedFile().toURL(),
+							tableIdentifiers.getSelectedRow(),
+							IDN_COL_OUTPUT);
+			} catch (java.net.MalformedURLException ex) {
+			    // TODO (should not happen)
+			    ex.printStackTrace();
+			}
+		    }
+
+		}
+	    };
+	actionSelectTemplate = new AbstractAction() {
+		{
+		    putValue(AbstractAction.NAME, "Template");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+		    JFileChooser chooser = new JFileChooser();
+		    if (JFileChooser.APPROVE_OPTION == chooser.showDialog(parent, "Select Template")) {
+			try {
+			    tableIdentifiers.setValueAt(chooser.getSelectedFile().toURL(),
+							tableIdentifiers.getSelectedRow(),
+							IDN_COL_TEMPLATE);
+			} catch (java.net.MalformedURLException ex) {
+			    // TODO (should not happen)
+			    ex.printStackTrace();
+			}
+		    }
+			
+		}
+	    };
     }
 
     private void initializeComponents() {
@@ -102,47 +188,44 @@ public class ArgoPrintManager
 	setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
 	JSplitPane mainPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	/* Proportional division does not work as the Panel has height 0 */
+	mainPane.setDividerLocation(200);
+	mainPane.setResizeWeight(0.90);
 
 	add(mainPane, BorderLayout.CENTER);
 
-
 	tableIdentifiers = new JTable() {
+		{
+		    setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+		}
 		public void setValueAt(Object aValue, int row, int column) {
 		    if (aValue instanceof String)
 			aValue = ((String)aValue).trim();
-		    super.setValueAt(aValue, row, column);
 
+		    super.setValueAt(aValue, row, column);
+		    
 		    //  The value might not have been set because of unique identifier
 		    // restriction. An exception can't be thrown from the model because
 		    // it must comply with the AbstractTableModel class interface.
 
-		    // TODO: remove the hardwired identifier column index
-		    if ((column == 1) && (!aValue.equals(getValueAt(row, column))))
+		    if ((column == IDN_COL_IDENTIFIER) && (!aValue.equals(getValueAt(row, column))))
 			JOptionPane.showMessageDialog(this,
 						      "The identifier must be unique and the one you selected is already in the list.",
 						      "Error",
 						      JOptionPane.ERROR_MESSAGE);
 		}
 	    };
-	mainPane.setTopComponent(new JScrollPane(tableIdentifiers));
-// 	add(new JScrollPane(tableIdentifiers), BorderLayout.CENTER);
 
 	tableIdentifiers.setModel(new AbstractTableModel() {
-		private static final int COUNT_COL = 4;
-		private static final int COL_SELECTED = 0;
-		private static final int COL_IDENTIFIER = 1;
-		private static final int COL_TEMPLATE = 2;
-		private static final int COL_OUTPUT = 3;
 
-		private Boolean selected;
-		private String identifier;
-		private URL template, output;
+		Boolean selected;
+		String identifier;
+		URL template, output;
 
 		// initialization
 		{
 		    initializeEditRow();
 		}
-
 
 		// helper functions
 		private void initializeEditRow() {
@@ -150,10 +233,6 @@ public class ArgoPrintManager
 		    identifier = "";
 		    template = null;
 		    output = null;
-		}
-
-		private boolean isEditRow(int row) {
-		    return (row == getRowCount() - 1);
 		}
 
 		private boolean isEditRowComplete() {
@@ -168,7 +247,7 @@ public class ArgoPrintManager
 		}
 
 		private boolean hasIdentifier(int row) {
-		    String ident = (String)getValueAt(row, COL_IDENTIFIER);
+		    String ident = (String)getValueAt(row, IDN_COL_IDENTIFIER);
 		    if ((ident == null) || ident.equals(""))
 			return false;
 		    return true;
@@ -176,7 +255,7 @@ public class ArgoPrintManager
 
 		// interface
 		public int getColumnCount() {
-		    return COUNT_COL;
+		    return IDN_COUNT;
 		}
 
 		public int getRowCount() {
@@ -185,50 +264,50 @@ public class ArgoPrintManager
 			+ 1;
 		}
 		public Object getValueAt(int row, int column) {
-		    if (isEditRow(row)) {
+		    if (isEditRow(tableIdentifiers, row)) {
 			switch (column) {
-			case COL_SELECTED:
+			case IDN_COL_SELECTED:
 			    return selected;
-			case COL_IDENTIFIER:
+			case IDN_COL_IDENTIFIER:
 			    return identifier;
-			case COL_TEMPLATE:
+			case IDN_COL_TEMPLATE:
 			    return template;
-			case COL_OUTPUT:
+			case IDN_COL_OUTPUT:
 			    return output;
 			default: return null;
 			}
 		    } else {
 			switch (column) {
-			case COL_SELECTED:
-			    return model.getJob((String)getValueAt(row, COL_IDENTIFIER))
+			case IDN_COL_SELECTED:
+			    return model.getJob((String)getValueAt(row, IDN_COL_IDENTIFIER))
 				.getSelected();
-			case COL_IDENTIFIER:
+			case IDN_COL_IDENTIFIER:
 			    // TODO: find another random-access to identifier
 			    return model.getIdentifiers().toArray()[row];
-			case COL_TEMPLATE:
-			    return model.getJob((String)getValueAt(row, COL_IDENTIFIER))
+			case IDN_COL_TEMPLATE:
+			    return model.getJob((String)getValueAt(row, IDN_COL_IDENTIFIER))
 				.getTemplate();
-			case COL_OUTPUT:
-			    return model.getJob((String)getValueAt(row, COL_IDENTIFIER))
+			case IDN_COL_OUTPUT:
+			    return model.getJob((String)getValueAt(row, IDN_COL_IDENTIFIER))
 				.getOutput();
 			default: return null;
 			}
 		    }
 		}
 		public void setValueAt(Object obj, int row, int column) {
-		    if (isEditRow(row)) {
+		    if (isEditRow(tableIdentifiers, row)) {
 			switch (column) {
-			case COL_SELECTED:
+			case IDN_COL_SELECTED:
 			    selected = (Boolean)obj;
 			    break;
-			case COL_IDENTIFIER:
+			case IDN_COL_IDENTIFIER:
 			    if (isIdentifierUnique((String)obj))
 				identifier = (String)obj;
 			    break;
-			case COL_TEMPLATE:
+			case IDN_COL_TEMPLATE:
 			    template = (URL)obj;
 			    break;
-			case COL_OUTPUT:
+			case IDN_COL_OUTPUT:
 			    output = (URL)obj;
 			    break;
 			}
@@ -240,94 +319,121 @@ public class ArgoPrintManager
 						      output,
 						      selected));
 			    initializeEditRow();
+			    // we don't know were the row was actually inserted
+			    fireTableDataChanged();
+			    return;
 			}
 		    } else {
 			switch (column) {
-			case COL_SELECTED:
-			    model.getJob((String)getValueAt(row, COL_IDENTIFIER))
+			case IDN_COL_SELECTED:
+			    model.getJob((String)getValueAt(row, IDN_COL_IDENTIFIER))
 				.setSelected((Boolean)obj);
 			    break;
-			case COL_IDENTIFIER:
-			    model.getJob((String)getValueAt(row, COL_IDENTIFIER))
+			case IDN_COL_IDENTIFIER:
+			    model.getJob((String)getValueAt(row, IDN_COL_IDENTIFIER))
 				.setIdentifier((String)obj);
 			    break;
-			case COL_TEMPLATE:
-			    model.getJob((String)getValueAt(row, COL_IDENTIFIER))
+			case IDN_COL_TEMPLATE:
+			    model.getJob((String)getValueAt(row, IDN_COL_IDENTIFIER))
 				.setTemplate((URL)obj);
 			    break;
-			case COL_OUTPUT:
-			    model.getJob((String)getValueAt(row, COL_IDENTIFIER))
+			case IDN_COL_OUTPUT:
+			    model.getJob((String)getValueAt(row, IDN_COL_IDENTIFIER))
 				.setOutput((URL)obj);
 			    break;
 			}
 
 		    }
+		    fireTableCellUpdated(row, column);
 		}
 
 		public String getColumnName(int column) {
 		    switch (column) {
-		    case COL_IDENTIFIER: return "Identifier";
-		    case COL_TEMPLATE: return "Template URL";
-		    case COL_OUTPUT: return "Output URL";
+		    case IDN_COL_IDENTIFIER: return "Identifier";
+		    case IDN_COL_TEMPLATE: return "Template URL";
+		    case IDN_COL_OUTPUT: return "Output URL";
 		    default: return "";
 		    }
 		}
 		public Class getColumnClass(int column) {
 		    switch (column) {
-		    case COL_SELECTED: return Boolean.class;
-		    case COL_IDENTIFIER: return String.class;
-		    case COL_TEMPLATE: return URL.class;
-		    case COL_OUTPUT: return URL.class;
+		    case IDN_COL_SELECTED: return Boolean.class;
+		    case IDN_COL_IDENTIFIER: return String.class;
+		    case IDN_COL_TEMPLATE: return URL.class;
+		    case IDN_COL_OUTPUT: return URL.class;
 		    default: return String.class;
 		    }
 		}
 		public boolean isCellEditable(int row, int column) {
-		    return hasIdentifier(row) || isEditRow(row);
+		    return hasIdentifier(row) || isEditRow(tableIdentifiers, row);
 		}
 	    });
+ 
+	// TODO: a smart way of determining the minimum requirement for the editor on the 1st col
+	tableIdentifiers.getColumnModel().getColumn(0).setMaxWidth(0);
 
+	tableIdentifiers.addMouseListener(new MouseAdapter() {
+		JPopupMenu contextmenu;
+		//initialize
+		{
+		    JMenu selectMenu = new JMenu("Select");
+		    selectMenu.add(actionSelectTemplate);
+		    selectMenu.add(actionSelectOutput);
+		    
+		    contextmenu = new JPopupMenu();
+		    contextmenu.add(actionEditTemplate);
+		    contextmenu.add(actionRemoveIdentifier);
+		    contextmenu.add(selectMenu);
+		}
+		public void mouseClicked(MouseEvent e) {
+		    if (e.getButton() == MouseEvent.BUTTON3) {
+			int row = tableIdentifiers.rowAtPoint(new Point(e.getX(), e.getY()));
+			tableIdentifiers.setRowSelectionInterval(row, row);
+			if (isEditRow(tableIdentifiers, row)) {
+			    actionEditTemplate.setEnabled(false);
+			    actionRemoveIdentifier.setEnabled(false);
+			} else {
+			    actionEditTemplate.setEnabled(true);
+			    actionRemoveIdentifier.setEnabled(true);
+			}
+			contextmenu.show((Component)e.getSource(), e.getX(), e.getY());
+		    }
+		}
+
+	    });
 
 	JTabbedPane templateTabs = new JTabbedPane();
 
-	mainPane.setBottomComponent(templateTabs);
-
-	final JTable tableParameters = new JTable();
+	tableParameters = new JTable() {
+		{
+		    setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+		}
+		};
 	tableParameters.setModel(new AbstractTableModel() {
-		private static final int COUNT_COL = 2;
-		private static final int COL_IDENTIFIER = 0;
-		private static final int COL_VALUE = 1;
 
-		private String identifier, value;
-		private ArgoPrintManagerModel.TemplateJob job;
-		private int rowCount;
+		String identifier, value;
+		ArgoPrintManagerModel.TemplateJob job;
+		int rowCount;
 
 		// initialization
 		{
 		    initializeEditRow();
-		    
+
  		    tableIdentifiers.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			    public void valueChanged(ListSelectionEvent e) {
 				updateModel();
 			    }
 			});
-
 		}
 
 		/** Updates the model of this "proxy-model" */
 		private void updateModel() {
-		    // TODO: ugly assumtion - last row in the other table is the
-		    //  edit row
 		    if ((tableIdentifiers.getSelectedRowCount() == 0) ||
-			(tableIdentifiers.getSelectedRow()
-			 == tableIdentifiers.getRowCount() - 1))
-
+			(isEditRow(tableIdentifiers, tableIdentifiers.getSelectedRow())))
 			rowCount = 0;
 		    else {
-			//TODO: remove explicit index
 			int selectedRow = tableIdentifiers.getSelectedRow();
-			String identifier = (String)tableIdentifiers
-			    .getValueAt(selectedRow, 1);
-			job = model.getJob(identifier);
+			job = model.getJob(getIdentifier());
 			rowCount = job.getParameters().size() 
 			    // and the edit row
 			    + 1;
@@ -339,9 +445,6 @@ public class ArgoPrintManager
 		    identifier = "";
 		    value = "";
 		}
-		private boolean isEditRow(int row) {
-		    return (row == getRowCount() - 1);
-		}
 		private boolean isEditRowComplete() {
 		    return
 			!identifier.equals("") &&
@@ -351,7 +454,7 @@ public class ArgoPrintManager
 		    return !job.getParameters().contains(identifier);
 		}
 		private boolean hasIdentifier(int row) {
-		    String ident = (String)getValueAt(row, COL_IDENTIFIER);
+		    String ident = (String)getValueAt(row, PAR_COL_IDENTIFIER);
 		    if ((ident == null) || ident.equals(""))
 			return false;
 		    return true;
@@ -359,34 +462,34 @@ public class ArgoPrintManager
 
 
 		public int getColumnCount() {
-		    return COUNT_COL;
+		    return PAR_COUNT;
 		}
 		public int getRowCount() {
 		    return rowCount;
 		}
 
 		public Object getValueAt(int row, int column) {
-		    if (isEditRow(row))
+		    if (isEditRow(tableParameters, row))
 			switch (column) {
-			case COL_IDENTIFIER: return identifier;
-			case COL_VALUE: return value;
+			case PAR_COL_IDENTIFIER: return identifier;
+			case PAR_COL_VALUE: return value;
 			default: return null;
 			}
 		    else
 			switch (column) {
-			case COL_IDENTIFIER: return job.getParameters().toArray()[row];
-			case COL_VALUE: return job.getParameter((String)getValueAt(row, COL_IDENTIFIER));
+			case PAR_COL_IDENTIFIER: return job.getParameters().toArray()[row];
+			case PAR_COL_VALUE: return job.getParameter((String)getValueAt(row, PAR_COL_IDENTIFIER));
 			default: return null;
 			}
 		}
 		public void setValueAt(Object obj, int row, int column) {
-		    if (isEditRow(row)) {
+		    if (isEditRow(tableParameters, row)) {
 			switch (column) {
-			case COL_IDENTIFIER: 
+			case PAR_COL_IDENTIFIER: 
 			    if (isIdentifierUnique((String)obj))
 				identifier = (String)obj;
 			    break;
-			case COL_VALUE:
+			case PAR_COL_VALUE:
 			    value = (String)obj;
 			    break;
 			}
@@ -396,43 +499,97 @@ public class ArgoPrintManager
 			    job.setParameter(identifier, value);
 			    rowCount = job.getParameters().size() + 1;
 			    initializeEditRow();
+
+			    fireTableDataChanged();
+			    return;
 			}
 		    } else
 			//TODO: parameter verification
 			switch (column) {
-			case COL_IDENTIFIER:
-			    job.renameParameter((String)getValueAt(row, COL_IDENTIFIER), (String)obj);
+			case PAR_COL_IDENTIFIER:
+			    job.renameParameter((String)getValueAt(row, PAR_COL_IDENTIFIER), (String)obj);
 			    break;
-			case COL_VALUE:
-			    job.setParameter((String)getValueAt(row, COL_IDENTIFIER), (String)obj);
+			case PAR_COL_VALUE:
+			    job.setParameter((String)getValueAt(row, PAR_COL_IDENTIFIER), (String)obj);
 			    break;
 			}
-
+		    
+		    fireTableCellUpdated(row, column);
 		}
 		public String getColumnName(int column) {
 		    switch (column) {
-		    case COL_IDENTIFIER: return "Identifier";
-		    case COL_VALUE: return "Value";
+		    case PAR_COL_IDENTIFIER: return "Identifier";
+		    case PAR_COL_VALUE: return "Value";
 		    default: return "";
 		    }
 		}
 		public Class getColumnClass(int column) {
 		    switch (column) {
-		    case COL_IDENTIFIER: return String.class;
-		    case COL_VALUE: return String.class;
+		    case PAR_COL_IDENTIFIER: return String.class;
+		    case PAR_COL_VALUE: return String.class;
 		    default: return null;
 		    }
 		}
 		public boolean isCellEditable(int row, int column) {
 		    return true;
 		}
+
+		public void fireTableRowsDeleted(int firstRow, int lastRow) {
+		    updateModel();
+		    super.fireTableRowsDeleted(firstRow, lastRow);
+		}
+						    
 	    });
+
+	tableParameters.addMouseListener(new MouseAdapter() {
+		JPopupMenu contextmenu;
+
+		{
+		    contextmenu = new JPopupMenu();
+		    contextmenu.add(actionRemoveParameter);
+		}
+
+		public void mouseClicked(MouseEvent e) {
+		    if (e.getButton() == MouseEvent.BUTTON3) {
+			int row = tableParameters.rowAtPoint(new Point(e.getX(), e.getY()));
+			tableParameters.setRowSelectionInterval(row, row);
+			if (!isEditRow(tableParameters, row))
+			    contextmenu.show((Component)e.getSource(), e.getX(), e.getY());
+		    }
+		}
+
+	    });
+
 
 	JTable tableHooks = new JTable();
 
 	templateTabs.addTab("Parameters", new JScrollPane(tableParameters));
 	templateTabs.addTab("Hooks", new JScrollPane(tableHooks));
 
-	mainPane.setDividerLocation(0.5);
+	mainPane.setTopComponent(new JScrollPane(tableIdentifiers));
+	mainPane.getTopComponent().setMinimumSize(new Dimension(0, 0));
+	mainPane.setBottomComponent(templateTabs);
+	mainPane.getBottomComponent().setMinimumSize(new Dimension(0, 0));
     }
+
+    private boolean isEditRow(JTable table, int row) {
+	return (row == table.getRowCount() - 1);
+    }
+
+    private String getIdentifier() {
+	int row = tableIdentifiers.getSelectedRow();
+	if (row != -1)
+	    return (String)tableIdentifiers.getValueAt(row, IDN_COL_IDENTIFIER);
+	else
+	    return null;
+    }
+    
+    private String getParameter() {
+	int row = tableParameters.getSelectedRow();
+	if (row != -1)
+	    return (String)tableParameters.getValueAt(row, PAR_COL_IDENTIFIER);
+	else
+	    return null;
+    }
+
 }

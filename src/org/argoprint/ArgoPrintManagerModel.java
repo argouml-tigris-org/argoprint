@@ -74,7 +74,13 @@ public class ArgoPrintManagerModel {
 	    parameters = new HashMap<String,String>();
 	}
 
+	// TODO: 
 	public void setIdentifier(String identifier) {
+	    if (getJob(getIdentifier()) == this) {
+		removeJob(getIdentifier());
+		jobs.put(identifier, this);
+	    }
+
 	    this.identifier = identifier;
 	}
 	
@@ -116,9 +122,11 @@ public class ArgoPrintManagerModel {
 			   parameters.get(oldIdentifier));
 	    parameters.remove(oldIdentifier);
 	}
-
 	public String getParameter(String name) {
 	    return parameters.get(name);
+	}
+	public void removeParameter(String identifier) {
+	    parameters.remove(identifier);
 	}
 
 	public Set<String> getParameters() {
@@ -138,11 +146,14 @@ public class ArgoPrintManagerModel {
 	jobs.put(job.getIdentifier(), job);
     }
 
+    public void removeJob(String identifier) {
+	jobs.remove(identifier);
+    }
+
     public Set<String> getIdentifiers() {
 	return jobs.keySet();
     }
 
-    // TODO: modify for identifier modification
     public TemplateJob getJob(String identifier) {
 	return jobs.get(identifier);
     }
@@ -168,6 +179,7 @@ public class ArgoPrintManagerModel {
 		job.setOutput(new URL(jobElement.getAttribute("output")));
 	    } catch (java.net.MalformedURLException ex) {
 		//TODO
+
 		ex.printStackTrace();
 	    }
 	    
@@ -286,51 +298,48 @@ public class ArgoPrintManagerModel {
 	while (identifier.hasNext()) {
 	    job = getJob((String)identifier.next());
 
-	    String inputParameter = job.getParameter("argouml");
+	    if (job.getSelected()) {
 
-	    if (inputParameter == null)
-		// TODO: throw exception
-		return;
-	    else if (inputParameter.equals("model")) {
-		Project project =
-		    ProjectManager.getManager().getCurrentProject();
+		String inputParameter = job.getParameter("argouml");
 
-		StringReader xmlString =
-		    new StringReader(PersistenceManager
-				     .getInstance()
-				     .getQuickViewDump(project));
+		// default to input source - model
+		if ((inputParameter == null) ||
+		    (inputParameter.equals("model"))) {
+		    Project project =
+			ProjectManager.getManager().getCurrentProject();
 
-		input = new StreamSource(xmlString);
-	    } else {
-		// TODO: from file
-	    }
+		    StringReader xmlString =
+			new StringReader(PersistenceManager
+					 .getInstance()
+					 .getQuickViewDump(project));
 
-	    try {
-// 		fileXSLT = new File(job.getTemplate().toURI());
-// 		fileOut = new File(job.getOutput().toURI());
+		    input = new StreamSource(xmlString);
+		} else {
+		    // TODO: from file
+		}
 
-		fileXSLT = new File(new URL("file:/home/comp_/xmieval.xsl").toURI());
-		fileOut = new File(new URL("file:/home/comp_/out.xml").toURI());
-	    } catch (java.net.URISyntaxException ex) {
-		// TODO:
-		ex.printStackTrace();
-	    } catch (java.net.MalformedURLException ex) {
-		// TODO:
-		ex.printStackTrace();
-	    }
+		try {
+		    // TODO: make sure the URLs don't have an authority component
+		    fileXSLT = new File(job.getTemplate().toURI());
+		    fileOut = new File(job.getOutput().toURI());
+		} catch (java.net.URISyntaxException ex) {
+		    // TODO:
+		    ex.printStackTrace();
+		}
 	    
-	    try {
-		transformer = TransformerFactory
-		    .newInstance()
-		    .newTransformer(new StreamSource(fileXSLT));
+		try {
+		    transformer = TransformerFactory
+			.newInstance()
+			.newTransformer(new StreamSource(fileXSLT));
 
-		transformer.transform(input, new StreamResult(fileOut));
-	    } catch (javax.xml.transform.TransformerConfigurationException ex) {
-		// TODO:
-		ex.printStackTrace();
-	    } catch (javax.xml.transform.TransformerException ex) {
-		// TODO:
-		ex.printStackTrace();
+		    transformer.transform(input, new StreamResult(fileOut));
+		} catch (javax.xml.transform.TransformerConfigurationException ex) {
+		    // TODO:
+		    ex.printStackTrace();
+		} catch (javax.xml.transform.TransformerException ex) {
+		    // TODO:
+		    ex.printStackTrace();
+		}
 	    }
 	}
     }
