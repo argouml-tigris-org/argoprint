@@ -29,34 +29,33 @@ import java.io.StringReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Map;
-
+import java.util.Set;
+import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-
 import org.argouml.kernel.Project;
 import org.argouml.kernel.ProjectManager;
 import org.argouml.persistence.PersistenceManager;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+
+// TODO: remove identifier data duplication
 public class ArgoPrintManagerModel {
-    private HashMap<String, TemplateJob> jobs;
+    private TreeMap<String, TemplateJob> jobs;
 
     public class TemplateJob {
 	private boolean selected;
 	private String identifier;
 	private URL template, output;
 
-	private HashMap<String, String> parameters;
+	private TreeMap<String, String> parameters;
 
 	public TemplateJob(String identifier) {
 	    this(identifier, null, null, false);
@@ -71,7 +70,7 @@ public class ArgoPrintManagerModel {
 	    setTemplate(template);
 	    setOutput(output);
 	    setSelected(selected);
-	    parameters = new HashMap<String,String>();
+	    parameters = new TreeMap<String,String>();
 	}
 
 	// TODO: 
@@ -118,9 +117,11 @@ public class ArgoPrintManagerModel {
 
 	public void renameParameter(String oldIdentifier,
 				    String newIdentifier) {
-	    parameters.put(newIdentifier,
-			   parameters.get(oldIdentifier));
-	    parameters.remove(oldIdentifier);
+	    if (!oldIdentifier.equals(newIdentifier)) {
+		parameters.put(newIdentifier,
+			       parameters.get(oldIdentifier));
+		parameters.remove(oldIdentifier);
+	    }
 	}
 	public String getParameter(String name) {
 	    return parameters.get(name);
@@ -135,7 +136,7 @@ public class ArgoPrintManagerModel {
     }
 
     public ArgoPrintManagerModel() {
-	jobs = new HashMap();
+	jobs = new TreeMap();
     }
 
     public void addJob(String identifier) {
@@ -155,6 +156,8 @@ public class ArgoPrintManagerModel {
     }
 
     public TemplateJob getJob(String identifier) {
+	if (identifier == null)
+	    return null;
 	return jobs.get(identifier);
     }
 
@@ -179,7 +182,6 @@ public class ArgoPrintManagerModel {
 		job.setOutput(new URL(jobElement.getAttribute("output")));
 	    } catch (java.net.MalformedURLException ex) {
 		//TODO
-
 		ex.printStackTrace();
 	    }
 	    
