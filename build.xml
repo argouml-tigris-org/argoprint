@@ -112,6 +112,8 @@
       <arg value="${argo.tools.dir}/checkstyle/checkstyle_argouml.xml"/>
       <arg value="-r"/>
       <arg value="src"/>
+      <arg value="-r"/>
+      <arg value="tests"/>
     </java>
   </target>
 
