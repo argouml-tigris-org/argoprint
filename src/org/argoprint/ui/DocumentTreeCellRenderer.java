@@ -24,22 +24,99 @@
 
 package org.argoprint.ui;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.w3c.dom.Attr;
-import org.w3c.dom.Node;
-import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Comment;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
+
+import org.argoprint.APResources;
 
 class DocumentTreeCellRenderer
     extends DefaultTreeCellRenderer {
 
-    private JPanel component;
+    private JPanel
+	panelAtt,
+	panelText,
+	panelComment,
+	panelElement;
+
+    private static final JLabel
+	SEPARATOR = new JLabel(":");
+
+    private static final Color
+	DEFAULT_SELECTED_COLOR = new Color(170, 208, 215);
+
+    private ImageIcon
+	iconAtt,
+	iconText,
+	iconComment;
+
+    public DocumentTreeCellRenderer() {
+	iconAtt = new ImageIcon(APResources
+				.getResource(APResources.ICON_DOT_GREEN));
+
+	iconText = new ImageIcon(APResources
+				.getResource(APResources.ICON_DOT_BLUE));
+
+	iconComment = new ImageIcon(APResources
+				    .getResource(APResources.ICON_DOT_RED));
+    }
+
+    private JPanel getAttPanel(Attr att) {
+	JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+	result.setBackground(DEFAULT_SELECTED_COLOR);
+
+	result.add(new JLabel(iconAtt));
+	result.add(new JLabel(att.getName()));
+	result.add(SEPARATOR);
+	result.add(new JLabel(att.getValue()));
+	
+	return result;
+    }
+    private JPanel getElementPanel(Element elem) {
+	JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+	result.setBackground(DEFAULT_SELECTED_COLOR);
+
+	result.add(new JLabel(elem.getTagName()));
+	
+	return result;
+    }
+    private JPanel getTextPanel(Text text) {
+	JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+	result.setBackground(DEFAULT_SELECTED_COLOR);
+
+	result.add(new JLabel(iconText));
+	result.add(new JLabel(text.getData()));
+	
+	return result;
+    }
+    private JPanel getCommentPanel(Comment comment) {
+	JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+	result.setBackground(DEFAULT_SELECTED_COLOR);
+
+	result.add(new JLabel(iconComment));
+	result.add(new JLabel(comment.getData()));
+	
+	return result;
+    }
+    private JPanel getDefaultPanel(Object obj) {
+	JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+	result.setBackground(DEFAULT_SELECTED_COLOR);
+
+	result.add(new JLabel(obj.toString()));
+	
+	return result;
+    }
 
     public Component getTreeCellRendererComponent(JTree tree,
 						  Object value,
@@ -48,47 +125,24 @@ class DocumentTreeCellRenderer
 						  boolean leaf,
 						  int row,
 						  boolean hasFocus) {
-	Node node = (Node)value;
-	StringBuffer label = new StringBuffer();
+	JPanel result;
 
-	switch (node.getNodeType()) {
-	case Node.ELEMENT_NODE:
-	    label.append(node.getNodeName());
+	if (value instanceof Attr)
+	    result = getAttPanel((Attr) value);
+	else if (value instanceof Element)
+	    result = getElementPanel((Element) value);
+        else if (value instanceof Text)
+	    result = getTextPanel((Text) value);
+	else if (value instanceof Comment)
+	    result = getCommentPanel((Comment) value);
+	else
+	    result = getDefaultPanel(value);
+	
+	if (selected)
+	    result.setOpaque(true);
+	else
+	    result.setOpaque(false);
 
-	    NamedNodeMap attrs = node.getAttributes();
-	    Attr attr;
-	    for (int i = 0; i < attrs.getLength(); i++) {
-		attr = (Attr)attrs.item(i);
-		label.append(" " + attr.getName() + "=\"" + attr.getValue() + "\"");
-	    }
-	    
-	    break;
-	case Node.TEXT_NODE:
-	case Node.COMMENT_NODE:
-	    label.append(node.getNodeValue());
-	    break;
-	default:
-	    label.append("???");
-	}
-
-// 	component = new JPanel();
-// 	component.setLayout(new java.awt.FlowLayout());
-// 	component.add(super.getTreeCellRendererComponent(tree,
-// 							 label.toString(),
-// 							 selected,
-// 							 expanded,
-// 							 leaf,
-// 							 row,
-// 							 hasFocus));
-// 	component.add(new javax.swing.JButton("+"));
-// 	return component;
-
-	return super.getTreeCellRendererComponent(tree,
-						  label.toString(),
-						  selected,
-						  expanded,
-						  leaf,
-						  row,
-						  hasFocus);
+	return result;
     }
 }

@@ -34,13 +34,19 @@ import javax.swing.tree.TreePath;
 import org.argoprint.DocumentSource;
 import org.argoprint.DocumentSourceEvent;
 import org.argoprint.DocumentSourceListener;
+import org.argoprint.GuidedEditing;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NameList;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Maps DOM Document objects to TreeModel objects.
+ * Maps DOM Document objects to TreeModel objects and provides helper
+ * functionality
  */
 
 public class DocumentTreeModel
@@ -54,22 +60,60 @@ public class DocumentTreeModel
 	listenerList = new EventListenerList();
     }
 
+    public Document getDocument() {
+	return source.getDocument();
+    }
+
     public Object getChild(Object parent, int index) {
-	return ((NodeList) ((Node)parent).getChildNodes() ).item(index);
+	Object result = null;
+	Node node = (Node) parent;
+
+	if (index < node.getAttributes().getLength())
+	    result = node.getAttributes().item(index);
+	else
+	    result = node
+		.getChildNodes()
+		.item(index - node.getAttributes().getLength());
+
+	return result;
     }
 
     public int getChildCount(Object parent) {
-	return ((NodeList) ((Node)parent).getChildNodes() ).getLength();
+	int result;
+
+	if (parent instanceof Attr) 
+	    result = 0;
+	else {
+	    Node node = (Node) parent;
+	    result = node.getChildNodes().getLength();
+	    if (node.hasAttributes())
+		result += node.getAttributes().getLength();
+	}
+
+	return result;
     }
 
     public int getIndexOfChild(Object parent, Object child) {
 	if ((parent == null) || (child == null))
 	    return -1;
 
-	NodeList childNodes = ((Node) parent).getChildNodes();
-	for (int i = 0; i < childNodes.getLength(); i++)
-	    if (childNodes.item(i) == child)
-		return i;
+	Node node = (Node) parent;
+
+	if (child instanceof Attr) {
+	    NamedNodeMap attrNodes = node.getAttributes();
+	    for (int i = 0; i < attrNodes.getLength(); i++)
+		if (attrNodes.item(i) == child)
+		    return i;
+	} else if (child instanceof Node) {
+	    NodeList childNodes = node.getChildNodes();
+	    for (int i = 0; i < childNodes.getLength(); i++)
+		if (childNodes.item(i) == child)
+		    return node
+			.getAttributes()
+			.getLength() 
+			+ i;
+	}
+
 	return -1;
     }
 
@@ -77,24 +121,87 @@ public class DocumentTreeModel
 	return source.getDocument().getDocumentElement();
     }
 
-    public void appendChild(TreePath parentPath, String tag) {
-	Node parent = (Node)parentPath.getLastPathComponent();
-	Node child = source.getDocument().createElement(tag);
+    public void appendAttribute(TreePath parentPath, String qname) {
+	Element parent = (Element) parentPath.getLastPathComponent();
+	String prefix = qname
+	    .substring(0, Math.max(0, qname.indexOf(':')));
+	Attr child = source.getDocument()
+	    .createAttributeNS(parent
+			       .lookupNamespaceURI(prefix),
+			       qname);
+	
+	child.setValue("fixme");
 
 	try {
-	    parent.appendChild(child);
-	    fireTreeNodesInserted(parentPath.getPath(), getChildCount(parent) - 1);
+	    parent.setAttributeNode(child);
+	    fireTreeNodesInserted(parentPath.getPath(),
+				  getIndexOfChild(parent, child));
 	} catch (org.w3c.dom.DOMException ex) {
 	    // TODO
 	    System.err.println(ex);
 	}
     }
 
-    public void insertSiblingBefore(TreePath refNodePath, String tag) {
-	Node refNode = (Node)refNodePath.getLastPathComponent();
+    private String inPrefixedForm(Element prefixSolver,
+				  String uri,
+				  String localname) {
+	StringBuffer result = new StringBuffer();
+	String prefix = prefixSolver.lookupPrefix(uri);
+	if (prefix != null) {
+	    result.append(prefix);
+	    result.append(":");
+	}
+	result.append(localname);
+	return result.toString();
+    }
+
+    private void addRequiredAtts(Element child) {
+	/* Add the required attributes together with the element */
+	NameList atts = GuidedEditing.getRequiredAttributes(child);
+	String label;
+	for (int i = 0; i < atts.getLength(); i++) {
+	    label = inPrefixedForm(child,
+				   atts.getNamespaceURI(i),
+				   atts.getName(i));
+	    child.setAttributeNode(source.getDocument()
+				   .createAttributeNS(atts.getNamespaceURI(i),
+						      label));
+	}
+    }
+
+    public void appendChild(TreePath parentPath, String qname) {
+	Node parent = (Node) parentPath.getLastPathComponent();
+	String prefix = qname
+	    .substring(0, Math.max(0, qname.indexOf(':')));
+
+	Element child = source.getDocument()
+	    .createElementNS(parent.lookupNamespaceURI(prefix),
+			     qname);
+	
+	addRequiredAtts(child);
+
+	try {
+	    parent.appendChild(child);
+	    fireTreeNodesInserted(parentPath.getPath(),
+				  getChildCount(parent) - 1);
+	} catch (org.w3c.dom.DOMException ex) {
+	    // TODO
+	    System.err.println(ex);
+	}
+    }
+
+    public void insertSiblingBefore(TreePath refNodePath, String qname) {
+	Node refNode = (Node) refNodePath.getLastPathComponent();
 	Node parent = refNode.getParentNode();
-	Node newNode = source.getDocument().createElement(tag);
+	String prefix = qname
+	    .substring(0, Math.max(0, qname.indexOf(':')));
+
+	Element newNode = source.getDocument()
+	    .createElementNS(parent.lookupNamespaceURI(prefix),
+			     qname);
 	int index = getIndexOfChild(parent, refNode);
+
+	addRequiredAtts(newNode);
 
 	try {
 	    parent.insertBefore(newNode, refNode);
@@ -105,23 +212,37 @@ public class DocumentTreeModel
 	}
     }
 
-    public void insertSiblingAfter(TreePath refNodePath, String tag) {
-
-	Node nextSibling = ((Node)refNodePath.getLastPathComponent()).getNextSibling();
+    public void insertSiblingAfter(TreePath refNodePath, String qname) {
+	Node nextSibling = ((Node) refNodePath.getLastPathComponent())
+	    .getNextSibling();
 
 	if (nextSibling == null)
-	    appendChild(refNodePath.getParentPath(), tag);
+	    appendChild(refNodePath.getParentPath(), qname);
 	else
-	    insertSiblingBefore(refNodePath.getParentPath().pathByAddingChild(nextSibling), tag);
+	    insertSiblingBefore(refNodePath
+				.getParentPath()
+				.pathByAddingChild(nextSibling),
+
+				qname);
     }
 
     public void removeSubTree(TreePath path) {
-	Node toRemove = (Node)path.getLastPathComponent();
-	Node parent = toRemove.getParentNode();
-	int index = getIndexOfChild(parent, toRemove);
+	Node toRemove = (Node) path.getLastPathComponent();
+
+	int index = getIndexOfChild(path
+				    .getParentPath()
+				    .getLastPathComponent(),
+				    
+				    toRemove);
 
 	try {
-	    parent.removeChild(toRemove);
+	    if (toRemove instanceof Attr)
+		((Attr) toRemove).getOwnerElement()
+				    .removeAttributeNode((Attr) toRemove);
+	    else
+		toRemove.getParentNode()
+		    .removeChild(toRemove);
+
 	    fireTreeNodesRemoved(path.getParentPath().getPath(), index);
 	} catch (org.w3c.dom.DOMException ex) {
 	    // TODO
@@ -157,9 +278,9 @@ public class DocumentTreeModel
 
 	Object[] listeners = listenerList.getListenerList();
 
-	for (int i = listeners.length-2; i>=0; i-=2) 
-	    if (listeners[i]==TreeModelListener.class)
-		((TreeModelListener)listeners[i+1]).treeNodesInserted(event);
+	for (int i = listeners.length - 2; i >= 0; i -= 2) 
+	    if (listeners[i] == TreeModelListener.class)
+		((TreeModelListener) listeners[i + 1]).treeNodesInserted(event);
     }
     public void	fireTreeNodesRemoved(Object [] parent, int index) {
 	int indexes [] = {index};
@@ -168,18 +289,20 @@ public class DocumentTreeModel
 
 	Object[] listeners = listenerList.getListenerList();
 
-	for (int i = listeners.length-2; i>=0; i-=2) 
-	    if (listeners[i]==TreeModelListener.class)
-		((TreeModelListener)listeners[i+1]).treeNodesRemoved(event);
+	for (int i = listeners.length - 2; i >= 0; i -= 2) 
+	    if (listeners[i] == TreeModelListener.class)
+		((TreeModelListener) listeners[i + 1]).treeNodesRemoved(event);
     }
     public void	fireTreeStructureChanged() {
-	TreeModelEvent event = new TreeModelEvent(this, new TreePath(getRoot()));
+	TreeModelEvent event = 
+	    new TreeModelEvent(this, new TreePath(getRoot()));
 
 	Object[] listeners = listenerList.getListenerList();
 
-	for (int i = listeners.length-2; i>=0; i-=2) 
-	    if (listeners[i]==TreeModelListener.class)
-		((TreeModelListener)listeners[i+1]).treeStructureChanged(event);
+	for (int i = listeners.length - 2; i >= 0; i -= 2) 
+	    if (listeners[i] == TreeModelListener.class)
+		((TreeModelListener) listeners[i + 1])
+		    .treeStructureChanged(event);
     }
 }
  

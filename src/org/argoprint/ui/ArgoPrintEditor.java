@@ -27,7 +27,6 @@ package org.argoprint.ui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.net.URL;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -40,9 +39,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 
 import org.argoprint.ArgoPrintEditorModel;
-import org.argoprint.DocumentSourceEvent;
-import org.argoprint.DocumentSourceListener;
-import org.argoprint.ArgoPrintResources;
+import org.argoprint.APResources;
 
 public class ArgoPrintEditor
     extends JPanel {
@@ -72,50 +69,54 @@ public class ArgoPrintEditor
 	actionNew = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    if (JOptionPane.showConfirmDialog(parent,
-						      "Are you sure you want to discard the current document?"
-						      ,"Question"
-						      ,JOptionPane.YES_NO_OPTION)
+						      "Are you sure you want to discard the current document?",
+						      "Question",
+						      JOptionPane.YES_NO_OPTION)
 			== JOptionPane.YES_OPTION) {
 			model.newDocument();
 		    }
 		}
 	    };
 	actionNew.putValue(AbstractAction.SMALL_ICON,
-			   new ImageIcon(ArgoPrintResources
-					 .getResource(ArgoPrintResources.ICON_NEW)));
+			   new ImageIcon(APResources
+					 .getResource(APResources.ICON_NEW)));
 
 	actionOpen = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    JFileChooser chooser = new JFileChooser();
-		    if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+		    if (chooser.showOpenDialog(parent)
+			== JFileChooser.APPROVE_OPTION) {
 			try {
 			    model.loadDocument(chooser.getSelectedFile());
 			} catch (java.io.IOException ex) {
 			    JOptionPane
-				.showMessageDialog(parent, "Unable to load the specified file.", "Error",
+				.showMessageDialog(parent,
+						   "Unable to load the specified file.", "Error",
 						   JOptionPane.ERROR_MESSAGE);
 			} catch (org.xml.sax.SAXException ex) {
 			    JOptionPane
-				.showMessageDialog(parent, "The specified file is not valid.", "Error",
+				.showMessageDialog(parent,
+						   "The specified file is not valid.", "Error",
 						   JOptionPane.ERROR_MESSAGE);
 			}
 		    }
 		}
 	    };
 	actionOpen.putValue(AbstractAction.SMALL_ICON,
-			    new ImageIcon(ArgoPrintResources
-					  .getResource(ArgoPrintResources.ICON_OPEN)));
+			    new ImageIcon(APResources
+					  .getResource(APResources.ICON_OPEN)));
 
 	actionSave = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    JFileChooser chooser = new JFileChooser();
-		    if (chooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION)
+		    if (chooser.showSaveDialog(parent)
+			== JFileChooser.APPROVE_OPTION)
 			model.saveDocument(chooser.getSelectedFile());
 		}
 	    };
 	actionSave.putValue(AbstractAction.SMALL_ICON,
-			    new ImageIcon(ArgoPrintResources
-					  .getResource(ArgoPrintResources.ICON_SAVE)));
+			    new ImageIcon(APResources
+					  .getResource(APResources.ICON_SAVE)));
 
 	actionRemoveSubtree = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {

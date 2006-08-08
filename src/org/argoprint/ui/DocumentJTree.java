@@ -27,118 +27,219 @@ package org.argoprint.ui;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.MouseAdapter;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JTree;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
+
+import org.argoprint.GuidedEditing;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.NameList;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 class DocumentJTree 
     extends JTree {
-//     implements TreeModelListener {
-
-    private class ContextMenu
-	extends JPopupMenu
-	implements MouseListener {
-
-	public void mouseClicked(MouseEvent e) {
-	    int selectedRow = getRowForLocation(e.getX(), e.getY());
-	    if ( selectedRow != -1) {
-		// should not be used outside DocumentJTree
-		((JTree)e.getSource()).setSelectionRow(selectedRow);
-		if (e.getButton() == MouseEvent.BUTTON3) {
-		    show((Component)e.getSource(), e.getX(), e.getY());
-		}
-	    }
-	}
-	public void mouseEntered(MouseEvent e) {}
-	public void mouseExited(MouseEvent e) {}
-	public void mousePressed(MouseEvent e) {}
-	public void mouseReleased(MouseEvent e) {}
-    }
 
     private ContextMenu contextMenu;
 
-    private AbstractAction
-	actionAppendChild,
-	actionInsertSiblingBefore,
-	actionInsertSiblingAfter,
-	actionRemoveSubTree;
+    private class ContextMenu
+	extends JPopupMenu {
+
+	private AbstractAction
+	    actionAppendAttribute,
+	    actionAppendChild,
+	    actionInsertSiblingBefore,
+	    actionInsertSiblingAfter,
+	    actionRemoveSubTree;
+
+	private JMenu
+	    menuAppendAttribute,
+	    menuAppendChild,
+	    menuInsertAfter,
+	    menuInsertBefore;
+
+	public ContextMenu() {
+	    initializeActions();
+	    initializeComponents();
+	}
+
+	private void initializeComponents() {
+	    menuAppendAttribute = new JMenu("Append attribute");
+	    menuAppendChild = new JMenu("Append child");
+	    menuInsertAfter = new JMenu("Insert after");
+	    menuInsertBefore = new JMenu("Insert before");
+
+
+	    add(menuAppendAttribute);
+ 	    add(menuAppendChild);
+	    add(menuInsertBefore);
+	    add(menuInsertAfter);
+	    add(actionRemoveSubTree);
+
+	    setDragEnabled(true);
+	}
+
+	private void initializeActions() {
+	    actionRemoveSubTree = new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			((DocumentTreeModel) getModel())
+			    .removeSubTree(getSelectionPath());
+		    }
+		};
+	    actionRemoveSubTree
+		.putValue(AbstractAction.NAME, "Remove");
+
+	    actionAppendChild = new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			((DocumentTreeModel) getModel())
+			    .appendChild(getSelectionPath(),
+					 
+					 ((JMenuItem) e
+					  .getSource()).getText());
+
+			expandPath(getSelectionPath());
+		    }
+		};
+	    actionAppendChild
+		.putValue(AbstractAction.NAME, "Append Child");
+
+	    actionAppendAttribute = new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			((DocumentTreeModel) getModel())
+			    .appendAttribute(getSelectionPath(),
+
+					     ((JMenuItem) e.getSource())
+					     .getText());
+
+			expandPath(getSelectionPath());
+		    }
+		};
+	    actionAppendAttribute
+		.putValue(AbstractAction.NAME, "Append Attribute");
+
+	    actionInsertSiblingBefore = new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			((DocumentTreeModel) getModel())
+			    .insertSiblingBefore(getSelectionPath(),
+
+						 ((JMenuItem) e.getSource())
+						 .getText());
+		    }
+		};
+	    actionInsertSiblingBefore
+		.putValue(AbstractAction.NAME, "Insert Before");
+
+	    actionInsertSiblingAfter = new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			((DocumentTreeModel) getModel())
+			    .insertSiblingAfter(getSelectionPath(),
+						((JMenuItem) e.getSource())
+						.getText());
+		    }
+		};
+	    actionInsertSiblingAfter
+		.putValue(AbstractAction.NAME, "Insert After");
+
+	}
+
+	public void update() {   
+	    Node selection = (Node) getLastSelectedPathComponent();
+	    NameList names;
+	    
+	    if (selection instanceof Element) {
+
+		menuAppendAttribute.removeAll();
+		names = GuidedEditing
+		    .getAllowedAttributes( (Element) selection );
+		NamedNodeMap presentAtts = selection.getAttributes();
+		for (int i = 0; i < names.getLength(); i++)
+		    if (presentAtts.getNamedItem(names.getName(i)) == null) {
+			StringBuffer name = new StringBuffer();
+			String prefix;
+
+			if ( (prefix = selection
+			      .lookupPrefix(names.getNamespaceURI(i)))
+			     != null) {
+
+			    name.append(prefix);
+			    name.append(":");
+			}
+
+			name.append(names.getName(i));
+
+			menuAppendAttribute
+			    .add(name.toString())
+			    .addActionListener(actionAppendAttribute);
+		    }
+
+		menuAppendChild.removeAll();
+		names = GuidedEditing
+		    .getAllowedChildren((Element) selection);
+		for (int i = 0; i < names.getLength(); i++)
+		    menuAppendChild
+			.add(names.getName(i))
+			.addActionListener(actionAppendChild);
+		
+		menuInsertBefore.removeAll();
+		names = GuidedEditing
+		    .getAllowedPreviousSiblings((Element) selection);
+		for (int i = 0; i < names.getLength(); i++)
+		    menuInsertBefore
+			.add(names.getName(i))
+			.addActionListener(actionInsertSiblingBefore);
+		
+		menuInsertAfter.removeAll();
+		names = GuidedEditing
+		    .getAllowedNextSiblings((Element) selection);
+		for (int i = 0; i < names.getLength(); i++)
+		    menuInsertAfter
+			.add(names.getName(i))
+			.addActionListener(actionInsertSiblingAfter);
+
+		menuAppendAttribute.setVisible(true);
+		menuAppendChild.setVisible(true);
+		menuInsertBefore.setVisible(true);
+		menuInsertAfter.setVisible(true);
+	    } else {
+		menuAppendAttribute.setVisible(false);
+		menuAppendChild.setVisible(false);
+		menuInsertBefore.setVisible(false);
+		menuInsertAfter.setVisible(false);
+	    }
+	}
+    }
 
     public DocumentJTree(DocumentTreeModel model) {
 	super();
 
 	setModel(model);
-// 	model.addTreeModelListener(this);
 
 	initializeComponents();
     }
 
-    private void initializeActions() {
-	actionRemoveSubTree = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    ((DocumentTreeModel)getModel()).removeSubTree(getSelectionPath());
-		}
-	    };
-
-	actionRemoveSubTree.putValue(AbstractAction.NAME, "Remove SubTree");
-
-	actionAppendChild = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    ((DocumentTreeModel)getModel()).appendChild(getSelectionPath(),"fix");
-		    expandPath(getSelectionPath());
-		}
-	    };
-
-	actionAppendChild.putValue(AbstractAction.NAME, "Append Child");
-
- 	actionInsertSiblingBefore = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    ((DocumentTreeModel)getModel()).insertSiblingBefore(getSelectionPath(),"fix");
-		}
-	    };
-	actionInsertSiblingBefore.putValue(AbstractAction.NAME, "Insert Before");
-
- 	actionInsertSiblingAfter = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    ((DocumentTreeModel)getModel()).insertSiblingAfter(getSelectionPath(),"fix");
-		}
-	    };
-	actionInsertSiblingAfter.putValue(AbstractAction.NAME, "Insert After");
-
-    }
-
     private void initializeComponents() {
-	initializeActions();
-
 	setCellRenderer(new DocumentTreeCellRenderer());
 	setCellEditor(new DocumentTreeCellEditor());
 	setEditable(true);
 
 	contextMenu = new ContextMenu();
 
-	contextMenu.add(actionAppendChild);
-	contextMenu.add(actionInsertSiblingBefore);
-	contextMenu.add(actionInsertSiblingAfter);
-	contextMenu.add(actionRemoveSubTree);
-
-
-	addMouseListener(contextMenu);
+	addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent e) {
+		    int selectedRow = getRowForLocation(e.getX(), e.getY());
+		    if (selectedRow != -1) {
+			setSelectionRow(selectedRow);
+			if (e.getButton() == MouseEvent.BUTTON3) {
+			    contextMenu.update();
+			    contextMenu.show((Component) e.getSource(), e.getX(), e.getY());
+			}
+		    }
+		}
+	    });
     }
-
-//     public void	treeNodesChanged(TreeModelEvent e) {
-// 	revalidate();
-//     }
-//     public void treeNodesInserted(TreeModelEvent e) {
-// 	revalidate();
-//     }
-//     public void	treeNodesRemoved(TreeModelEvent e) {
-// 	revalidate();
-//     }
-//     public void	treeStructureChanged(TreeModelEvent e) {
-// 	treeDidChange();
-// // 	revalidate();
-//     }
 }

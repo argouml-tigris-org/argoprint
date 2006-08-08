@@ -26,19 +26,39 @@ package org.argoprint;
 
 import java.net.URL;
 
-public class ArgoPrintResources {
+/** Central point for resource locations */
+
+public class APResources {
 
     // File Icons
-    public static final String ICON_NEW = "/org/argoprint/Images/new.png";
-    public static final String ICON_OPEN = "/org/argoprint/Images/open.png";
-    public static final String ICON_SAVE = "/org/argoprint/Images/save.png";
+    public static final String ICON_NEW
+	= "/org/argoprint/Images/new.png";
+    public static final String ICON_OPEN
+	= "/org/argoprint/Images/open.png";
+    public static final String ICON_SAVE
+	= "/org/argoprint/Images/save.png";
+
+    public static final String ICON_DOT_BLUE
+	= "/org/argoprint/Images/blue_dot.png";
+    public static final String ICON_DOT_GREEN
+	= "/org/argoprint/Images/green_dot.png";
+    public static final String ICON_DOT_RED
+	= "/org/argoprint/Images/red_dot.png";
+
    
     // Cell Editor Icons
-    public static final String ICON_ADD = "/org/argoprint/Images/add.png";
-    public static final String ICON_CONFIRM = "/org/argoprint/Images/confirm.png";
-    public static final String ICON_REMOVE = "/org/argoprint/Images/remove.png";
+    public static final String ICON_ADD
+	= "/org/argoprint/Images/add.png";
+    public static final String ICON_CONFIRM
+	= "/org/argoprint/Images/confirm.png";
+    public static final String ICON_REMOVE
+	= "/org/argoprint/Images/remove.png";
+
+    // XML Schemas
+    public static final String SCHEMA_XSLT
+	= "/org/argoprint/ge/xslt_simpl.rng";
 
     public static URL getResource(String id) {
-	return ArgoPrintResources.class.getResource(id);
+	return APResources.class.getResource(id);
     }
 }

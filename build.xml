@@ -71,6 +71,9 @@
     <copy todir="${module.build.dest}/classes/org/argoprint/Images">
       <fileset dir="src/org/argoprint/Images" excludes="CVS/**" includes="**/**"/>
     </copy>
+    <copy todir="${module.build.dest}/classes/org/argoprint/ge">
+      <fileset dir="src/org/argoprint/ge" excludes="CVS/**" includes="**/**"/>
+    </copy>
     <jar jarfile="${module.build.dest}/argoprint.jar"
          basedir="${module.build.dest}/classes"
          includes="org/**"

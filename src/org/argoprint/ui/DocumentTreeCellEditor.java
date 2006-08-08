@@ -26,49 +26,35 @@ package org.argoprint.ui;
 
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 
 import java.util.EventObject;
 
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeCellEditor;
 
 import javax.swing.event.CellEditorListener;
 
 import org.w3c.dom.Attr;
-import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
-
-import org.argoprint.ArgoPrintResources;
 
 /** Custom CellEditor for DOM Trees. */
 
 class DocumentTreeCellEditor 
     implements TreeCellEditor {
 
-    /** Client propery key for the action to be triggered to stop editing */
-    private static final Object KEY_STOP_EDITING_ACTION = new Object();
-
-    /** Element specific action to be called when editing stops */
-    private static final Object KEY_ELEMENT_STOP_EDITING_ACTION = new Object();
+    private static final short MIN_COL_COUNT = 10;
 
     /** The component that is used for editing */
-    private JComponent component;
-    private JPanel componentElement;
-    private JPanel componentText;
+    private JPanel panelComponent;
 
     /** The value (Node) that is subject to editing */
     private Node value;
@@ -76,184 +62,44 @@ class DocumentTreeCellEditor
     /** The number of clicks required to start editing */
     private static final int CLICK_COUNT = 2;
 
-    private JButton
-	buttonAddAtt,
-	buttonAcceptAttMod,
-	buttonAcceptAttAdd,
-	buttonRemoveAtt;
-
-    private JComboBox
-	comboTag,
-	comboAtt;
+    private JLabel
+	label;
 
     private JTextField
-	fieldAttName,
-	fieldAttValue,
-	fieldTag,
-	fieldText;
+	fieldValue;
 
-    private AbstractAction
-	actionStopEditingOnElement,
-	actionStopEditingOnText,
-
-	actionAcceptAttModification,
-	actionAcceptNewAtt,
-	actionAcceptTextModification,
-	actionAppendAtt,
-	actionRemoveAtt,
-	actionAcceptTagModification;
+    private JTree
+	tree;
 
     public DocumentTreeCellEditor() {
-	initializeActions();
-	initializeComponents();
-    }
+	panelComponent = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+	panelComponent.setOpaque(false);
 
-    private void initializeActions() {
-	actionStopEditingOnElement = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    // TODO
+	label = new JLabel();
+
+	fieldValue = new JTextField() {
+		public void setText(String text) {
+		    int textWidth = SwingUtilities
+			.computeStringWidth(getFontMetrics(getFont()),
+					    text);
+
+		    setColumns(Math.max(MIN_COL_COUNT,
+					textWidth
+					/ getColumnWidth()
+					+ 1));		    
+
+		    super.setText(text);
 		}
 	    };
 
-	actionStopEditingOnText = new AbstractAction() {
+	fieldValue.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    System.err.println("action stop");
-		    actionAcceptTextModification.actionPerformed(e);
-		}
-	    };
-
-	// Attribute modification action
-	actionAcceptAttModification = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    String newAttValue, attName;
-
-		    attName = (String)comboAtt.getSelectedItem();
-		    newAttValue = fieldAttValue.getText();
-		    // TODO: validate the new value
-		    ((Element)value).getAttributeNode(attName).setValue(newAttValue);
-		}
-	    };
-	actionAcceptAttModification.putValue(AbstractAction.SMALL_ICON,
-					     new ImageIcon(ArgoPrintResources
-							   .getResource(ArgoPrintResources.ICON_CONFIRM)));
-	actionAcceptAttModification.putValue(AbstractAction.SHORT_DESCRIPTION,
-					     "Confirm attribute modification.");
-
-	// New attribute action
-	actionAcceptNewAtt = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    String attName = fieldAttName.getText(),
-			attValue = fieldAttValue.getText();
-		    ((Element)value).setAttribute(attName, attValue);
-
-		    setComponentElementForMod();
-		}
-	    };
-	actionAcceptNewAtt.putValue(AbstractAction.SMALL_ICON,
-				    new ImageIcon(ArgoPrintResources
-						  .getResource(ArgoPrintResources.ICON_CONFIRM)));
-	actionAcceptNewAtt.putValue(AbstractAction.SHORT_DESCRIPTION,
-				    "Confirm new attribute.");
-				    
-
-	actionAcceptTextModification = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    ((CharacterData)value).setData(fieldText.getText());
-		}
-	    };
-
-	// Append action
-	actionAppendAtt = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    setComponentElementForAdd();
-		}
-	    };
-	actionAppendAtt.putValue(AbstractAction.SMALL_ICON,
-				 new ImageIcon(ArgoPrintResources
-					       .getResource(ArgoPrintResources.ICON_ADD)));
-	actionAppendAtt.putValue(AbstractAction.SHORT_DESCRIPTION,
-				 "Append attribute.");
-
-	// Remove action
-	actionRemoveAtt = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    String attName = (String)comboAtt.getSelectedItem();
-		    ((Element)value).removeAttribute(attName);
-
-		    setComponentElementForMod();
-		}
-	    };
-	actionRemoveAtt.putValue(AbstractAction.SMALL_ICON,
-				 new ImageIcon(ArgoPrintResources
-					       .getResource(ArgoPrintResources.ICON_REMOVE)));
-	actionRemoveAtt.putValue(AbstractAction.SHORT_DESCRIPTION,
-				 "Remove attribute.");
-
-	// Action set tag
-	actionAcceptTagModification = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    String newTag = fieldTag.getText();
-		    value.getOwnerDocument().renameNode(value, null, newTag);
-		}
-	    };
-	
-    }
-
-    private void initializeComponents() {
-	initializeElementComponent();
-	initializeTextComponent();
-    }
-
-    private void initializeElementComponent() {
-	componentElement = new JPanel();
-	componentElement.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
-	componentElement.putClientProperty(DocumentTreeCellEditor.KEY_STOP_EDITING_ACTION,
-					   actionStopEditingOnElement);
-
-	comboTag = new JComboBox();
-	comboTag.addItemListener(new ItemListener() {
-		public void itemStateChanged(ItemEvent e) {
+		    tree.stopEditing();
 		}
 	    });
 
-	fieldTag = new JTextField(15);
-
-	comboAtt = new JComboBox();
-	comboAtt.addItemListener(new ItemListener() {
-		public void itemStateChanged(ItemEvent e) {
-		    if (ItemEvent.SELECTED == e.getStateChange()) {
-			String attName = (String)e.getItem();
-			String attValue = ((Attr)value.getAttributes().getNamedItem(attName)).getValue();
-			fieldAttValue.setText(attValue);
-		    }
-		}
-	    });
-	fieldAttName = new JTextField(10);
-	fieldAttValue = new JTextField(15);
-
-	componentElement.add(new JLabel("tag:"));
-	componentElement.add(fieldTag);
-	componentElement.add(comboTag);
-	comboTag.setVisible(false);
-	componentElement.add(buttonAddAtt = new JButton(actionAppendAtt));
-	componentElement.add(buttonRemoveAtt = new JButton(actionRemoveAtt));
-	componentElement.add(new JLabel("attribute:"));
-	componentElement.add(comboAtt);
-	componentElement.add(fieldAttName);
-	componentElement.add(fieldAttValue);
-
-	componentElement.add(buttonAcceptAttAdd = new JButton(actionAcceptNewAtt));
-	buttonAcceptAttAdd.setVisible(false);
-	componentElement.add(buttonAcceptAttMod = new JButton(actionAcceptAttModification));
-    }
-
-    private void initializeTextComponent() {
-	componentText = new JPanel();
-	componentText.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
-	componentText.putClientProperty(DocumentTreeCellEditor.KEY_STOP_EDITING_ACTION,
-					actionStopEditingOnText);
-
-	componentText.add(fieldText = new JTextField(15));
+	panelComponent.add(label);
+	panelComponent.add(fieldValue);
     }
 
     public Component getTreeCellEditorComponent(JTree tree,
@@ -262,75 +108,25 @@ class DocumentTreeCellEditor
 						boolean expanded,
 						boolean leaf,
 						int row) {
-	this.value = (Node)value;
-	if (value instanceof Element) {
-	    setComponentElement((Node)value);
-	    component = componentElement;
+	if (value instanceof Attr) {
+	    Attr attr = (Attr) value;
+	    label.setText(attr.getName());
+	    fieldValue.setText(attr.getValue());
 	} else if (value instanceof Text) {
-	    setComponentText((Node)value);
-	    component = componentText;
-	} else
-	    return new JTextField(((Node)value).getNodeName());
-
-	return component;
-    }
-
-    private void updateAttCombo() {
-	comboAtt.removeAllItems();
-
-	NamedNodeMap atts = value.getAttributes();
-	for (int i = 0; i < atts.getLength(); i++)
-	    comboAtt.addItem(((Attr)atts.item(i)).getName());
-    }
-
-    private void setComponentElementForMod() {
-	updateAttCombo();
-
-	if (((Element)value).hasAttributes()) {
-	    buttonRemoveAtt.setVisible(true);
-	    comboAtt.setVisible(true);
-	    fieldAttValue.setVisible(true);
-	    buttonAcceptAttMod.setVisible(true);
-	} else {
-	    buttonRemoveAtt.setVisible(false);
-	    comboAtt.setVisible(false);
-	    fieldAttValue.setVisible(false);
-	    buttonAcceptAttMod.setVisible(false);
+	    Text text = (Text) value;
+	    label.setText("Text");
+	    fieldValue.setText(text.getData());
 	}
 
-	buttonAddAtt.setVisible(true);
-	buttonAcceptAttAdd.setVisible(false);
-	fieldAttName.setVisible(false);
+	// Adjust the width of the value field
 
-	componentElement.setSize(componentElement.getLayout().preferredLayoutSize(componentElement));
-    }
 
-    private void setComponentElementForAdd() {
-	buttonAddAtt.setVisible(false);
-	buttonRemoveAtt.setVisible(false);
-	buttonAcceptAttMod.setVisible(false);
-	buttonAcceptAttAdd.setVisible(true);
 
-	comboAtt.setVisible(false);
-	fieldAttName.setVisible(true);
-	fieldAttValue.setVisible(true);
-	
-	fieldAttName.setText("");
-	fieldAttValue.setText("");
 
-	componentElement.setSize(componentElement.getLayout().preferredLayoutSize(componentElement));
-    }
+	this.tree = tree;
+	this.value = (Node) value;
 
-    public void setComponentElement(Node value) {
-	comboTag.removeAllItems();
-	comboTag.addItem(((Element)value).getTagName());
-
-	fieldTag.setText(((Element)value).getTagName());
-	setComponentElementForMod();
-    }
-    
-    public void setComponentText(Node value) {
-	fieldText.setText(((Text)value).getWholeText());
+	return panelComponent;
     }
 
     public void addCellEditorListener(CellEditorListener l) {
@@ -341,33 +137,40 @@ class DocumentTreeCellEditor
     public Object getCellEditorValue() {
 	return value;
     }
-    public boolean isCellEditable(EventObject anEvent) {
-	if (anEvent instanceof java.awt.event.MouseEvent)
-	    return
-		(((java.awt.event.MouseEvent)anEvent).getClickCount()
-		 == DocumentTreeCellEditor.CLICK_COUNT);
 
-	return false;
+    public boolean isCellEditable(EventObject event) {
+	JTree source = (JTree) event.getSource();
+	Object subject = source.getLastSelectedPathComponent();
+
+	return (event instanceof MouseEvent)
+	    && !(subject instanceof Element)
+	    && SwingUtilities.isLeftMouseButton((MouseEvent) event)
+	    && (((MouseEvent) event).getClickCount()
+		== DocumentTreeCellEditor.CLICK_COUNT);
     }
 
     public boolean shouldSelectCell(EventObject anEvent) {
-	// TODO
 	return true;
     }
 
     public void cancelCellEditing() {
-	System.err.println("cancelCellEditing");
     }
     public boolean stopCellEditing() {
-	// TODO
-	System.err.println("stopCellEditing");
-	( (AbstractAction) component.getClientProperty(DocumentTreeCellEditor.KEY_STOP_EDITING_ACTION))
-	    // FIX!
-	    .actionPerformed(null);
-				    
+	if (isValid(fieldValue.getText())) {
+	    if (value instanceof Attr)
+		((Attr) value)
+		    .setValue(fieldValue.getText());
+	    else if (value instanceof Text)
+		((Text) value)
+		    .setData(fieldValue.getText());
+
+	    return true;
+	} else
+	    return false;
+    }
+
+    // TODO:
+    private boolean isValid(String value) {
 	return true;
     }
 }
-
-
-

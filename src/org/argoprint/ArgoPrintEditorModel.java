@@ -26,25 +26,23 @@ package org.argoprint;
 
 import java.io.File;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import javax.swing.event.EventListenerList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.argoprint.ui.DocumentTreeModel;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 public class ArgoPrintEditorModel
     implements DocumentSource {
 
     private Document document;
+
     private EventListenerList listenerList;
 
     public ArgoPrintEditorModel() {
@@ -65,7 +63,8 @@ public class ArgoPrintEditorModel
 	DocumentSourceEvent event = new DocumentSourceEvent(this, type);
 	for (int i = list.length - 2; i >= 0; i -= 2)
          if (list[i] == DocumentSourceListener.class)
-             ((DocumentSourceListener)list[i + 1]).documentSourceChanged(event);
+             ((DocumentSourceListener) list[i + 1])
+		 .documentSourceChanged(event);
     }
     
     public void setDocument(Document document) {
@@ -88,11 +87,34 @@ public class ArgoPrintEditorModel
 	    org.xml.sax.SAXException {
 
 	try {
-	    document = DocumentBuilderFactory
+	    Document rawDocument = DocumentBuilderFactory
 		.newInstance()
 		.newDocumentBuilder()
 		.parse(file);
+	    Transformer cleanWhiteSpace = TransformerFactory
+		.newInstance()
+		.newTransformer();
+	    cleanWhiteSpace
+		.setOutputProperty(OutputKeys.METHOD,
+				   "xml");
+	    cleanWhiteSpace
+		.setOutputProperty(OutputKeys.INDENT,
+				   "no");
+
+	    document = DocumentBuilderFactory
+		.newInstance()
+		.newDocumentBuilder()
+		.newDocument();
+
+	    cleanWhiteSpace.transform(new DOMSource(rawDocument), new DOMResult(document));
+		
 	} catch (javax.xml.parsers.ParserConfigurationException ex) {
+	    // TODO
+	    System.err.println(ex);
+	} catch (javax.xml.transform.TransformerConfigurationException ex) {
+	    // TODO
+	    System.err.println(ex);
+	} catch (javax.xml.transform.TransformerException ex) {
 	    // TODO
 	    System.err.println(ex);
 	}
@@ -105,6 +127,9 @@ public class ArgoPrintEditorModel
 	    Transformer transformer = TransformerFactory
 		.newInstance()
 		.newTransformer();
+
+	    transformer.setOutputProperty(javax.xml.transform.OutputKeys.METHOD, "xml");
+	    transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
 	    transformer.transform(new DOMSource(document), new StreamResult(file));
 	} catch (javax.xml.transform.TransformerConfigurationException ex) {
 	    // TODO
@@ -115,15 +140,4 @@ public class ArgoPrintEditorModel
 	}
 	    
     }
-
-//     public void removeSubtree(Node root) {
-// 	try {
-// 	    // does this remove all the nodes?
-// 	    root.getParent().removeChild(root);
-// 	} catch (org.w3c.dom.DOMException ex) {
-// 	    // TODO
-// 	    System.err.println(ex);
-// 	}
-//     }
-
 }

@@ -52,14 +52,20 @@ public class ArgoPrintDocumentFactory {
 	    Element documentElement, mainTemplateElement;
 	    
 	    // XSLT document element
-	    documentElement = result.createElementNS(XSL_NS, "xsl:stylesheet");
-	    documentElement.setAttribute("version", XSL_VERSION);
-	    result.appendChild(documentElement);
+	    documentElement = result
+		.createElementNS(XSL_NS, "xsl:stylesheet");
+	    documentElement
+		.setAttribute("version", XSL_VERSION);
+	    result
+		.appendChild(documentElement);
 
 	    // main template
-	    mainTemplateElement = result.createElementNS(XSL_NS, "xsl:template");
-	    mainTemplateElement.setAttribute("match", "/");
-	    documentElement.appendChild(mainTemplateElement);
+	    mainTemplateElement = result
+		.createElementNS(XSL_NS, "xsl:template");
+	    mainTemplateElement
+		.setAttribute("match", "/");
+	    documentElement
+		.appendChild(mainTemplateElement);
 
 	} catch (DOMException ex) {
 	    // TODO

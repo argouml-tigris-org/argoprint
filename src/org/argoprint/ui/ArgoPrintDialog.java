@@ -30,7 +30,6 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 
-
 import java.io.File;
 
 import javax.swing.AbstractAction;
@@ -39,17 +38,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTree;
-
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.argoprint.ArgoPrintEditorModel;
 import org.argoprint.ArgoPrintManagerModel;
-import org.argoprint.ui.ArgoPrintEditor;
-
-import org.w3c.dom.Document;
 
 public class ArgoPrintDialog extends JDialog {
 
@@ -93,8 +85,9 @@ public class ArgoPrintDialog extends JDialog {
 		}
 	    };
 	actionGenerateOutput.putValue(AbstractAction.NAME, "Generate");
-	actionGenerateOutput.putValue(AbstractAction.SHORT_DESCRIPTION,
-				      "Generate the output for the selected jobs.");
+	actionGenerateOutput
+	    .putValue(AbstractAction.SHORT_DESCRIPTION,
+		      "Generate the output for the selected jobs.");
 	
     }
 
