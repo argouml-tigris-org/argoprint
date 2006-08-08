@@ -6,6 +6,39 @@
 This is Ion's activity log for the SoC work on ArgoPrint.
 </p>
 
+<h2>Guided Editing implementation</h2>
+
+<p> Given that the <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-Val-20040127">DOM validation</a>
+specification is not implemented in any available parser I decided to implement it myself trying to
+make the transition to a future standard implementation, once it's available, easy. </p>
+
+<p> Initially I wanted to provide an implementation of the
+<a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-Val-20040127/java-binding.html">Java bindings</a>
+available in the standard and to make the parser create instances of DOM trees using these type of nodes.
+I thought that it was possible to give to the parser a factory instance that would create the initial
+Document instance that would then be used to create the rest of the parts of a DOM tree. Unfortunatlly I
+could not find a way to achieve this so I decided to bundle all the instance methods that would have been
+defined on the DOM "parts" into a single class and make them static and taking as parameter the "part"
+instance to which the message would have normally been send in the standard implementation.</p>
+
+<p> Provided that I understood how to implement the API correctly the transition to the standard DOM-3-Val
+API should only imply the change from static calls on the GuidedEditing class to instance calls on the
+"parts".</p>
+
+<p> For the implementation I considered DTDs, XML Schemas and Relax NG schemas. I've decided to use Relax NG
+since it's less complex in comparison to the XML Schemas and since the DTDs can't handle namespaces well and
+the use of XSLT implies the use of multiple namespaces in a single document.</p>
+
+<p> The input Relax NG schemas must use the
+<a href="http://relaxng.org/spec-20011203.html#simple-syntax">simple XML syntax</a>. Convertion tools
+<a href="http://thaiopensource.com/relaxng/trang.html">to Relax NG</a> and
+<a href="http://www.kohsuke.org/relaxng/rng2srng/">to the simple syntax</a> are available and
+<a href="http://relaxng.org/#schemas">schemas</a> for various XML vocabularies including XSLT.</p>
+
+<p> At the moment the validation queryes are answered by evaluating XPath expressions against
+the parsed simple-syntax Relax NG schemas which makes them really unefficient but it's only a 
+temporary solution until I find a way to speed things up.</p>
+
 <p><b>-29/06/06</b> Work on the template-management GUI part; it took two
 rewrites and lots of tests because of the strange depedencies between components.
 Still not complete but it seems to be going in the right direction. I was unable
