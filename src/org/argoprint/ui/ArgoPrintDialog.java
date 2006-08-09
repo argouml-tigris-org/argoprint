@@ -61,17 +61,17 @@ public class ArgoPrintDialog extends JDialog {
 	manager = new ArgoPrintManagerModel();
 	editor = new ArgoPrintEditorModel();
 
+	manager.loadData();
+
 	initActions();
 	initComponents();
-
-	manager.loadData(new File("managerdata.xml"));
     }
 
     private void initActions() {
 	actionCloseDialog = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    // TODO: determine location from resource
-		    manager.saveData(new java.io.File("managerdata.xml"));
+		    manager.saveData();
 		    setVisible(false);
 		}
 	    };
