@@ -24,7 +24,18 @@
 
 package org.argoprint;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import java.net.URL;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.w3c.dom.Document;
 
 /** Central point for resource locations */
 
@@ -58,7 +69,32 @@ public class APResources {
     public static final String SCHEMA_XSLT
 	= "/org/argoprint/ge/xslt_simpl.rng";
 
+    public static final String MANAGER_DATA_FILENAME
+	= "manager.apx";
+
     public static URL getResource(String id) {
 	return APResources.class.getResource(id);
+    }
+
+    public static Document getDOMFromJAR(String rep) {
+	Document result = null;
+	try {
+	    InputStream in = getResource(rep)
+		.openConnection()
+		.getInputStream();
+	    
+	    result = javax.xml.parsers.DocumentBuilderFactory
+		.newInstance()
+		.newDocumentBuilder()
+		.parse(in);
+	    
+	} catch (org.xml.sax.SAXException ex) {
+	    ex.printStackTrace();
+	} catch (java.io.IOException ex) {
+	    ex.printStackTrace();
+	} catch (javax.xml.parsers.ParserConfigurationException ex) {
+	    ex.printStackTrace();
+	}
+	return result;
     }
 }
