@@ -34,6 +34,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JTree;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import org.argoprint.GuidedEditing;
 
@@ -46,6 +48,10 @@ class DocumentJTree
     extends JTree {
 
     private ContextMenu contextMenu;
+
+    private AbstractAction
+	actionRecursiveCollapse,
+	actionRecursiveExpand;
 
     private class ContextMenu
 	extends JPopupMenu {
@@ -79,7 +85,10 @@ class DocumentJTree
  	    add(menuAppendChild);
 	    add(menuInsertBefore);
 	    add(menuInsertAfter);
+
 	    add(actionRemoveSubTree);
+	    add(actionRecursiveCollapse);
+	    add(actionRecursiveExpand);
 
 	    setDragEnabled(true);
 	}
@@ -87,7 +96,7 @@ class DocumentJTree
 	private void initializeActions() {
 	    actionRemoveSubTree = new AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
-			((DocumentTreeModel) getModel())
+			((DocumentTreeModel) treeModel)
 			    .removeSubTree(getSelectionPath());
 		    }
 		};
@@ -96,7 +105,7 @@ class DocumentJTree
 
 	    actionAppendChild = new AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
-			((DocumentTreeModel) getModel())
+			((DocumentTreeModel) treeModel)
 			    .appendChild(getSelectionPath(),
 					 
 					 ((JMenuItem) e
@@ -110,7 +119,7 @@ class DocumentJTree
 
 	    actionAppendAttribute = new AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
-			((DocumentTreeModel) getModel())
+			((DocumentTreeModel) treeModel)
 			    .appendAttribute(getSelectionPath(),
 
 					     ((JMenuItem) e.getSource())
@@ -124,7 +133,7 @@ class DocumentJTree
 
 	    actionInsertSiblingBefore = new AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
-			((DocumentTreeModel) getModel())
+			((DocumentTreeModel) treeModel)
 			    .insertSiblingBefore(getSelectionPath(),
 
 						 ((JMenuItem) e.getSource())
@@ -136,7 +145,7 @@ class DocumentJTree
 
 	    actionInsertSiblingAfter = new AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
-			((DocumentTreeModel) getModel())
+			((DocumentTreeModel) treeModel)
 			    .insertSiblingAfter(getSelectionPath(),
 						((JMenuItem) e.getSource())
 						.getText());
@@ -145,13 +154,53 @@ class DocumentJTree
 	    actionInsertSiblingAfter
 		.putValue(AbstractAction.NAME, "Insert After");
 
+	    actionRecursiveCollapse = new AbstractAction() {
+		    private void collapse(Object node, TreePath path) {
+			TreeModel model = treeModel;
+			if (!model.isLeaf(node)) {
+			    for (int i = 0; i < model.getChildCount(node); i++) {
+				Object child = model.getChild(node, i);
+				collapse(child, path.pathByAddingChild(child));
+			    }
+			    collapsePath(path);
+			}
+		    }		    
+
+		    public void actionPerformed(ActionEvent e) {
+			collapse(getLastSelectedPathComponent(),
+				 getSelectionPath());
+		    }
+		};
+	    actionRecursiveCollapse
+		.putValue(AbstractAction.NAME, "Collapse");
+
+	    actionRecursiveExpand = new AbstractAction() {
+		    private void expand(Object node, TreePath path) {
+			TreeModel model = treeModel;
+			if (!model.isLeaf(node)) {
+			    for (int i = 0; i < model.getChildCount(node); i++) {
+				Object child = model.getChild(node, i);
+				expand(child, path.pathByAddingChild(child));
+			    }
+			    expandPath(path);
+			}
+		    }
+		    public void actionPerformed(ActionEvent e) {
+			expand(getLastSelectedPathComponent(),
+			       getSelectionPath());
+		    }
+		};
+	    actionRecursiveExpand
+		.putValue(AbstractAction.NAME, "Expand");
+
 	}
 
 	public void update() {   
 	    Node selection = (Node) getLastSelectedPathComponent();
 	    NameList names;
 	    
-	    if (selection instanceof Element) {
+	    if ((selection instanceof Element)
+		&& GuidedEditing.knows(selection)) {
 
 		menuAppendAttribute.removeAll();
 		names = GuidedEditing
@@ -210,6 +259,14 @@ class DocumentJTree
 		menuAppendChild.setVisible(false);
 		menuInsertBefore.setVisible(false);
 		menuInsertAfter.setVisible(false);
+	    }
+	    
+	    if (treeModel.isLeaf(selection)) {
+		actionRecursiveCollapse.setEnabled(false);
+		actionRecursiveExpand.setEnabled(false);
+	    } else {
+		actionRecursiveCollapse.setEnabled(true);
+		actionRecursiveExpand.setEnabled(true);
 	    }
 	}
     }

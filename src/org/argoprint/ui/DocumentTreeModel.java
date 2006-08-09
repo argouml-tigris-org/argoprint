@@ -130,7 +130,7 @@ public class DocumentTreeModel
 			       .lookupNamespaceURI(prefix),
 			       qname);
 	
-	child.setValue("fixme");
+	child.setValue("");
 
 	try {
 	    parent.setAttributeNode(child);
