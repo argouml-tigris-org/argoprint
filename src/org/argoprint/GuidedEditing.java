@@ -50,30 +50,9 @@ public class GuidedEditing {
     // TODO: should be moved out
     static {
 	// GuidedEditing.add(APToolkit.URI_XSLT, APToolkit.XS_DOM_XSLT);
-	GuidedEditing.add(N_URI_XSLT, getDOMFromJAR(APResources.SCHEMA_XSLT));
-    }
-
-    private static Document getDOMFromJAR(String rep) {
-	Document result = null;
-	try {
-	    JarURLConnection con = (JarURLConnection)
-		(APResources.getResource(rep))
-		.openConnection();
-	    
-	    System.err.println(APResources.getResource(rep));
-	    result = javax.xml.parsers.DocumentBuilderFactory
-		.newInstance()
-		.newDocumentBuilder()
-		.parse(con.getInputStream());
-	    
-	} catch (org.xml.sax.SAXException ex) {
-	    ex.printStackTrace();
-	} catch (java.io.IOException ex) {
-	    ex.printStackTrace();
-	} catch (javax.xml.parsers.ParserConfigurationException ex) {
-	    ex.printStackTrace();
-	}
-	return result;
+	GuidedEditing
+	    .add(N_URI_XSLT,
+		 APResources.getDOMFromJAR(APResources.SCHEMA_XSLT));
     }
 
     private static class XPathVariableResolverImpl
@@ -109,6 +88,11 @@ public class GuidedEditing {
 
     public static Set<String> getAvailableURIs() {
 	return schemas.keySet();
+    }
+
+    public static boolean knows(Node elem) {
+	return schemas
+	    .containsKey(elem.getNamespaceURI());
     }
 
     /* Utility functions */
