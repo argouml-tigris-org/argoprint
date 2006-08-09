@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -49,6 +50,7 @@ import org.w3c.dom.NodeList;
 // TODO: remove identifier data duplication
 public class ArgoPrintManagerModel {
     private TreeMap<String, TemplateJob> jobs;
+    private File fileJobs;
 
     public class TemplateJob {
 	private boolean selected;
@@ -137,6 +139,8 @@ public class ArgoPrintManagerModel {
 
     public ArgoPrintManagerModel() {
 	jobs = new TreeMap();
+	fileJobs = new File(APResources
+			    .MANAGER_DATA_FILENAME);
     }
 
     public void addJob(String identifier) {
@@ -250,7 +254,7 @@ public class ArgoPrintManagerModel {
 
 	return doc;
     }
-    public void saveData(File file) {
+    public void saveData() {
 	Document doc = toDOMDocument();
 
 	// TODO: indentation of output
@@ -258,7 +262,7 @@ public class ArgoPrintManagerModel {
 	    Transformer transformer = TransformerFactory
 		.newInstance()
 		.newTransformer();
-	    transformer.transform(new DOMSource(doc), new StreamResult(file));
+	    transformer.transform(new DOMSource(doc), new StreamResult(fileJobs));
 	} catch (javax.xml.transform.TransformerConfigurationException ex) {
 	    // TODO
 	    System.err.println(ex);
@@ -267,20 +271,23 @@ public class ArgoPrintManagerModel {
 	    System.err.println(ex);
 	}
     }
-    public void loadData(File file) {
+    public void loadData() {
 	// TODO: implement the exception handling part
+	DocumentBuilder builder = null;
 	Document doc = null;
 
 	try {
-	    doc = DocumentBuilderFactory
+	    builder = DocumentBuilderFactory
 		.newInstance()
-		.newDocumentBuilder()
-		.parse(file);
+		.newDocumentBuilder();
+	    doc = builder.parse(fileJobs);
 	} catch (javax.xml.parsers.ParserConfigurationException ex) {
-
 	    System.err.println(ex);
 	} catch (org.xml.sax.SAXException ex) {
 	    System.err.println(ex);
+	} catch (java.io.FileNotFoundException ex) {
+	    doc = builder.newDocument();
+	    doc.appendChild(doc.createElement("jobs"));
 	} catch (java.io.IOException ex) {
 	    System.err.println(ex);
 	}
