@@ -170,10 +170,10 @@ public class ArgoPrintEditor
 	xpathToolbar.add(actionClearXPath);
 	toolbarPanel.add(xpathToolbar, BorderLayout.NORTH);
 
-	JToolBar xslToolbar = new JToolBar();
-	xslToolbar.add(new JButton("template"));
-	xslToolbar.add(new JButton("parameter"));
-	toolbarPanel.add(xslToolbar, BorderLayout.NORTH);
+// 	JToolBar xslToolbar = new JToolBar();
+// 	xslToolbar.add(new JButton("template"));
+// 	xslToolbar.add(new JButton("parameter"));
+// 	toolbarPanel.add(xslToolbar, BorderLayout.NORTH);
 
 	JTabbedPane tabbedpane = new JTabbedPane(JTabbedPane.BOTTOM);
 	DocumentTreeModel treeModel = new DocumentTreeModel(model);
