@@ -6,6 +6,33 @@
 This is Ion's activity log for the SoC work on ArgoPrint.
 </p>
 
+<h2>TODO List</h2>
+Unordered list with things that must be done:
+
+<h3>Manager</h3>
+<ul>
+<li> alternate datasources using a pluging/interface in addition
+to XML imput
+</ul>
+
+<h3>Editor</h3>
+<ul>
+<li> complete implementation of DOM-3-Val specification
+<li> fit remaining editing functions into GUI
+<li> guided editing for XPath (selecting data from the input sources)
+<li> speed-ul XPath evaluations using compiled expressions
+and variable handlers.
+<li> multiple schemas used simulatanously with guided editing
+<li> preview of result (as XML as it would take additional plugins
+to handle the multitude of possible outputs)
+<li> raw text editing (I no longer think that raw editing is
+a good idea - Ion Savin).
+<li> handle xml that does not have a namespaceURI specified or
+has walidation specified as DOCTYPEs
+<li> WYSYWYG on top of basic guided editing
+</ul>
+
+
 <h2>Guided Editing implementation</h2>
 
 <p> Given that the <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-Val-20040127">DOM validation</a>
@@ -38,6 +65,8 @@ the use of XSLT implies the use of multiple namespaces in a single document.</p>
 <p> At the moment the validation queryes are answered by evaluating XPath expressions against
 the parsed simple-syntax Relax NG schemas which makes them really unefficient but it's only a 
 temporary solution until I find a way to speed things up.</p>
+
+<h2>Activity</h2>
 
 <p><b>-29/06/06</b> Work on the template-management GUI part; it took two
 rewrites and lots of tests because of the strange depedencies between components.
