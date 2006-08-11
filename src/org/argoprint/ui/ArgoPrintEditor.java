@@ -32,10 +32,12 @@ import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
 import org.argoprint.ArgoPrintEditorModel;
@@ -50,10 +52,11 @@ public class ArgoPrintEditor
 	actionNew,
 	actionOpen,
 	actionSave,
-
+	actionHighlight,
+	actionClearXPath,
 	actionRemoveSubtree;
 
-    
+    private DocumentJTree treeDocument;
 
     public ArgoPrintEditor(ArgoPrintEditorModel model) {
 	super();
@@ -118,6 +121,23 @@ public class ArgoPrintEditor
 			    new ImageIcon(APResources
 					  .getResource(APResources.ICON_SAVE)));
 
+	actionHighlight = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    treeDocument.highlightXPathNodes(((JTextField) e.getSource())
+						     .getText());
+		}
+	    };
+	actionHighlight.putValue(AbstractAction.NAME,
+				 "Hightlight");
+
+	actionClearXPath = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    treeDocument.clearXPathNodes();
+		}
+	    };
+	actionClearXPath.putValue(AbstractAction.NAME,
+				 "Clear");
+
 	actionRemoveSubtree = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		}
@@ -136,8 +156,19 @@ public class ArgoPrintEditor
 	fileToolbar.add(new JButton(actionOpen));
 	fileToolbar.add(new JButton(actionSave));
 	fileToolbar.addSeparator();
-	fileToolbar.add(new JButton("Context"));
 	toolbarPanel.add(fileToolbar, BorderLayout.NORTH);
+
+	JToolBar xpathToolbar = new JToolBar();
+	JTextField field =
+	    new JTextField(25);
+
+	field.addActionListener(actionHighlight);
+	xpathToolbar.add(new JLabel("XPath:"));
+	// is this solution dependent on the L&F impl.?
+	xpathToolbar.addSeparator();
+	xpathToolbar.add(field);
+	xpathToolbar.add(actionClearXPath);
+	toolbarPanel.add(xpathToolbar, BorderLayout.NORTH);
 
 	JToolBar xslToolbar = new JToolBar();
 	xslToolbar.add(new JButton("template"));
@@ -148,8 +179,10 @@ public class ArgoPrintEditor
 	DocumentTreeModel treeModel = new DocumentTreeModel(model);
 	model.addDocumentSourceListener(treeModel);
 
+	treeDocument = new DocumentJTree(treeModel);
+
 	tabbedpane.addTab("Tree",
-			  new JScrollPane(new DocumentJTree(treeModel)));
+			  new JScrollPane(treeDocument));
 	tabbedpane.addTab("Raw",
 			  new JPanel());
 	tabbedpane.addTab("Preview",

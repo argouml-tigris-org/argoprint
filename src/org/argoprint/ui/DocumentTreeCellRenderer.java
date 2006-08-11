@@ -37,6 +37,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
 import org.argoprint.APResources;
@@ -53,13 +54,17 @@ class DocumentTreeCellRenderer
     private static final JLabel
 	SEPARATOR = new JLabel(":");
 
-    private static final Color
-	DEFAULT_SELECTED_COLOR = new Color(170, 208, 215);
-
     private ImageIcon
 	iconAtt,
 	iconText,
 	iconComment;
+
+    private static boolean
+	inDropState = false;
+
+    private static void setDropState(boolean state) {
+	inDropState = state;
+    }
 
     public DocumentTreeCellRenderer() {
 	iconAtt = new ImageIcon(APResources
@@ -70,11 +75,18 @@ class DocumentTreeCellRenderer
 
 	iconComment = new ImageIcon(APResources
 				    .getResource(APResources.ICON_DOT_RED));
+
+    }
+
+    private JPanel getPanel() { 
+	JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+// 	result.setBackground(DEFAULT_SELECTED_COLOR);
+
+	return result;
     }
 
     private JPanel getAttPanel(Attr att) {
-	JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-	result.setBackground(DEFAULT_SELECTED_COLOR);
+	JPanel result = getPanel();
 
 	result.add(new JLabel(iconAtt));
 	result.add(new JLabel(att.getName()));
@@ -84,16 +96,14 @@ class DocumentTreeCellRenderer
 	return result;
     }
     private JPanel getElementPanel(Element elem) {
-	JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-	result.setBackground(DEFAULT_SELECTED_COLOR);
-
+	JPanel result = getPanel();
+	
 	result.add(new JLabel(elem.getTagName()));
 	
 	return result;
     }
     private JPanel getTextPanel(Text text) {
-	JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-	result.setBackground(DEFAULT_SELECTED_COLOR);
+	JPanel result = getPanel();
 
 	result.add(new JLabel(iconText));
 	result.add(new JLabel(text.getData()));
@@ -101,8 +111,7 @@ class DocumentTreeCellRenderer
 	return result;
     }
     private JPanel getCommentPanel(Comment comment) {
-	JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-	result.setBackground(DEFAULT_SELECTED_COLOR);
+	JPanel result = getPanel();
 
 	result.add(new JLabel(iconComment));
 	result.add(new JLabel(comment.getData()));
@@ -110,8 +119,7 @@ class DocumentTreeCellRenderer
 	return result;
     }
     private JPanel getDefaultPanel(Object obj) {
-	JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-	result.setBackground(DEFAULT_SELECTED_COLOR);
+	JPanel result = getPanel();
 
 	result.add(new JLabel(obj.toString()));
 	
@@ -125,8 +133,10 @@ class DocumentTreeCellRenderer
 						  boolean leaf,
 						  int row,
 						  boolean hasFocus) {
+	DocumentJTree djtree = (DocumentJTree) tree;
 	JPanel result;
-
+	Color highlight = djtree.getHighlight((Node) value, selected);
+	
 	if (value instanceof Attr)
 	    result = getAttPanel((Attr) value);
 	else if (value instanceof Element)
@@ -138,9 +148,10 @@ class DocumentTreeCellRenderer
 	else
 	    result = getDefaultPanel(value);
 	
-	if (selected)
+	if (highlight != DocumentJTree.NO_HIGHLIGHT) {
+	    result.setBackground(highlight);
 	    result.setOpaque(true);
-	else
+	} else
 	    result.setOpaque(false);
 
 	return result;

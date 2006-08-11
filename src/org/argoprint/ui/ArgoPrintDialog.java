@@ -25,6 +25,7 @@
 package org.argoprint.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
@@ -37,8 +38,11 @@ import javax.swing.BorderFactory;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+
+import javax.xml.transform.TransformerException;
 
 import org.argoprint.ArgoPrintEditorModel;
 import org.argoprint.ArgoPrintManagerModel;
@@ -68,6 +72,7 @@ public class ArgoPrintDialog extends JDialog {
     }
 
     private void initActions() {
+	final Component thisComponent = this;
 	actionCloseDialog = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    // TODO: determine location from resource
@@ -81,7 +86,12 @@ public class ArgoPrintDialog extends JDialog {
 
 	actionGenerateOutput = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-		    manager.generateOutput();
+		    try {
+			manager.generateOutput();
+		    } catch (TransformerException ex) {
+			JOptionPane.showMessageDialog(thisComponent,
+						      ex.getMessageAndLocation());
+		    }
 		}
 	    };
 	actionGenerateOutput.putValue(AbstractAction.NAME, "Generate");

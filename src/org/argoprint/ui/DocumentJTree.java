@@ -24,10 +24,12 @@
 
 package org.argoprint.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
@@ -37,21 +39,40 @@ import javax.swing.JTree;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
 import org.argoprint.GuidedEditing;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NameList;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 class DocumentJTree 
     extends JTree {
+
+    public static final Color
+	NO_HIGHLIGHT = null;
+    public static final Color
+	SELECTED_HIGHLIGHT = new Color(170, 208, 215);
+    public static final Color
+	VALIDDROP_HIGHLIGHT = new Color(113, 196, 140);
+    public static final Color
+	XPATH_HIGHLIGHT = new Color(237, 235, 100);
 
     private ContextMenu contextMenu;
 
     private AbstractAction
 	actionRecursiveCollapse,
 	actionRecursiveExpand;
+
+    private NodeList
+	xpathHighlightNodes;
 
     private class ContextMenu
 	extends JPopupMenu {
@@ -86,11 +107,14 @@ class DocumentJTree
 	    add(menuInsertBefore);
 	    add(menuInsertAfter);
 
+	    addSeparator();
+
 	    add(actionRemoveSubTree);
+
+	    addSeparator();
+
 	    add(actionRecursiveCollapse);
 	    add(actionRecursiveExpand);
-
-	    setDragEnabled(true);
 	}
 
 	private void initializeActions() {
@@ -277,6 +301,7 @@ class DocumentJTree
 	setModel(model);
 
 	initializeComponents();
+
     }
 
     private void initializeComponents() {
@@ -298,5 +323,59 @@ class DocumentJTree
 		    }
 		}
 	    });
+
+	addMouseMotionListener(new MouseMotionListener() {
+		public void mouseDragged(MouseEvent e) {
+		    TreePath subject = getPathForLocation(e.getX(),
+							  e.getY());
+		    System.err.println("drag" + subject);
+		}
+		public void mouseMoved(MouseEvent e) {
+		}
+	    });
+    }
+
+    public void clearXPathNodes() {
+	xpathHighlightNodes = null;
+	updateUI();
+    }
+
+    public void highlightXPathNodes(String xpath) {
+	Document doc = ((DocumentTreeModel) treeModel)
+	    .getDocument();
+
+	try {
+	    xpathHighlightNodes = (NodeList)
+		XPathFactory
+		.newInstance()
+		.newXPath()
+		.evaluate(xpath,
+			  doc,
+			  XPathConstants.NODESET);
+	} catch (XPathExpressionException ex) {
+	    ex.printStackTrace();
+	}
+	updateUI();
+    }
+
+    public boolean isXPathNode(Node node) {
+	if (xpathHighlightNodes == null)
+	    return false;
+
+	for (int i = 0;
+	     i < xpathHighlightNodes.getLength();
+	     i++)
+	    if (xpathHighlightNodes.item(i)
+		== node)
+		return true;
+	return false;
+    }
+
+    public Color getHighlight(Node node, boolean selected) {
+	if (selected)
+	    return SELECTED_HIGHLIGHT;
+	else if (isXPathNode(node))
+	    return XPATH_HIGHLIGHT;
+	return NO_HIGHLIGHT;
     }
 }

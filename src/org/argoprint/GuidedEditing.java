@@ -42,6 +42,7 @@ public class GuidedEditing {
 
     // TODO: should be moved out
     public static String N_URI_XSLT = "http://www.w3.org/1999/XSL/Transform";
+    public static String N_URI_DOCBOOK = "http://docbook.org/ns/docbook";
 
     private static HashMap<String, Document> schemas = new HashMap<String, Document>();
     private static XPathVariableResolverImpl varRes = new XPathVariableResolverImpl();
@@ -52,6 +53,9 @@ public class GuidedEditing {
 	// GuidedEditing.add(APToolkit.URI_XSLT, APToolkit.XS_DOM_XSLT);
 	GuidedEditing
 	    .add(N_URI_XSLT,
+		 APResources.getDOMFromJAR(APResources.SCHEMA_XSLT));
+	GuidedEditing
+	    .add(N_URI_DOCBOOK,
 		 APResources.getDOMFromJAR(APResources.SCHEMA_XSLT));
     }
 
@@ -100,15 +104,15 @@ public class GuidedEditing {
     private static Object evalXPathOn(String xpath, String namespaceURI) {
 	Object result = null;
 	Document schema = schemas.get(namespaceURI);
-
-	try {
-	    result = XPathFactory
-		.newInstance()
-		.newXPath()
-		.evaluate(xpath, schema, XPathConstants.NODESET);
-	} catch (javax.xml.xpath.XPathExpressionException ex) {
-	    ex.printStackTrace();
-	}
+	if (schema != null) 
+	    try {
+		result = XPathFactory
+		    .newInstance()
+		    .newXPath()
+		    .evaluate(xpath, schema, XPathConstants.NODESET);
+	    } catch (javax.xml.xpath.XPathExpressionException ex) {
+		ex.printStackTrace();
+	    }
 
 	return result;
     }

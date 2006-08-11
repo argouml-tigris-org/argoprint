@@ -68,6 +68,8 @@ public class APResources {
     // XML Schemas
     public static final String SCHEMA_XSLT
 	= "/org/argoprint/ge/xslt_simpl.rng";
+    public static final String SCHEMA_DOCBOOK
+	= "/org/argoprint/ge/docbook_simpl.rng";
 
     public static final String MANAGER_DATA_FILENAME
 	= "manager.apx";

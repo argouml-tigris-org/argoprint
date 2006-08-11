@@ -35,6 +35,7 @@ import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -296,7 +297,9 @@ public class ArgoPrintManagerModel {
     }
 
     // TODO: throw exceptions
-    public void generateOutput() {
+    public void generateOutput()
+	throws TransformerException {
+
 	Transformer transformer = null;
 	File fileXSLT = null , fileOut = null;
 	StreamSource input = null;
@@ -336,19 +339,11 @@ public class ArgoPrintManagerModel {
 		    ex.printStackTrace();
 		}
 	    
-		try {
-		    transformer = TransformerFactory
-			.newInstance()
-			.newTransformer(new StreamSource(fileXSLT));
-
-		    transformer.transform(input, new StreamResult(fileOut));
-		} catch (javax.xml.transform.TransformerConfigurationException ex) {
-		    // TODO:
-		    ex.printStackTrace();
-		} catch (javax.xml.transform.TransformerException ex) {
-		    // TODO:
-		    ex.printStackTrace();
-		}
+		transformer = TransformerFactory
+		    .newInstance()
+		    .newTransformer(new StreamSource(fileXSLT));
+		
+		transformer.transform(input, new StreamResult(fileOut));
 	    }
 	}
     }
