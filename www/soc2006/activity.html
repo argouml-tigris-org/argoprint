@@ -13,6 +13,10 @@ Unordered list with things that must be done:
 <ul>
 <li> alternate datasources using a pluging/interface in addition
 to XML imput
+<li> the "Edit" item in the context menu should open the template
+specified in the selected row in the editor
+<li> command line utility for the manager (basically the same functionality
+with the xslproc or xalan tool - input, output, template, params)
 </ul>
 
 <h3>Editor</h3>
@@ -30,6 +34,16 @@ a good idea - Ion Savin).
 <li> handle xml that does not have a namespaceURI specified or
 has walidation specified as DOCTYPEs
 <li> WYSYWYG on top of basic guided editing
+<li> XPath highlighting should work with namespaces (did'n figure it out
+why it does not work) - currently instead of "/grammar" you have to use
+"/*[local-name()='grammar']"
+<li> using XPath to select nodes in the document and access to the functions
+in the context menu that can be applied to all of these nodes (remove, collapse
+and expand)
+<li> copy/paste functionality
+<li> ability to drag a subtree and to move it around the document using the
+mouse and the ability to drop the subtree on the places where it would be
+valid to drop it (with the highlight of these places)
 </ul>
 
 
