@@ -228,25 +228,27 @@ public class DocumentTreeModel
 
     public void removeSubTree(TreePath path) {
 	Node toRemove = (Node) path.getLastPathComponent();
+	TreePath parentPath = path
+	    .getParentPath();
 
-	int index = getIndexOfChild(path
-				    .getParentPath()
-				    .getLastPathComponent(),
-				    
-				    toRemove);
+	if (parentPath != null) {
+	    int index = getIndexOfChild(parentPath
+					.getLastPathComponent(),
+					toRemove);
 
-	try {
-	    if (toRemove instanceof Attr)
-		((Attr) toRemove).getOwnerElement()
-				    .removeAttributeNode((Attr) toRemove);
-	    else
-		toRemove.getParentNode()
-		    .removeChild(toRemove);
+	    try {
+		if (toRemove instanceof Attr)
+		    ((Attr) toRemove).getOwnerElement()
+			.removeAttributeNode((Attr) toRemove);
+		else
+		    toRemove.getParentNode()
+			.removeChild(toRemove);
 
-	    fireTreeNodesRemoved(path.getParentPath().getPath(), index);
-	} catch (org.w3c.dom.DOMException ex) {
-	    // TODO
-	    System.err.println(ex);
+		fireTreeNodesRemoved(path.getParentPath().getPath(), index);
+	    } catch (org.w3c.dom.DOMException ex) {
+		// TODO
+		System.err.println(ex);
+	    }
 	}
     }
 
