@@ -14,7 +14,8 @@
     <property name="argo.build.dir" value="${argo.root}/build"/>
     <property name="argo.tools.dir" value="${argo.root}/tools"/>
 
-    <property name="ant.xml-libs" value="${ANT_HOME}/lib/jaxp.jar:${ANT_HOME}/lib/parser.jar"/>
+    <property name="ant.xml-libs"
+              value="${ANT_HOME}/lib/jaxp.jar:${ANT_HOME}/lib/parser.jar"/>
 
     <property name="debug" value="on"/>
     <property name="optimize" value="on"/>
@@ -51,19 +52,16 @@
                 <include name="antlrall.jar" />
                 <include name="log4j.jar" />
                 <include name="gef.jar" />
-<!--                 <include name="xerces.jar" /> -->
             </fileset>
-	    <pathelement location="${argo.build.dir}/classes" />
-	    <pathelement location="${argo.root}/lib/gef-0.11.3M9.jar" />
         </classpath>
      </javac>
   </target>
 
 
   <!-- =================================================================== -->
-  <!-- Creates the class package                                           -->
+  <!-- Creates the jar file                                                -->
   <!-- =================================================================== -->
-  <target name="package" depends="compile">
+  <target name="jar" depends="compile">
     <copy file="src/org/manifest.mf"
           tofile="${module.build.dest}/classes/org/manifest.mf"
 	  filtering="on"
@@ -84,7 +82,7 @@
   <!-- =================================================================== -->
   <!-- Move the jar file into the extension directory.                     -->
   <!-- =================================================================== -->
-  <target name="install" depends="package">
+  <target name="install" depends="jar">
     <copy todir="${argo.build.dir}/ext">
       <fileset dir="${module.build.dest}" includes="argoprint.jar"/>
     </copy>
@@ -95,6 +93,9 @@
   <!-- =================================================================== -->
   <target name="clean" depends="init">
     <delete dir="${module.build.dest}"/>
+    <delete>
+      <fileset dir="${argo.build.dir}/ext" includes="argoprint.jar"/>
+    </delete>
   </target>
 
 
@@ -103,13 +104,14 @@
   <!-- =================================================================== -->
   <target name="checkstyle" depends="init"
           description="Run checkstyle on all source.">
-    <java classname="com.puppycrawl.tools.checkstyle.Main" failonerror="false" fork="true" maxmemory="32M">
-      <sysproperty key="checkstyle.header.file" value="../argouml/tools/checkstyle/java.header"/>
+    <java classname="com.puppycrawl.tools.checkstyle.Main"
+          failonerror="false" fork="true" maxmemory="32M">
+      <sysproperty key="checkstyle.header.file"
+                   value="../argouml/tools/checkstyle/java.header"/>
       <classpath>
         <fileset dir="${argo.tools.dir}/checkstyle-3.3">
           <include name="*.jar"/>
         </fileset>
-<!--         <pathelement location="${argo.tools.dir}/ant-1.4.1/lib/xerces-1.2.3.jar"/> -->
       </classpath>
       <arg value="-c"/>
       <arg value="${argo.tools.dir}/checkstyle/checkstyle_argouml.xml"/>
