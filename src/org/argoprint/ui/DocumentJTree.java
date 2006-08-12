@@ -32,6 +32,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -80,11 +81,15 @@ class DocumentJTree
 	private AbstractAction
 	    actionAppendAttribute,
 	    actionAppendChild,
+	    actionAppendElement,
+	    actionAppendSelAttribute,
 	    actionAppendText,
-	    actionInsertSiblingBefore,
-	    actionInsertTextBefore,
+	    actionInsertElementAfter,
+	    actionInsertElementBefore,
 	    actionInsertSiblingAfter,
+	    actionInsertSiblingBefore,
 	    actionInsertTextAfter,
+	    actionInsertTextBefore,
 	    actionRemoveSubTree;
 
 	private JMenu
@@ -121,6 +126,7 @@ class DocumentJTree
 	}
 
 	private void initializeActions() {
+	    final Component thisComponent = this;
 	    actionRemoveSubTree = new AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
 			((DocumentTreeModel) treeModel)
@@ -134,6 +140,9 @@ class DocumentJTree
 		    public void actionPerformed(ActionEvent e) {
 			((DocumentTreeModel) treeModel)
 			    .appendTextChild(getSelectionPath());
+
+			if (!isExpanded(getSelectionPath()))
+			    expandPath(getSelectionPath());
 		    }
 		};
 	    actionAppendText
@@ -147,13 +156,14 @@ class DocumentJTree
 					 ((JMenuItem) e
 					  .getSource()).getText());
 
-			expandPath(getSelectionPath());
+			if (!isExpanded(getSelectionPath()))
+			    expandPath(getSelectionPath());
 		    }
 		};
 	    actionAppendChild
 		.putValue(AbstractAction.NAME, "Append Child");
 
-	    actionAppendAttribute = new AbstractAction() {
+	    actionAppendSelAttribute = new AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
 			((DocumentTreeModel) treeModel)
 			    .appendAttribute(getSelectionPath(),
@@ -161,11 +171,31 @@ class DocumentJTree
 					     ((JMenuItem) e.getSource())
 					     .getText());
 
-			expandPath(getSelectionPath());
+			if (!isExpanded(getSelectionPath()))
+			    expandPath(getSelectionPath());
+		    }
+		};
+	    actionAppendSelAttribute
+		.putValue(AbstractAction.NAME, "Append Attribute");
+
+	    actionAppendAttribute = new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			String qname = JOptionPane
+			    .showInputDialog(thisComponent,
+					     "Insert the qualified name for the attribute:");
+
+			((DocumentTreeModel) treeModel)
+			    .appendAttribute(getSelectionPath(),
+					     qname);
+
+			if (!isExpanded(getSelectionPath()))
+			    expandPath(getSelectionPath());
+
 		    }
 		};
 	    actionAppendAttribute
-		.putValue(AbstractAction.NAME, "Append Attribute");
+		.putValue(AbstractAction.NAME, "attribute");
+
 
 	    actionInsertSiblingBefore = new AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
@@ -208,6 +238,52 @@ class DocumentJTree
 	    actionInsertTextAfter
 		.putValue(AbstractAction.NAME, "text");
 
+
+	    actionAppendElement = new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			String tag = JOptionPane
+			    .showInputDialog(thisComponent,
+					     "Insert the TagName of the element.");
+
+			((DocumentTreeModel) treeModel)
+			    .appendChild(getSelectionPath(),
+					 tag);
+
+			if (!isExpanded(getSelectionPath()))
+			    expandPath(getSelectionPath());
+		    }
+		};
+	    actionAppendElement
+		.putValue(AbstractAction.NAME, "element");
+
+	    actionInsertElementAfter = new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			String tag = JOptionPane
+			    .showInputDialog(thisComponent,
+					     "Insert the TagName of the element.");
+
+			((DocumentTreeModel) treeModel)
+			    .insertSiblingAfter(getSelectionPath(),
+						tag);
+		    }
+		};
+	    actionInsertElementAfter
+		.putValue(AbstractAction.NAME, "element");
+
+	    actionInsertElementBefore = new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			String tag = JOptionPane
+			    .showInputDialog(thisComponent,
+					     "Insert the TagName of the element.");
+
+			((DocumentTreeModel) treeModel)
+			    .insertSiblingBefore(getSelectionPath(),
+						 tag);
+		    }
+		};
+	    actionInsertElementBefore
+		.putValue(AbstractAction.NAME, "element");
+
 	    actionRecursiveCollapse = new AbstractAction() {
 		    private void collapse(Object node, TreePath path) {
 			TreeModel model = treeModel;
@@ -236,7 +312,8 @@ class DocumentJTree
 				Object child = model.getChild(node, i);
 				expand(child, path.pathByAddingChild(child));
 			    }
-			    expandPath(path);
+			    if (!isExpanded(path))
+				expandPath(path);
 			}
 		    }
 		    public void actionPerformed(ActionEvent e) {
@@ -249,118 +326,104 @@ class DocumentJTree
 
 	}
 
-	public void update() {   
+	private void fillAttr(Element elem) {
+	    NameList names = GuidedEditing
+		.getAllowedAttributes((Element) elem);
+
+	    NamedNodeMap presentAtts = elem.getAttributes();
+	    for (int i = 0; i < names.getLength(); i++)
+		if (presentAtts.getNamedItem(names.getName(i)) == null) {
+		    StringBuffer name = new StringBuffer();
+		    String prefix;
+
+		    if ( (prefix = elem
+			  .lookupPrefix(names.getNamespaceURI(i)))
+			 != null) {
+
+			name.append(prefix);
+			name.append(":");
+		    }
+
+		    name.append(names.getName(i));
+
+		    menuAppendAttribute
+			.add(name.toString())
+			.addActionListener(actionAppendSelAttribute);
+		}
+
+	}
+
+	private void fillChildren(Element elem) {
+	    NameList names = GuidedEditing
+		.getAllowedChildren((Element) elem);
+
+	    for (int i = 0; i < names.getLength(); i++)
+		menuAppendChild
+		    .add(names.getName(i))
+		    .addActionListener(actionAppendChild);
+	}
+
+	private void fillSiblingBefore(Element elem) {
+	    NameList names = GuidedEditing
+		.getAllowedPreviousSiblings((Element) elem);
+	    for (int i = 0; i < names.getLength(); i++)
+		menuInsertBefore
+		    .add(names.getName(i))
+		    .addActionListener(actionInsertSiblingBefore);
+	}
+
+	private void fillSiblingAfter(Element elem) {
+	    NameList names = GuidedEditing
+		.getAllowedNextSiblings((Element) elem);
+	    for (int i = 0; i < names.getLength(); i++)
+		menuInsertAfter
+		    .add(names.getName(i))
+		    .addActionListener(actionInsertSiblingAfter);
+	}
+
+	private void update() {   
 	    Node selection = (Node) getLastSelectedPathComponent();
 	    NameList names;
 	    
-	    if ((selection instanceof Element)
-		&& GuidedEditing.knows(selection)) {
-
+	    if (selection instanceof Element) {
 		menuAppendAttribute.removeAll();
-		names = GuidedEditing
-		    .getAllowedAttributes( (Element) selection );
-		NamedNodeMap presentAtts = selection.getAttributes();
-		for (int i = 0; i < names.getLength(); i++)
-		    if (presentAtts.getNamedItem(names.getName(i)) == null) {
-			StringBuffer name = new StringBuffer();
-			String prefix;
-
-			if ( (prefix = selection
-			      .lookupPrefix(names.getNamespaceURI(i)))
-			     != null) {
-
-			    name.append(prefix);
-			    name.append(":");
-			}
-
-			name.append(names.getName(i));
-
-			menuAppendAttribute
-			    .add(name.toString())
-			    .addActionListener(actionAppendAttribute);
-		    }
-
-		short contentType = GuidedEditing
-		    .getContentType((Element) selection);
-		short parentContentType = GuidedEditing
-		    .getContentType((Element) getSelectionPath()
-				    .getParentPath()
-				    .getLastPathComponent());
-		
-		if ((contentType
-		     == GuidedEditing.VAL_ELEMENTS_CONTENTTYPE)
-		    || (contentType
-			== GuidedEditing.VAL_MIXED_CONTENTTYPE)
-		    || (contentType
-			== GuidedEditing.VAL_ANY_CONTENTTYPE)) {
-
-		    menuAppendChild.removeAll();
-		    menuAppendChild.add(actionAppendText);
-		    menuAppendChild.addSeparator();
-
-		    names = GuidedEditing
-			.getAllowedChildren((Element) selection);
-		    for (int i = 0; i < names.getLength(); i++)
-			menuAppendChild
-			    .add(names.getName(i))
-			    .addActionListener(actionAppendChild);
-		}
-		
+		menuAppendAttribute.add(actionAppendAttribute);
+		menuAppendAttribute.addSeparator();
+		fillAttr((Element) selection);
+	    
+		menuAppendChild.removeAll();
+		menuAppendChild.add(actionAppendText);
+		menuAppendChild.add(actionAppendElement);
+		menuAppendChild.addSeparator();
+		fillChildren((Element) selection);
+	    
 		menuInsertBefore.removeAll();
 		menuInsertBefore.add(actionInsertTextBefore);
+		menuInsertBefore.add(actionInsertElementBefore);
 		menuInsertBefore.addSeparator();
-
-		names = GuidedEditing
-		    .getAllowedPreviousSiblings((Element) selection);
-		for (int i = 0; i < names.getLength(); i++)
-		    menuInsertBefore
-			.add(names.getName(i))
-			.addActionListener(actionInsertSiblingBefore);
-		
+		fillSiblingBefore((Element) selection);
+	    
 		menuInsertAfter.removeAll();
 		menuInsertAfter.add(actionInsertTextAfter);
+		menuInsertAfter.add(actionInsertElementAfter);
 		menuInsertAfter.addSeparator();
+		fillSiblingAfter((Element) selection);
+	    } 
+	    menuAppendAttribute
+		.setVisible(selection instanceof Element);
+	    menuAppendChild
+		.setVisible(selection instanceof Element);
+	    menuInsertBefore
+		.setVisible(selection instanceof Element);
+	    menuInsertAfter
+		.setVisible(selection instanceof Element);
 
-		names = GuidedEditing
-		    .getAllowedNextSiblings((Element) selection);
-		for (int i = 0; i < names.getLength(); i++)
-		    menuInsertAfter
-			.add(names.getName(i))
-			.addActionListener(actionInsertSiblingAfter);
-
-		actionAppendText.setEnabled((contentType
-					     == GuidedEditing.VAL_MIXED_CONTENTTYPE)
-					    || (contentType
-						== GuidedEditing.VAL_SIMPLE_CONTENTTYPE));
-
-		actionInsertTextBefore.setEnabled((parentContentType
-						   == GuidedEditing.VAL_MIXED_CONTENTTYPE)
-						  || (parentContentType
-						      == GuidedEditing.VAL_SIMPLE_CONTENTTYPE));
-
-		actionInsertTextAfter.setEnabled((parentContentType
-						  == GuidedEditing.VAL_MIXED_CONTENTTYPE)
-						 || (parentContentType
-						     == GuidedEditing.VAL_SIMPLE_CONTENTTYPE));
-
-		menuAppendAttribute.setVisible(true);
-		menuAppendChild.setVisible(true);
-		menuInsertBefore.setVisible(true);
-		menuInsertAfter.setVisible(true);
-	    } else {
-		menuAppendAttribute.setVisible(false);
-		menuAppendChild.setVisible(false);
-		menuInsertBefore.setVisible(false);
-		menuInsertAfter.setVisible(false);
-	    }
-	    
-	    if (treeModel.isLeaf(selection)) {
-		actionRecursiveCollapse.setEnabled(false);
-		actionRecursiveExpand.setEnabled(false);
-	    } else {
-		actionRecursiveCollapse.setEnabled(true);
-		actionRecursiveExpand.setEnabled(true);
-	    }
+	    actionRecursiveCollapse
+		.setEnabled(!treeModel
+			    .isLeaf(selection));
+	    actionRecursiveExpand
+		.setEnabled(!treeModel
+			    .isLeaf(selection));
 	}
     }
 

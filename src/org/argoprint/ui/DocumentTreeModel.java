@@ -157,15 +157,17 @@ public class DocumentTreeModel
 
     private void addRequiredAtts(Element child) {
 	/* Add the required attributes together with the element */
-	NameList atts = GuidedEditing.getRequiredAttributes(child);
-	String label;
-	for (int i = 0; i < atts.getLength(); i++) {
-	    label = inPrefixedForm(child,
-				   atts.getNamespaceURI(i),
-				   atts.getName(i));
-	    child.setAttributeNode(source.getDocument()
-				   .createAttributeNS(atts.getNamespaceURI(i),
-						      label));
+	if (GuidedEditing.knows(child)) {
+	    NameList atts = GuidedEditing.getRequiredAttributes(child);
+	    String label;
+	    for (int i = 0; i < atts.getLength(); i++) {
+		label = inPrefixedForm(child,
+				       atts.getNamespaceURI(i),
+				       atts.getName(i));
+		child.setAttributeNode(source.getDocument()
+				       .createAttributeNS(atts.getNamespaceURI(i),
+							  label));
+	    }
 	}
     }
 
