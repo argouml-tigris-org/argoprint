@@ -137,6 +137,8 @@ public class ArgoPrintEditor
 	    };
 	actionClearXPath.putValue(AbstractAction.NAME,
 				 "Clear");
+	actionClearXPath.putValue(AbstractAction.SHORT_DESCRIPTION,
+				 "Removes the highlighting that may be present.");
 
 	actionRemoveSubtree = new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {

@@ -190,6 +190,22 @@ public class DocumentTreeModel
 	}
     }
 
+    public void appendTextChild(TreePath parentPath) {
+	Node parent = (Node) parentPath.getLastPathComponent();
+
+	Node child = source.getDocument()
+	    .createTextNode("");
+	
+	try {
+	    parent.appendChild(child);
+	    fireTreeNodesInserted(parentPath.getPath(),
+				  getChildCount(parent) - 1);
+	} catch (org.w3c.dom.DOMException ex) {
+	    // TODO
+	    System.err.println(ex);
+	}
+    }
+
     public void insertSiblingBefore(TreePath refNodePath, String qname) {
 	Node refNode = (Node) refNodePath.getLastPathComponent();
 	Node parent = refNode.getParentNode();
@@ -212,6 +228,23 @@ public class DocumentTreeModel
 	}
     }
 
+    public void insertTextBefore(TreePath refNodePath) {
+	Node refNode = (Node) refNodePath.getLastPathComponent();
+	Node parent = refNode.getParentNode();
+
+	Node newNode = source.getDocument()
+	    .createTextNode("");
+	int index = getIndexOfChild(parent, refNode);
+
+	try {
+	    parent.insertBefore(newNode, refNode);
+	    fireTreeNodesInserted(refNodePath.getParentPath().getPath(), index);
+	} catch (org.w3c.dom.DOMException ex) {
+	    // TODO
+	    System.err.println(ex);
+	}
+    }
+
     public void insertSiblingAfter(TreePath refNodePath, String qname) {
 	Node nextSibling = ((Node) refNodePath.getLastPathComponent())
 	    .getNextSibling();
@@ -224,6 +257,18 @@ public class DocumentTreeModel
 				.pathByAddingChild(nextSibling),
 
 				qname);
+    }
+
+    public void insertTextAfter(TreePath refNodePath) {
+	Node nextSibling = ((Node) refNodePath.getLastPathComponent())
+	    .getNextSibling();
+
+	if (nextSibling == null)
+	    appendTextChild(refNodePath.getParentPath());
+	else
+	    insertTextBefore(refNodePath
+			     .getParentPath()
+			     .pathByAddingChild(nextSibling));
     }
 
     public void removeSubTree(TreePath path) {

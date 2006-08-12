@@ -114,14 +114,9 @@ class DocumentTreeCellEditor
 	    fieldValue.setText(attr.getValue());
 	} else if (value instanceof Text) {
 	    Text text = (Text) value;
-	    label.setText("Text");
+	    label.setText("");
 	    fieldValue.setText(text.getData());
 	}
-
-	// Adjust the width of the value field
-
-
-
 
 	this.tree = tree;
 	this.value = (Node) value;

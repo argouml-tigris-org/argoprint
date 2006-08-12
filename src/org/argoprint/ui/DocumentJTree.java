@@ -80,8 +80,11 @@ class DocumentJTree
 	private AbstractAction
 	    actionAppendAttribute,
 	    actionAppendChild,
+	    actionAppendText,
 	    actionInsertSiblingBefore,
+	    actionInsertTextBefore,
 	    actionInsertSiblingAfter,
+	    actionInsertTextAfter,
 	    actionRemoveSubTree;
 
 	private JMenu
@@ -127,6 +130,15 @@ class DocumentJTree
 	    actionRemoveSubTree
 		.putValue(AbstractAction.NAME, "Remove");
 
+	    actionAppendText = new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			((DocumentTreeModel) treeModel)
+			    .appendTextChild(getSelectionPath());
+		    }
+		};
+	    actionAppendText
+		.putValue(AbstractAction.NAME, "text");
+
 	    actionAppendChild = new AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
 			((DocumentTreeModel) treeModel)
@@ -167,6 +179,15 @@ class DocumentJTree
 	    actionInsertSiblingBefore
 		.putValue(AbstractAction.NAME, "Insert Before");
 
+	    actionInsertTextBefore = new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			((DocumentTreeModel) treeModel)
+			    .insertTextBefore(getSelectionPath());
+		    }
+		};
+	    actionInsertTextBefore
+		.putValue(AbstractAction.NAME, "text");
+
 	    actionInsertSiblingAfter = new AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
 			((DocumentTreeModel) treeModel)
@@ -177,6 +198,15 @@ class DocumentJTree
 		};
 	    actionInsertSiblingAfter
 		.putValue(AbstractAction.NAME, "Insert After");
+
+	    actionInsertTextAfter = new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			((DocumentTreeModel) treeModel)
+			    .insertTextAfter(getSelectionPath());
+		    }
+		};
+	    actionInsertTextAfter
+		.putValue(AbstractAction.NAME, "text");
 
 	    actionRecursiveCollapse = new AbstractAction() {
 		    private void collapse(Object node, TreePath path) {
@@ -250,15 +280,36 @@ class DocumentJTree
 			    .addActionListener(actionAppendAttribute);
 		    }
 
-		menuAppendChild.removeAll();
-		names = GuidedEditing
-		    .getAllowedChildren((Element) selection);
-		for (int i = 0; i < names.getLength(); i++)
-		    menuAppendChild
-			.add(names.getName(i))
-			.addActionListener(actionAppendChild);
+		short contentType = GuidedEditing
+		    .getContentType((Element) selection);
+		short parentContentType = GuidedEditing
+		    .getContentType((Element) getSelectionPath()
+				    .getParentPath()
+				    .getLastPathComponent());
+		
+		if ((contentType
+		     == GuidedEditing.VAL_ELEMENTS_CONTENTTYPE)
+		    || (contentType
+			== GuidedEditing.VAL_MIXED_CONTENTTYPE)
+		    || (contentType
+			== GuidedEditing.VAL_ANY_CONTENTTYPE)) {
+
+		    menuAppendChild.removeAll();
+		    menuAppendChild.add(actionAppendText);
+		    menuAppendChild.addSeparator();
+
+		    names = GuidedEditing
+			.getAllowedChildren((Element) selection);
+		    for (int i = 0; i < names.getLength(); i++)
+			menuAppendChild
+			    .add(names.getName(i))
+			    .addActionListener(actionAppendChild);
+		}
 		
 		menuInsertBefore.removeAll();
+		menuInsertBefore.add(actionInsertTextBefore);
+		menuInsertBefore.addSeparator();
+
 		names = GuidedEditing
 		    .getAllowedPreviousSiblings((Element) selection);
 		for (int i = 0; i < names.getLength(); i++)
@@ -267,12 +318,30 @@ class DocumentJTree
 			.addActionListener(actionInsertSiblingBefore);
 		
 		menuInsertAfter.removeAll();
+		menuInsertAfter.add(actionInsertTextAfter);
+		menuInsertAfter.addSeparator();
+
 		names = GuidedEditing
 		    .getAllowedNextSiblings((Element) selection);
 		for (int i = 0; i < names.getLength(); i++)
 		    menuInsertAfter
 			.add(names.getName(i))
 			.addActionListener(actionInsertSiblingAfter);
+
+		actionAppendText.setEnabled((contentType
+					     == GuidedEditing.VAL_MIXED_CONTENTTYPE)
+					    || (contentType
+						== GuidedEditing.VAL_SIMPLE_CONTENTTYPE));
+
+		actionInsertTextBefore.setEnabled((parentContentType
+						   == GuidedEditing.VAL_MIXED_CONTENTTYPE)
+						  || (parentContentType
+						      == GuidedEditing.VAL_SIMPLE_CONTENTTYPE));
+
+		actionInsertTextAfter.setEnabled((parentContentType
+						  == GuidedEditing.VAL_MIXED_CONTENTTYPE)
+						 || (parentContentType
+						     == GuidedEditing.VAL_SIMPLE_CONTENTTYPE));
 
 		menuAppendAttribute.setVisible(true);
 		menuAppendChild.setVisible(true);
