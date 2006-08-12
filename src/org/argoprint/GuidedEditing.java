@@ -63,6 +63,10 @@ public class GuidedEditing {
 	= getCompiledExp("/grammar/define[element/name/text()=$elem_name]/descendant::attribute[not(ancestor::choice/empty)]/name");
     private static final XPathExpression XPATH_ALLOWED_PARENTS
 	= getCompiledExp("/grammar/define/element[descendant::ref[@name=/grammar/define[element/name/text()=$elem_name]/@name]]/name/text()");
+    private static final XPathExpression XPATH_CONTENTTYPE_MIXED
+	= getCompiledExp("/grammar/define/element[name/text()=$elem_name][descendant::text[not(ancestor::attribute)]]");
+    private static final XPathExpression XPATH_CONTENTTYPE_ELEMENTS
+	= getCompiledExp("/grammar/define/element[name/text()=$elem_name][not(descendant::text[not(ancestor::attribute)])]");
 
 
     private static XPathExpression getCompiledExp(String exp) {
@@ -250,43 +254,46 @@ public class GuidedEditing {
     // TODO: all nameclasses
     public static NameList getAllowedChildren(Element element) {
 	NameListImpl names = new NameListImpl();
-	
-	varSolver.put("elem_name", element.getLocalName());
 
-	NodeList refnames = (NodeList) evalCXPathOn(XPATH_ALLOWED_CHILDREN_REFS,
-						    element.getNamespaceURI(),
-						    XPathConstants.NODESET);
+	if (knows(element)) {
+	    varSolver.put("elem_name", element.getLocalName());
 
-	for (int i = 0; i < refnames.getLength(); i++) {
-	    Attr ref_name = (Attr) refnames.item(i);
+	    NodeList refnames = (NodeList) evalCXPathOn(XPATH_ALLOWED_CHILDREN_REFS,
+							element.getNamespaceURI(),
+							XPathConstants.NODESET);
 
-	    varSolver.put("ref_name", ref_name.getValue());
+	    for (int i = 0; i < refnames.getLength(); i++) {
+		Attr ref_name = (Attr) refnames.item(i);
 
-	    Element current = (Element) evalCXPathOn(XPATH_ALLOWED_CHILDREN_NAMECLASS,
-						     element.getNamespaceURI(),
-						     XPathConstants.NODE);
+		varSolver.put("ref_name", ref_name.getValue());
 
-	    if ("name".equals(current.getTagName())) {
-		StringBuffer result = new StringBuffer();
+		Element current = (Element) evalCXPathOn(XPATH_ALLOWED_CHILDREN_NAMECLASS,
+							 element.getNamespaceURI(),
+							 XPathConstants.NODE);
 
-		String text = current.getTextContent();
-		Attr ns = current.getAttributeNode("ns");
+		if ("name".equals(current.getTagName())) {
+		    StringBuffer result = new StringBuffer();
+
+		    String text = current.getTextContent();
+		    Attr ns = current.getAttributeNode("ns");
 	    
-		if (ns != null) {
-		    String prefix = element.lookupPrefix(ns.getValue());
-		    if (prefix != null) {
-			result.append(prefix);
-			result.append(":");
+		    if (ns != null) {
+			String prefix = element.lookupPrefix(ns.getValue());
+			if (prefix != null) {
+			    result.append(prefix);
+			    result.append(":");
+			}
 		    }
+
+		    // TODO: anyName
+		    if (text != null)
+			result.append(text);
+
+		    names.add(result.toString());
 		}
-
-		// TODO: anyName
-		if (text != null)
-		    result.append(text);
-
-		names.add(result.toString());
 	    }
 	}
+
 	return names;
     }
 
@@ -332,38 +339,59 @@ public class GuidedEditing {
     public static NameList getAllowedAttributes(Element element) {
 	NameListImpl result = new NameListImpl();
 
-	varSolver.put("elem_name", element.getLocalName());
-
-	NodeList nodes = (NodeList) evalCXPathOn(XPATH_ALLOWED_ATTRIBUTES,
-						 element.getNamespaceURI(),
-						 XPathConstants.NODESET);
-
-	for (int i = 0; i < nodes.getLength(); i++) {
-	    Element node = (Element)nodes.item(i);
-	    result.add(node.getAttribute("ns"), node.getTextContent());
+	if (knows(element)) {
+	    varSolver.put("elem_name", element.getLocalName());
+	    
+	    NodeList nodes = (NodeList) evalCXPathOn(XPATH_ALLOWED_ATTRIBUTES,
+						     element.getNamespaceURI(),
+						     XPathConstants.NODESET);
+	    
+	    for (int i = 0; i < nodes.getLength(); i++) {
+		Element node = (Element)nodes.item(i);
+		result.add(node.getAttribute("ns"), node.getTextContent());
+	    }
 	}
-
+	    
 	return result;
     }
 
     public static NameList getRequiredAttributes(Element element) {
 	NameListImpl result = new NameListImpl();
 
-	varSolver.put("elem_name", element.getLocalName());
+	if (knows(element)) {
+	    varSolver.put("elem_name", element.getLocalName());
 
-	NodeList nodes = (NodeList) evalCXPathOn(XPATH_REQUIRED_ATTRIBUTES,
-						 element.getNamespaceURI(),
-						 XPathConstants.NODESET);
+	    NodeList nodes = (NodeList) evalCXPathOn(XPATH_REQUIRED_ATTRIBUTES,
+						     element.getNamespaceURI(),
+						     XPathConstants.NODESET);
 
-	for (int i = 0; i < nodes.getLength(); i++) {
-	    Element node = (Element)nodes.item(i);
-	    result.add(node.getAttribute("ns"), node.getTextContent());
+	    for (int i = 0; i < nodes.getLength(); i++) {
+		Element node = (Element)nodes.item(i);
+		result.add(node.getAttribute("ns"), node.getTextContent());
+	    }
 	}
 
 	return result;
     }
 
     public static short getContentType(Element element) {
+	if (knows(element)) {
+	    NodeList nodes;
+	    varSolver.put("elem_name", element.getLocalName());
+
+	    nodes = (NodeList) evalCXPathOn(XPATH_CONTENTTYPE_ELEMENTS,
+					    element.getNamespaceURI(),
+					    XPathConstants.NODESET);
+	    if (nodes.getLength() != 0)
+		return VAL_ELEMENTS_CONTENTTYPE;
+
+	    nodes = (NodeList) evalCXPathOn(XPATH_CONTENTTYPE_MIXED,
+					    element.getNamespaceURI(),
+					    XPathConstants.NODESET);
+	    if (nodes.getLength() != 0)
+		return VAL_MIXED_CONTENTTYPE;
+	}
+
 	return VAL_ANY_CONTENTTYPE;
     }
 
