@@ -88,9 +88,14 @@ public class ArgoPrintDialog extends JDialog {
 		public void actionPerformed(ActionEvent e) {
 		    try {
 			manager.generateOutput();
+			JOptionPane.showMessageDialog(thisComponent,
+						      "The templates were generated.");
+
 		    } catch (TransformerException ex) {
 			JOptionPane.showMessageDialog(thisComponent,
-						      ex.getMessageAndLocation());
+						      ex.getMessageAndLocation(),
+						      "Error",
+						      JOptionPane.ERROR_MESSAGE);
 		    }
 		}
 	    };
