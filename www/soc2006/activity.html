@@ -95,6 +95,31 @@ temporary solution until I find a way to speed things up.</p>
 
 <h2>Activity</h2>
 
+<p><b>15/08/06</b> Windows env set-up for testing. Prototyped XPath guided editing
+functionality. Tried to fix the XPath highlighting issue with respect to default
+namespaces - without positive results - NamespaceContext seems not to be used for
+the default namespaces. Digged the net for info regarding the issue Linus is having
+with the generator but couldn't find anything different from the previous search -
+the presence of whitespace before the "xml" processing instruction which turned out
+not to be the case. Also the search for solution to the XPath evaluation issue didn't
+turn out any useful result. I could not find any documentation besides the API doc
+which isn't of any help as it doesn't explain how the evaluation is done and how the
+nodes are considered. The W3C specification of XPath was no help either as it leaves
+the implementors freedom with respect to this. The ugly part is that I have to work
+with interfaces and not with implementations and a stricter specification would have
+been helpful in this respect.</p>
+
+<p><b>-14/08/06</b> The editor is usable but kind of primitive - it does not allow
+the editing of more then one file at the time it does not have undo/redo functionality.
+I consider it good for XML browsing but the editing bit needs more work. Most of the
+work from the previous post consisted on looking at OSS editors, reading the DOM-3-Val
+specification, reading about DTDs, XML Schemas and Relax NG in the context of using
+them for guided editing. DTDs turned out to be too restrictive because they are not
+aware of namespaces, XML Schema prototypes turned out impossible to write because of
+the complexity of the vocabulary. Relax NG schemas are turned out to be easyer to use
+for this purpose especialy in simple form. Besides this there were some modifications
+to the code that can be traced in the repository.
+
 <p><b>-29/06/06</b> Work on the template-management GUI part; it took two
 rewrites and lots of tests because of the strange depedencies between components.
 Still not complete but it seems to be going in the right direction. I was unable
