@@ -83,7 +83,7 @@ public class ArgoPrintMenuPlugin
 
 	// This is where the ArgoPrint GUI frame is created and displayed
 	ArgoPrintDialog argoPrintDialog =
-	    ArgoPrintDialog.getInstance(new JFrame());
+	    ArgoPrintDialog.getInstance(ProjectBrowser.getInstance());
 	LOG.info("Setting Gui Log");
 	LOG.info("Showing ArgoPrint Dialog");
 	argoPrintDialog.setVisible(true);
