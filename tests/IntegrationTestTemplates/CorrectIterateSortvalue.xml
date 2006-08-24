@@ -1,5 +1,0 @@
-<root xmlns:ap="http://argoprint.tigris.org/2003">
-    <ap:iterate what="getCollection()" iteratorname="it" sortvalue="intern">
-        <ap:call what="toString" iterator="it"/>
-    </ap:iterate>
-</root>

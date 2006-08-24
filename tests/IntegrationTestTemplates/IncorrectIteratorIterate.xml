@@ -1,5 +1,0 @@
-<root xmlns:ap="http://argoprint.tigris.org/2003">
-    <ap:iterate what="getCollection()">
-        Topp.
-    </ap:iterate>
-</root>

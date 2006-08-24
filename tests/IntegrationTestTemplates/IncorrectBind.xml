@@ -1,8 +1,0 @@
-<root xmlns:ap="http://argoprint.tigris.org/2003">
-    <ap:bind name="img">
-        <ap:attr name="src">
-            <ap:call what="ThisMethodDoesNotExist()"/>
-        </ap:attr>
-        image
-    </ap:bind>
-</root>
