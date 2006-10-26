@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="argoprint" default="package" basedir=".">
+<project name="argoprint" default="install" basedir=".">
 
   <!-- =================================================================== -->
   <!-- Initialization target                                               -->
@@ -13,6 +13,7 @@
     <property name="argo.root" value="../argouml"/>
     <property name="argo.build.dir" value="${argo.root}/build"/>
     <property name="argo.tools.dir" value="${argo.root}/tools"/>
+    <property name="argo.ext.dir" value="${argo.build.dir}/ext"/>
 
     <property name="ant.xml-libs"
               value="${ANT_HOME}/lib/jaxp.jar:${ANT_HOME}/lib/parser.jar"/>
@@ -29,8 +30,8 @@
   <!-- Compiles the source directory                                       -->
   <!-- =================================================================== -->
 
-  <target name="compile" depends="init"> 
-
+  <target name="compile" depends="init"
+          description="Compile the sources." > 
     <echo message="Compiling the sources"/>
 
     <!-- create directories -->
@@ -61,7 +62,8 @@
   <!-- =================================================================== -->
   <!-- Creates the jar file                                                -->
   <!-- =================================================================== -->
-  <target name="jar" depends="compile">
+  <target name="jar" depends="compile"
+          description="Build the jar file for the module.">
     <copy file="src/org/manifest.mf"
           tofile="${module.build.dest}/classes/org/manifest.mf"
 	  filtering="on"
@@ -82,8 +84,9 @@
   <!-- =================================================================== -->
   <!-- Move the jar file into the extension directory.                     -->
   <!-- =================================================================== -->
-  <target name="install" depends="jar">
-    <copy todir="${argo.build.dir}/ext">
+  <target name="install" depends="jar"
+          description="Copy the jar file into ${argo.ext.dir}.">
+    <copy todir="${argo.ext.dir}">
       <fileset dir="${module.build.dest}" includes="argoprint.jar"/>
     </copy>
   </target>
@@ -91,7 +94,8 @@
   <!-- =================================================================== -->
   <!-- Clean out built files.                                              -->
   <!-- =================================================================== -->
-  <target name="clean" depends="init">
+  <target name="clean" depends="init"
+          description="Clean out all build files.">
     <delete dir="${module.build.dest}"/>
     <delete>
       <fileset dir="${argo.build.dir}/ext" includes="argoprint.jar"/>
