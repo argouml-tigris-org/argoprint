@@ -40,6 +40,19 @@
     <property name="module.build.src" value="${module.src.dir}"/>
     <property name="module.build.dest" value="${module.build.dir}/classes"/>
 
+    <property name="module.tests.src" value="${module.root}/tests"/>
+    <property name="module.tests.dest" value="${module.build.dir}/tests"/>
+
+    <!--     Fix the problem with junit.jar and ant-junit.jar not being -->
+    <!--     in the same dir or in the classpath -->
+    <taskdef name="junit"
+            classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
+      <classpath>
+        <pathelement location="${junit.jar.path}"/>
+        <pathelement location="${ant.home}/libopt/ant-junit.jar"/>
+      </classpath>
+    </taskdef>
+
     <property name="argo.jarfile"
               value="${argo.build.dir}/argouml.jar"/>
     <property name="module.jarfile.name"
@@ -54,6 +67,18 @@
     <property name="optimize" value="on"/>
     <property name="deprecation" value="on"/>
     <property name="developer.lib.dir" value="${argo.build.dir}"/>
+
+    <path id="module.compile.classpath">
+      <pathelement location="${argo.build.dir}/argouml.jar"/>
+      <pathelement location="${ocl-argo.jar.path}"/>
+      <pathelement location="${gef.jar.path}"/>
+      <pathelement location="${log4j.jar.path}"/>
+      <pathelement location="${swidgets.jar.path}"/>
+      <pathelement location="${toolbar.jar.path}"/>
+      <pathelement location="${commons-logging.jar.path}"/>
+      <pathelement location="${antlrall.jar.path}"/>
+      <pathelement location="${argo.build.dir}/argouml-model.jar"/>
+    </path>
 
   </target>
 
@@ -76,6 +101,7 @@
     <echo message="   run          --> runs ArgoUML ${argo.module.jarfile}.jar"/>
     <echo message="   install      --> merges ./org into ../src_new/org tree"/>
     <echo message="   checkstyle   --> runs checkstyle on all sources."/>
+    <echo message="   tests        --> runs all the tests.            "/>
     <echo message="   usage        --> show this message (default)"/>
     <echo message=""/>
     <echo message=" See the comments inside the build.xml file for more details."/>
@@ -120,15 +146,7 @@
            deprecation="${deprecation}"
            optimize="${optimize}">
         <classpath>
-            <pathelement location="${argo.build.dir}/argouml.jar"/>
-            <pathelement location="${ocl-argo.jar.path}"/>
-            <pathelement location="${gef.jar.path}"/>
-            <pathelement location="${log4j.jar.path}"/>
-            <pathelement location="${swidgets.jar.path}"/>
-            <pathelement location="${toolbar.jar.path}"/>
-            <pathelement location="${commons-logging.jar.path}"/>
-            <pathelement location="${antlrall.jar.path}"/>
-            <pathelement location="${argo.build.dir}/argouml-model.jar"/>
+	 <path refid="module.compile.classpath"/>
         </classpath>
      </javac>
   </target>
@@ -158,15 +176,7 @@
             <fileset dir="${module.build.dir}">
                 <include name="${module.jarfile.name}" />
 	    </fileset>
-            <pathelement location="${argo.build.dir}/argouml.jar"/>
-            <pathelement location="${ocl-argo.jar.path}"/>
-            <pathelement location="${gef.jar.path}"/>
-            <pathelement location="${log4j.jar.path}"/>
-            <pathelement location="${swidgets.jar.path}"/>
-            <pathelement location="${toolbar.jar.path}"/>
-            <pathelement location="${commons-logging.jar.path}"/>
-            <pathelement location="${antlrall.jar.path}"/>
-            <pathelement location="${argo.build.dir}/argouml-model.jar"/>
+	    <path refid="module.compile.classpath"/>
         </classpath>
 
     </java>
@@ -214,6 +224,54 @@
       <arg value="-r"/>
       <arg value="tests"/>
     </java>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Compile all the tests.                                              -->
+  <!-- =================================================================== -->
+  <target name="compile.tests" depends="init,compile"> 
+
+    <echo message="Compiling the tests"/>
+
+    <!-- create directories -->
+    <mkdir dir="${module.tests.dest}"/>
+
+    <javac srcdir="${module.tests.src}"
+           destdir="${module.tests.dest}"
+           excludes="*.txt,*.bat,*.xml,*.sh"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           optimize="${optimize}">
+        <classpath>
+	    <pathelement location="${module.build.dest}"/>
+	    <path refid="module.compile.classpath"/>
+	    <pathelement location="${junit.jar.path}"/>
+        </classpath>
+     </javac>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Run all the tests.                                                  -->
+  <!-- =================================================================== -->
+  <target name="tests" depends="compile.tests"
+          description="Run all the tests.">
+	  <junit printsummary="on"
+	         fork="yes"
+		 haltonfailure="on">
+	    <classpath>
+	      <pathelement location="${module.build.dest}"/>
+	      <pathelement location="${module.tests.dest}"/>
+	      <pathelement location="${junit.jar.path}"/>
+	      <path refid="module.compile.classpath"/>
+	    </classpath>
+	    
+	    <batchtest>
+	     <fileset dir="${module.tests.dest}">
+	      <include name="**/Test*.class"/>
+	     </fileset>
+	    </batchtest>
+
+	  </junit>
   </target>
 
 </project>
