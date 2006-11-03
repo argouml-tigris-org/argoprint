@@ -42,6 +42,7 @@
 
     <property name="module.tests.src" value="${module.root}/tests"/>
     <property name="module.tests.dest" value="${module.build.dir}/tests"/>
+    <property name="module.tests.res" value="${module.tests.dest}/org/argoprint/resources"/>
 
     <!--     Fix the problem with junit.jar and ant-junit.jar not being -->
     <!--     in the same dir or in the classpath -->
@@ -227,9 +228,18 @@
   </target>
 
   <!-- =================================================================== -->
+  <!-- Prepare for tests.                                                  -->
+  <!-- =================================================================== -->
+  <target name="prepare.tests" depends="init,compile">
+    <copy todir="${module.tests.res}">
+     <fileset dir="${module.tests.src}/org/argoprint/resources" includes="**/**"/>
+    </copy>
+  </target>
+
+  <!-- =================================================================== -->
   <!-- Compile all the tests.                                              -->
   <!-- =================================================================== -->
-  <target name="compile.tests" depends="init,compile"> 
+  <target name="compile.tests" depends="init,compile,prepare.tests"> 
 
     <echo message="Compiling the tests"/>
 
