@@ -274,6 +274,8 @@
 	      <pathelement location="${junit.jar.path}"/>
 	      <path refid="module.compile.classpath"/>
 	    </classpath>
+
+	    <formatter type="brief" usefile="false"/>
 	    
 	    <batchtest>
 	     <fileset dir="${module.tests.dest}">
