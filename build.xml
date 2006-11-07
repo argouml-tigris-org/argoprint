@@ -29,7 +29,6 @@
     <property name="module.src.dir" value="${module.root}/src"/>
 
     <property name="module.lib.dir" value="${module.root}/lib"/>
-    <property name="classpath" value="${argo.build.dir}/ocl-argo.jar:${argo.build.dir}/gef.jar:${argo.build.dir}/antlrall.jar:${argo.build.dir}/log4j.jar"/> 
     <property name="ant.xml-libs" value="${ANT_HOME}/lib/jaxp.jar:${ANT_HOME}/lib/parser.jar"/>
 
     <property name="packages" value="org.argouml.*"/>
@@ -43,6 +42,8 @@
     <property name="module.tests.src" value="${module.root}/tests"/>
     <property name="module.tests.dest" value="${module.build.dir}/tests"/>
     <property name="module.tests.res" value="${module.tests.dest}/org/argoprint/resources"/>
+
+    <property name="xmlunit.jar.path" value="${module.root}/tools/xmlunit/lib/xmlunit1.0.jar"/>
 
     <!--     Fix the problem with junit.jar and ant-junit.jar not being -->
     <!--     in the same dir or in the classpath -->
@@ -256,6 +257,7 @@
 	    <pathelement location="${module.build.dest}"/>
 	    <path refid="module.compile.classpath"/>
 	    <pathelement location="${junit.jar.path}"/>
+      	    <pathelement location="${xmlunit.jar.path}"/>
         </classpath>
      </javac>
   </target>
@@ -272,6 +274,7 @@
 	      <pathelement location="${module.build.dest}"/>
 	      <pathelement location="${module.tests.dest}"/>
 	      <pathelement location="${junit.jar.path}"/>
+      	      <pathelement location="${xmlunit.jar.path}"/>
 	      <path refid="module.compile.classpath"/>
 	    </classpath>
 

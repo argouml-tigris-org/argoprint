@@ -1,0 +1,141 @@
+<project name="xmlunit" default="compile" basedir=".">
+  <!-- The properties junit.lib, xmlxsl.lib, and test.report.dir should be defined in your build.properties file -->
+  <target name="init">
+    <property name="xmlunit.version" value="1.0"/>
+    <property name="src.dir" value="src"/>
+    <property name="test.dir" value="tests"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="out.dir" value="classes"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="docs.dir" value="doc"/>
+    <property file="build.properties"/>
+    <mkdir dir="${lib.dir}"/>
+    <mkdir dir="${out.dir}"/>
+    <mkdir dir="${test.report.dir}"/>
+    <mkdir dir="${dist.dir}"/>
+  </target>
+
+  <target name="clean" depends="init">
+    <delete includeEmptyDirs="true" >
+      <fileset dir="${out.dir}" includes="**/*.class"/>
+      <fileset dir="${test.report.dir}" includes="**/TEST*.*"/>
+      <fileset dir="${dist.dir}"/>
+    </delete> 
+  </target>
+
+  <target name="compile" depends="init">
+    <mkdir dir="${out.dir}"/>
+    <javac srcdir="${src.dir}/java:${test.dir}/java" destdir="${out.dir}" debug="on" target="1.2">
+      <classpath>
+        <pathelement location="${xmlxsl.lib}"/>
+        <pathelement location="${junit.lib}"/>
+        <pathelement path="${java.class.path}"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="test" depends="clean,compile">
+    <mkdir dir="${test.report.dir}"/>
+    <junit printsummary="yes" haltonfailure="no" fork="yes">
+      <sysproperty key="basedir" value="${basedir}"/>
+      <sysproperty key="user.dir" value="${basedir}"/>
+      <!--
+          <sysproperty key="javax.xml.parsers.DocumentBuilderFactory"
+            value="org.apache.xerces.jaxp.DocumentBuilderFactoryImpl"/>
+          <sysproperty key="javax.xml.parsers.SAXParserFactory"
+            value="org.apache.xerces.jaxp.SAXParserFactoryImpl"/>
+          <sysproperty key="javax.xml.transform.TransformerFactory"
+        value="org.apache.xalan.processor.TransformerFactoryImpl"/>
+        -->
+      <classpath>
+        <pathelement location="${out.dir}"/>
+        <pathelement location="${xmlxsl.lib}"/>
+        <pathelement location="${junit.lib}"/>
+        <pathelement path="${java.class.path}"/>
+      </classpath>
+      <formatter type="xml"/>
+      <batchtest fork="yes" todir="${test.report.dir}">
+        <fileset dir="${test.dir}/java">
+          <include name="**/test_*.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+    <junitreport todir="${test.report.dir}">
+      <fileset dir="${test.report.dir}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${test.report.dir}/html"/>
+    </junitreport>
+  </target>
+
+  <target name="setDistVersion" depends="init">
+    <replace dir="${src.dir}" token="@@version@@" value="${xmlunit.version}"
+      includes="**/*.java"/>
+  </target>
+
+  <target name="docs" depends="init">
+    <mkdir dir="${docs.dir}"/>
+    <delete includeEmptyDirs="true" dir="${docs.dir}/org"/>
+    <javadoc destdir="${docs.dir}"
+      overview="${src.dir}/java/overview.html"
+      windowtitle="XMLUnit Documentation"
+      footer="&lt;p&gt;&lt;a href=&quot;http://xmlunit.sourceforge.net/&quot;&gt;XMLUnit&lt;/a&gt; is hosted by sourceforge.net&lt;/p&gt;">
+      <group title="XMLUnit v${xmlunit.version}"
+        packages="org.custommonkey.xmlunit.*"/>
+      <fileset dir="${src.dir}/java">
+        <include name="org/custommonkey/**/*.java"/>
+      </fileset>
+      <classpath>
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <pathelement path="${java.class.path}"/>
+      </classpath>
+    </javadoc>
+  </target>
+
+  <target name="jar" depends="clean,setDistVersion,compile">
+    <jar jarfile="${lib.dir}/xmlunit${xmlunit.version}.jar"
+       basedir="${out.dir}"
+       excludes="**/test_*.class"
+    />
+  </target>
+
+  <target name="dist" depends="jar,test,docs">
+    <mkdir dir="${dist.dir}"/>
+    <zip zipfile="${dist.dir}/xmlunit${xmlunit.version}.zip">
+        <zipfileset prefix="xmlunit" dir="${basedir}"
+            includes="**/xmlunit${xmlunit.version}.jar"/>
+        <zipfileset prefix="xmlunit" dir="${basedir}"
+            includes="**/*.java,**/*.txt,**/*.xml,**/*.xsl,**/*.dtd,**/*.xsd"
+            excludes="${out.dir}/*,**/TEST*.xml,bugs/*"/>
+        <zipfileset prefix="xmlunit" dir="${basedir}"
+            includes="${docs.dir}/**/*.css,${docs.dir}/**/*.html,${test.dir}/etc/*.html"/>
+        <zipfileset prefix="xmlunit" dir="${src.dir}/site"
+            includes="*.pdf,example.html"/>
+    </zip>
+  </target>
+
+  <target name="src" depends="clean">
+    <property name="dist.name"
+      value="${ant.project.name}-${xmlunit.version}"/>
+    <copy todir="${dist.dir}/${dist.name}">
+      <fileset dir="${basedir}">
+        <include name="${src.dir}/**"/>
+        <include name="${test.dir}/**"/>
+        <include name="ISSUES"/>
+        <include name="LICENSE.txt"/>
+        <include name="README.txt"/>
+        <include name="build.xml"/>
+        <include name="build.properties"/>
+      </fileset>
+    </copy>
+    <tar tarfile="${dist.name}-src.tar" basedir="${dist.dir}">
+    </tar>
+    <gzip zipfile="${dist.name}-src.tgz"
+      src="${dist.name}-src.tar" />
+    <delete file="${dist.name}-src.tar" />
+  </target>
+
+</project>
