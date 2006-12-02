@@ -25,21 +25,16 @@
 package org.argoprint;
 
 import java.io.InputStream;
-import java.io.OutputStream;
-
 import java.net.URL;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 
-/** Central point for resource locations */
-
-public class APResources {
+/**
+ * Central point for resource locations.
+ */
+public final class APResources {
 
     // File Icons
     public static final String ICON_NEW
@@ -56,7 +51,7 @@ public class APResources {
     public static final String ICON_DOT_RED
 	= "/org/argoprint/Images/red_dot.png";
 
-   
+
     // Cell Editor Icons
     public static final String ICON_ADD
 	= "/org/argoprint/Images/add.png";
@@ -81,15 +76,13 @@ public class APResources {
     public static Document getDOMFromJAR(String rep) {
 	Document result = null;
 	try {
-	    InputStream in = getResource(rep)
-		.openConnection()
-		.getInputStream();
-	    
-	    result = javax.xml.parsers.DocumentBuilderFactory
-		.newInstance()
-		.newDocumentBuilder()
-		.parse(in);
-	    
+	    InputStream in =
+		getResource(rep).openConnection().getInputStream();
+
+	    result =
+		DocumentBuilderFactory.newInstance()
+			.newDocumentBuilder().parse(in);
+
 	} catch (org.xml.sax.SAXException ex) {
 	    ex.printStackTrace();
 	} catch (java.io.IOException ex) {
@@ -98,5 +91,12 @@ public class APResources {
 	    ex.printStackTrace();
 	}
 	return result;
+    }
+
+    /**
+     * A private constructor to make sure this is never created.
+     */
+    private APResources() {
+
     }
 }

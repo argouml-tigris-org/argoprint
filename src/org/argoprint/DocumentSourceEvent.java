@@ -33,9 +33,9 @@ public class DocumentSourceEvent
 
     private short eventType;
 
-    public DocumentSourceEvent(Object source, short eventType) {
-	super(source);
-	this.eventType = eventType;
+    public DocumentSourceEvent(Object src, short eventTp) {
+	super(src);
+	eventType = eventTp;
     }
 
     public short getType() {

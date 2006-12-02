@@ -27,11 +27,11 @@ package org.argoprint;
 import java.io.File;
 import java.io.StringReader;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -40,6 +40,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
 import org.argouml.kernel.Project;
 import org.argouml.kernel.ProjectManager;
 import org.argouml.persistence.PersistenceManager;
@@ -50,7 +51,7 @@ import org.w3c.dom.NodeList;
 
 // TODO: remove identifier data duplication
 public class ArgoPrintManagerModel {
-    private TreeMap<String, TemplateJob> jobs;
+    private Map<String, TemplateJob> jobs;
     private File fileJobs;
 
     public class TemplateJob {
@@ -58,58 +59,58 @@ public class ArgoPrintManagerModel {
 	private String identifier;
 	private URL template, output;
 
-	private TreeMap<String, String> parameters;
+	private Map<String, String> parameters;
 
-	public TemplateJob(String identifier) {
-	    this(identifier, null, null, false);
-	}
-	
-	public TemplateJob(String identifier,
-			   URL template,
-			   URL output,
-			   Boolean selected) {
-
-	    setIdentifier(identifier);
-	    setTemplate(template);
-	    setOutput(output);
-	    setSelected(selected);
-	    parameters = new TreeMap<String,String>();
+	public TemplateJob(String id) {
+	    this(id, null, null, false);
 	}
 
-	// TODO: 
-	public void setIdentifier(String identifier) {
+	public TemplateJob(String id,
+			   URL templ,
+			   URL outpt,
+			   Boolean sel) {
+
+	    setIdentifier(id);
+	    setTemplate(templ);
+	    setOutput(outpt);
+	    setSelected(sel);
+	    parameters = new TreeMap<String, String>();
+	}
+
+	// TODO:
+	public void setIdentifier(String id) {
 	    if (getJob(getIdentifier()) == this) {
 		removeJob(getIdentifier());
-		jobs.put(identifier, this);
+		jobs.put(id, this);
 	    }
 
-	    this.identifier = identifier;
+	    this.identifier = id;
 	}
-	
+
 	public String getIdentifier() {
 	    return identifier;
 	}
 
-	public void setSelected(boolean selected) {
-	    this.selected = selected;
+	public void setSelected(boolean sel) {
+	    selected = sel;
 	}
 
 	public boolean getSelected() {
 	    return selected;
 	}
-	
-	public void setTemplate(URL template) {
-	    this.template = template;
+
+	public void setTemplate(URL templ) {
+	    template = templ;
 	}
-	
+
 	public URL getTemplate() {
 	    return template;
 	}
 
-	public void setOutput(URL output) {
-	    this.output = output;
+	public void setOutput(URL outpt) {
+	    output = outpt;
 	}
-	
+
 	public URL getOutput() {
 	    return output;
 	}
@@ -129,8 +130,8 @@ public class ArgoPrintManagerModel {
 	public String getParameter(String name) {
 	    return parameters.get(name);
 	}
-	public void removeParameter(String identifier) {
-	    parameters.remove(identifier);
+	public void removeParameter(String id) {
+	    parameters.remove(id);
 	}
 
 	public Set<String> getParameters() {
@@ -139,21 +140,21 @@ public class ArgoPrintManagerModel {
     }
 
     public ArgoPrintManagerModel() {
-	jobs = new TreeMap();
-	fileJobs = new File(APResources
-			    .MANAGER_DATA_FILENAME);
+	jobs = new TreeMap<String, TemplateJob>();
+	fileJobs =
+	    new File(APResources.MANAGER_DATA_FILENAME);
     }
 
-    public void addJob(String identifier) {
-	jobs.put(identifier, new TemplateJob(identifier));
+    public void addJob(String id) {
+	jobs.put(id, new TemplateJob(id));
     }
 
     public void addJob(TemplateJob job) {
 	jobs.put(job.getIdentifier(), job);
     }
 
-    public void removeJob(String identifier) {
-	jobs.remove(identifier);
+    public void removeJob(String id) {
+	jobs.remove(id);
     }
 
     public Set<String> getIdentifiers() {
@@ -161,26 +162,29 @@ public class ArgoPrintManagerModel {
     }
 
     public TemplateJob getJob(String identifier) {
-	if (identifier == null)
+	if (identifier == null) {
 	    return null;
+	}
 	return jobs.get(identifier);
     }
 
 
     // IO methods
     public void fromDOMDocument(Document doc) {
-	NodeList jobNodes = doc.getDocumentElement()
-	    .getElementsByTagName("job");
+	NodeList jobNodes =
+	    doc.getDocumentElement()
+	    	.getElementsByTagName("job");
 	NodeList parameters;
 
 	TemplateJob job;
 	Element jobElement, parameterElement;
 
 	for (int i = 0; i < jobNodes.getLength(); i++) {
-	    jobElement = (Element)jobNodes.item(i);
+	    jobElement = (Element) jobNodes.item(i);
 	    job = new TemplateJob(jobElement.getAttribute("identifier"));
 
-	    job.setSelected(Boolean.parseBoolean(jobElement.getAttribute("selected")));
+	    job.setSelected(
+		    Boolean.parseBoolean(jobElement.getAttribute("selected")));
 
 	    try {
 		job.setTemplate(new URL(jobElement.getAttribute("template")));
@@ -189,10 +193,10 @@ public class ArgoPrintManagerModel {
 		//TODO
 		ex.printStackTrace();
 	    }
-	    
+
 	    parameters = jobElement.getElementsByTagName("parameter");
 	    for (int j = 0; j < parameters.getLength(); j++) {
-		parameterElement = (Element)parameters.item(j);
+		parameterElement = (Element) parameters.item(j);
 		job.setParameter(parameterElement.getAttribute("name"),
 				 parameterElement.getAttribute("value"));
 	    }
@@ -203,23 +207,23 @@ public class ArgoPrintManagerModel {
 
     public Document toDOMDocument() {
 	Document doc = null;
-	
+
 	try {
-	    doc = DocumentBuilderFactory
-		.newInstance()
-		.newDocumentBuilder()
-		.newDocument();
+	    doc =
+		DocumentBuilderFactory.newInstance()
+			.newDocumentBuilder()
+			.newDocument();
 	} catch (javax.xml.parsers.ParserConfigurationException ex) {
 	    //TODO:
 	    System.err.println("Should not happen.");
 	}
-	    
+
 	Element documentElement, elementJob, elementParameter;
 	TemplateJob currentJob;
 
 	documentElement = doc.createElement("jobs");
 	doc.appendChild(documentElement);
-	
+
 	Iterator<String> identifier = jobs.keySet().iterator();
 
 	while (identifier.hasNext()) {
@@ -255,15 +259,17 @@ public class ArgoPrintManagerModel {
 
 	return doc;
     }
+
     public void saveData() {
 	Document doc = toDOMDocument();
 
 	// TODO: indentation of output
 	try {
-	    Transformer transformer = TransformerFactory
-		.newInstance()
-		.newTransformer();
-	    transformer.transform(new DOMSource(doc), new StreamResult(fileJobs));
+	    Transformer transformer =
+		TransformerFactory.newInstance()
+			.newTransformer();
+	    transformer.transform(new DOMSource(doc),
+		    new StreamResult(fileJobs));
 	} catch (javax.xml.transform.TransformerConfigurationException ex) {
 	    // TODO
 	    System.err.println(ex);
@@ -278,9 +284,9 @@ public class ArgoPrintManagerModel {
 	Document doc = null;
 
 	try {
-	    builder = DocumentBuilderFactory
-		.newInstance()
-		.newDocumentBuilder();
+	    builder =
+		DocumentBuilderFactory.newInstance()
+			.newDocumentBuilder();
 	    doc = builder.parse(fileJobs);
 	} catch (javax.xml.parsers.ParserConfigurationException ex) {
 	    System.err.println(ex);
@@ -292,7 +298,7 @@ public class ArgoPrintManagerModel {
 	} catch (java.io.IOException ex) {
 	    System.err.println(ex);
 	}
-	
+
 	fromDOMDocument(doc);
     }
 
@@ -306,17 +312,17 @@ public class ArgoPrintManagerModel {
 
 	Iterator identifier = getIdentifiers().iterator();
 	TemplateJob job;
-	
+
 	while (identifier.hasNext()) {
-	    job = getJob((String)identifier.next());
+	    job = getJob((String) identifier.next());
 
 	    if (job.getSelected()) {
 
 		String inputParameter = job.getParameter("argouml");
 
 		// default to input source - model
-		if ((inputParameter == null) ||
-		    (inputParameter.equals("model"))) {
+		if ((inputParameter == null)
+			|| (inputParameter.equals("model"))) {
 		    Project project =
 			ProjectManager.getManager().getCurrentProject();
 
@@ -326,23 +332,25 @@ public class ArgoPrintManagerModel {
 					 .getQuickViewDump(project));
 
 		    input = new StreamSource(xmlString);
-		} else {
-		    // TODO: from file
 		}
+		// else {
+		// TODO: from file
+		// }
 
 		try {
-		    // TODO: make sure the URLs don't have an authority component
+		    // TODO: make sure the URLs don't have
+		    // an authority component
 		    fileXSLT = new File(job.getTemplate().toURI());
 		    fileOut = new File(job.getOutput().toURI());
 		} catch (java.net.URISyntaxException ex) {
 		    // TODO:
 		    ex.printStackTrace();
 		}
-	    
-		transformer = TransformerFactory
-		    .newInstance()
-		    .newTransformer(new StreamSource(fileXSLT));
-		
+
+		transformer =
+		    TransformerFactory.newInstance()
+		    	.newTransformer(new StreamSource(fileXSLT));
+
 		transformer.transform(input, new StreamResult(fileOut));
 	    }
 	}

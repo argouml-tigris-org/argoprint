@@ -27,7 +27,6 @@ package org.argoprint;
 import java.io.File;
 
 import javax.swing.event.EventListenerList;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -61,14 +60,16 @@ public class ArgoPrintEditorModel
     public void fireEvent(short type) {
 	Object[] list = listenerList.getListenerList();
 	DocumentSourceEvent event = new DocumentSourceEvent(this, type);
-	for (int i = list.length - 2; i >= 0; i -= 2)
-         if (list[i] == DocumentSourceListener.class)
-             ((DocumentSourceListener) list[i + 1])
-		 .documentSourceChanged(event);
+	for (int i = list.length - 2; i >= 0; i -= 2) {
+	    if (list[i] == DocumentSourceListener.class) {
+		((DocumentSourceListener) list[i + 1])
+			.documentSourceChanged(event);
+	    }
+	}
     }
-    
-    public void setDocument(Document document) {
-	this.document = document;
+
+    public void setDocument(Document doc) {
+	document = doc;
 	fireEvent(DocumentSourceEvent.DOCUMENT_CHANGED);
     }
 
@@ -87,13 +88,12 @@ public class ArgoPrintEditorModel
 	    org.xml.sax.SAXException {
 
 	try {
-	    Document rawDocument = DocumentBuilderFactory
-		.newInstance()
-		.newDocumentBuilder()
-		.parse(file);
-	    Transformer cleanWhiteSpace = TransformerFactory
-		.newInstance()
-		.newTransformer();
+	    Document rawDocument =
+		DocumentBuilderFactory.newInstance()
+			.newDocumentBuilder().parse(file);
+	    Transformer cleanWhiteSpace =
+		TransformerFactory.newInstance()
+			.newTransformer();
 	    cleanWhiteSpace
 		.setOutputProperty(OutputKeys.METHOD,
 				   "xml");
@@ -101,13 +101,14 @@ public class ArgoPrintEditorModel
 		.setOutputProperty(OutputKeys.INDENT,
 				   "no");
 
-	    document = DocumentBuilderFactory
-		.newInstance()
-		.newDocumentBuilder()
-		.newDocument();
+	    document =
+		DocumentBuilderFactory.newInstance()
+			.newDocumentBuilder()
+			.newDocument();
 
-	    cleanWhiteSpace.transform(new DOMSource(rawDocument), new DOMResult(document));
-		
+	    cleanWhiteSpace.transform(new DOMSource(rawDocument),
+		    new DOMResult(document));
+
 	} catch (javax.xml.parsers.ParserConfigurationException ex) {
 	    // TODO
 	    System.err.println(ex);
@@ -124,13 +125,14 @@ public class ArgoPrintEditorModel
     public void saveDocument(File file) {
 	// TODO: indentation of output
 	try {
-	    Transformer transformer = TransformerFactory
-		.newInstance()
-		.newTransformer();
+	    Transformer transformer =
+		TransformerFactory.newInstance()
+			.newTransformer();
 
-	    transformer.setOutputProperty(javax.xml.transform.OutputKeys.METHOD, "xml");
-	    transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
-	    transformer.transform(new DOMSource(document), new StreamResult(file));
+	    transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+	    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+	    transformer.transform(new DOMSource(document),
+		    new StreamResult(file));
 	} catch (javax.xml.transform.TransformerConfigurationException ex) {
 	    // TODO
 	    System.err.println(ex);
@@ -138,6 +140,5 @@ public class ArgoPrintEditorModel
 	    // TODO
 	    System.err.println(ex);
 	}
-	    
     }
 }

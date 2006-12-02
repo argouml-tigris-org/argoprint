@@ -24,14 +24,13 @@
 
 package org.argoprint;
 
-import java.net.JarURLConnection;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -39,34 +38,44 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathVariableResolver;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Attr;
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.DOMStringList;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NameList;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-public class GuidedEditing {
+public final class GuidedEditing {
 
     // TODO: should be moved out
-    public static String N_URI_XSLT = "http://www.w3.org/1999/XSL/Transform";
-    public static String N_URI_DOCBOOK = "http://docbook.org/ns/docbook";
+    public static final String N_URI_XSLT =
+	"http://www.w3.org/1999/XSL/Transform";
+    public static final String N_URI_DOCBOOK = "http://docbook.org/ns/docbook";
 
-    private static HashMap<String, Document> schemas = new HashMap<String, Document>();
-    private static XPathVariableResolverImpl
-	varSolver = new XPathVariableResolverImpl();
+    private static Map<String, Document> schemas =
+	new HashMap<String, Document>();
+    private static XPathVariableResolverImpl varSolver =
+	new XPathVariableResolverImpl();
 
     private static final XPathExpression XPATH_DEFINED_ELEMENTS
 	= getCompiledExp("/grammar/define/element/name/text()");
-    private static final XPathExpression XPATH_ALLOWED_ATTRIBUTES
-	= getCompiledExp("/grammar/define[element/name/text()=$elem_name]/descendant::attribute/name");
-    private static final XPathExpression XPATH_ALLOWED_CHILDREN_REFS
-	= getCompiledExp("/grammar/define[element/name/text()=$elem_name]/descendant::ref/@name");
-    private static final XPathExpression XPATH_ALLOWED_CHILDREN_NAMECLASS
-	= getCompiledExp("/grammar/define[@name=$ref_name]/element/*[1]");
-    private static final XPathExpression XPATH_REQUIRED_ATTRIBUTES
-	= getCompiledExp("/grammar/define[element/name/text()=$elem_name]/descendant::attribute[not(ancestor::choice/empty)]/name");
-    private static final XPathExpression XPATH_ALLOWED_PARENTS
-	= getCompiledExp("/grammar/define/element[descendant::ref[@name=/grammar/define[element/name/text()=$elem_name]/@name]]/name/text()");
-    private static final XPathExpression XPATH_CONTENTTYPE_MIXED
-	= getCompiledExp("/grammar/define/element[name/text()=$elem_name][descendant::text[not(ancestor::attribute)]]");
-    private static final XPathExpression XPATH_CONTENTTYPE_ELEMENTS
-	= getCompiledExp("/grammar/define/element[name/text()=$elem_name][not(descendant::text[not(ancestor::attribute)])]");
+    private static final XPathExpression XPATH_ALLOWED_ATTRIBUTES =
+	getCompiledExp("/grammar/define[element/name/text()=$elem_name]/descendant::attribute/name");
+    private static final XPathExpression XPATH_ALLOWED_CHILDREN_REFS =
+	getCompiledExp("/grammar/define[element/name/text()=$elem_name]/descendant::ref/@name");
+    private static final XPathExpression XPATH_ALLOWED_CHILDREN_NAMECLASS =
+	getCompiledExp("/grammar/define[@name=$ref_name]/element/*[1]");
+    private static final XPathExpression XPATH_REQUIRED_ATTRIBUTES =
+	getCompiledExp("/grammar/define[element/name/text()=$elem_name]/descendant::attribute[not(ancestor::choice/empty)]/name");
+    private static final XPathExpression XPATH_ALLOWED_PARENTS =
+	getCompiledExp("/grammar/define/element[descendant::ref[@name=/grammar/define[element/name/text()=$elem_name]/@name]]/name/text()");
+    private static final XPathExpression XPATH_CONTENTTYPE_MIXED =
+	getCompiledExp("/grammar/define/element[name/text()=$elem_name][descendant::text[not(ancestor::attribute)]]");
+    private static final XPathExpression XPATH_CONTENTTYPE_ELEMENTS =
+	getCompiledExp("/grammar/define/element[name/text()=$elem_name][not(descendant::text[not(ancestor::attribute)])]");
 
 
     private static XPathExpression getCompiledExp(String exp) {
@@ -99,7 +108,7 @@ public class GuidedEditing {
     private static class XPathVariableResolverImpl
 	implements XPathVariableResolver {
 
-	private HashMap<String, Object> varList;
+	private Map<String, Object> varList;
 
 	public XPathVariableResolverImpl() {
 	    varList = new HashMap<String, Object>();
@@ -138,10 +147,13 @@ public class GuidedEditing {
 
     /* Utility functions */
 
+    /**
+     * TODO: This method is never used. Can it be removed?
+     */
     private static Object evalXPathOn(String xpath, String namespaceURI) {
 	Object result = null;
 	Document schema = schemas.get(namespaceURI);
-	if (schema != null) 
+	if (schema != null) {
 	    try {
 		result = XPathFactory
 		    .newInstance()
@@ -150,6 +162,7 @@ public class GuidedEditing {
 	    } catch (javax.xml.xpath.XPathExpressionException ex) {
 		ex.printStackTrace();
 	    }
+	}
 
 	return result;
     }
@@ -159,13 +172,14 @@ public class GuidedEditing {
 				       QName resultType) {
 	Object result = null;
 	Document schema = schemas.get(namespaceURI);
-	if (schema != null) 
+	if (schema != null) {
 	    try {
 		result = xpath
 		    .evaluate(schema, resultType);
 	    } catch (javax.xml.xpath.XPathExpressionException ex) {
 		ex.printStackTrace();
 	    }
+	}
 
 	return result;
     }
@@ -173,17 +187,22 @@ public class GuidedEditing {
     private static NameList toNameListCData(NodeList nodes) {
 	NameListImpl result = new NameListImpl();
 
-	for (int i = 0; i < nodes.getLength(); i++)
-	    result.add(((CharacterData)nodes.item(i)).getData());
+	for (int i = 0; i < nodes.getLength(); i++) {
+	    result.add(((CharacterData) nodes.item(i)).getData());
+	}
 
 	return result;
     }
 
+    /**
+     * TODO: This method is never used. Can it be removed?
+     */
     private static NameList toNameListAttr(NodeList nodes) {
 	NameListImpl result = new NameListImpl();
 
-	for (int i = 0; i < nodes.getLength(); i++)
-	    result.add(((Attr)nodes.item(i)).getValue());
+	for (int i = 0; i < nodes.getLength(); i++) {
+	    result.add(((Attr) nodes.item(i)).getValue());
+	}
 
 	return result;
     }
@@ -191,10 +210,13 @@ public class GuidedEditing {
 
     /* DocumentEditVAL */
 
-    public static NameList getDefinedElements(Document doc, String namespaceURI) {
-	NodeList nodes = (NodeList) evalCXPathOn(XPATH_DEFINED_ELEMENTS,
-						 namespaceURI,
-						 XPathConstants.NODESET);
+    public static NameList getDefinedElements(
+	    Document doc,
+	    String namespaceURI) {
+	NodeList nodes =
+	    (NodeList) evalCXPathOn(XPATH_DEFINED_ELEMENTS,
+				    namespaceURI,
+				    XPathConstants.NODESET);
 	return toNameListCData(nodes);
     }
 
@@ -219,9 +241,9 @@ public class GuidedEditing {
     public static DOMStringList getEnumeratedValues(Node node) {
 	return null;
     }
-    
+
     public static short canInsertBefore(Node node,
-					Node newChild, 
+					Node newChild,
 					Node refChild) {
 	return VAL_FALSE;
     }
@@ -232,7 +254,7 @@ public class GuidedEditing {
     }
 
     public static short canReplaceChild(Node node,
-					Node newChild, 
+					Node newChild,
 					Node oldChild) {
 	return VAL_FALSE;
     }
@@ -244,7 +266,7 @@ public class GuidedEditing {
 
     /* ElementEditVAL */
 
-    public static final short VAL_EMPTY_CONTENTTYPE     = 1; 
+    public static final short VAL_EMPTY_CONTENTTYPE     = 1;
     public static final short VAL_ANY_CONTENTTYPE       = 2;
     public static final short VAL_MIXED_CONTENTTYPE     = 3;
     public static final short VAL_ELEMENTS_CONTENTTYPE  = 4;
@@ -258,25 +280,27 @@ public class GuidedEditing {
 	if (knows(element)) {
 	    varSolver.put("elem_name", element.getLocalName());
 
-	    NodeList refnames = (NodeList) evalCXPathOn(XPATH_ALLOWED_CHILDREN_REFS,
-							element.getNamespaceURI(),
-							XPathConstants.NODESET);
+	    NodeList refnames =
+		(NodeList) evalCXPathOn(XPATH_ALLOWED_CHILDREN_REFS,
+					element.getNamespaceURI(),
+					XPathConstants.NODESET);
 
 	    for (int i = 0; i < refnames.getLength(); i++) {
-		Attr ref_name = (Attr) refnames.item(i);
+		Attr refName = (Attr) refnames.item(i);
 
-		varSolver.put("ref_name", ref_name.getValue());
+		varSolver.put("ref_name", refName.getValue());
 
-		Element current = (Element) evalCXPathOn(XPATH_ALLOWED_CHILDREN_NAMECLASS,
-							 element.getNamespaceURI(),
-							 XPathConstants.NODE);
+		Element current =
+		    (Element) evalCXPathOn(XPATH_ALLOWED_CHILDREN_NAMECLASS,
+			    		   element.getNamespaceURI(),
+			    		   XPathConstants.NODE);
 
 		if ("name".equals(current.getTagName())) {
 		    StringBuffer result = new StringBuffer();
 
 		    String text = current.getTextContent();
 		    Attr ns = current.getAttributeNode("ns");
-	    
+
 		    if (ns != null) {
 			String prefix = element.lookupPrefix(ns.getValue());
 			if (prefix != null) {
@@ -286,8 +310,9 @@ public class GuidedEditing {
 		    }
 
 		    // TODO: anyName
-		    if (text != null)
+		    if (text != null) {
 			result.append(text);
+		    }
 
 		    names.add(result.toString());
 		}
@@ -308,10 +333,11 @@ public class GuidedEditing {
 						 element.getNamespaceURI(),
 						 XPathConstants.NODESET);
 
-	if (nodes == null)
+	if (nodes == null) {
 	    return new NameListImpl();
-	else
+	} else {
 	    return toNameListCData(nodes);
+	}
     }
 
     // TODO
@@ -319,10 +345,11 @@ public class GuidedEditing {
 	if (element
 	    .getOwnerDocument()
 	    .getDocumentElement()
-	    .isSameNode(element))
+	    .isSameNode(element)) {
 	    return new NameListImpl();
-	else
+	} else {
 	    return getAllowedChildren((Element) element.getParentNode());
+	}
     }
 
     // TODO
@@ -330,10 +357,11 @@ public class GuidedEditing {
 	if (element
 	    .getOwnerDocument()
 	    .getDocumentElement()
-	    .isSameNode(element))
+	    .isSameNode(element)) {
 	    return new NameListImpl();
-	else
+	} else {
 	    return getAllowedChildren((Element) element.getParentNode());
+	}
     }
 
     public static NameList getAllowedAttributes(Element element) {
@@ -341,17 +369,17 @@ public class GuidedEditing {
 
 	if (knows(element)) {
 	    varSolver.put("elem_name", element.getLocalName());
-	    
+
 	    NodeList nodes = (NodeList) evalCXPathOn(XPATH_ALLOWED_ATTRIBUTES,
 						     element.getNamespaceURI(),
 						     XPathConstants.NODESET);
-	    
+
 	    for (int i = 0; i < nodes.getLength(); i++) {
-		Element node = (Element)nodes.item(i);
+		Element node = (Element) nodes.item(i);
 		result.add(node.getAttribute("ns"), node.getTextContent());
 	    }
 	}
-	    
+
 	return result;
     }
 
@@ -366,7 +394,7 @@ public class GuidedEditing {
 						     XPathConstants.NODESET);
 
 	    for (int i = 0; i < nodes.getLength(); i++) {
-		Element node = (Element)nodes.item(i);
+		Element node = (Element) nodes.item(i);
 		result.add(node.getAttribute("ns"), node.getTextContent());
 	    }
 	}
@@ -379,28 +407,33 @@ public class GuidedEditing {
 	    NodeList nodes;
 	    varSolver.put("elem_name", element.getLocalName());
 
-	    nodes = (NodeList) evalCXPathOn(XPATH_CONTENTTYPE_ELEMENTS,
-					    element.getNamespaceURI(),
-					    XPathConstants.NODESET);
-	    if (nodes.getLength() != 0)
+	    nodes =
+		(NodeList) evalCXPathOn(XPATH_CONTENTTYPE_ELEMENTS,
+					element.getNamespaceURI(),
+					XPathConstants.NODESET);
+	    if (nodes.getLength() != 0) {
 		return VAL_ELEMENTS_CONTENTTYPE;
+	    }
 
-	    nodes = (NodeList) evalCXPathOn(XPATH_CONTENTTYPE_MIXED,
-					    element.getNamespaceURI(),
-					    XPathConstants.NODESET);
-	    if (nodes.getLength() != 0)
+	    nodes =
+		(NodeList) evalCXPathOn(XPATH_CONTENTTYPE_MIXED,
+					element.getNamespaceURI(),
+					XPathConstants.NODESET);
+	    if (nodes.getLength() != 0) {
 		return VAL_MIXED_CONTENTTYPE;
+	    }
 	}
 
 	return VAL_ANY_CONTENTTYPE;
     }
 
-    public static short canSetTextContent(Element element, String possibleTextContent) {
+    public static short canSetTextContent(Element element,
+	    String possibleTextContent) {
 	return VAL_FALSE;
     }
 
     public static short canSetAttribute(Element element,
-					String attrname, 
+					String attrname,
 					String attrval) {
 	return VAL_FALSE;
     }
@@ -411,8 +444,8 @@ public class GuidedEditing {
     }
 
     public static short canSetAttributeNS(Element element,
-					  String namespaceURI, 
-					  String qualifiedName, 
+					  String namespaceURI,
+					  String qualifiedName,
 					  String value) {
 	return VAL_FALSE;
     }
@@ -423,7 +456,7 @@ public class GuidedEditing {
     }
 
     public static short canRemoveAttributeNS(Element element,
-					     String namespaceURI, 
+					     String namespaceURI,
 					     String localName) {
 	return VAL_FALSE;
     }
@@ -439,13 +472,13 @@ public class GuidedEditing {
     }
 
     public static short isElementDefinedNS(Element element,
-					   String namespaceURI, 
+					   String namespaceURI,
 					   String name) {
 	return VAL_FALSE;
     }
 
     /* CharacterDataEditVAL */
-    
+
     public static short isWhitespaceOnly(CharacterData chardata) {
 	return VAL_FALSE;
     }
@@ -461,22 +494,22 @@ public class GuidedEditing {
     }
 
     public static short canReplaceData(CharacterData chardata,
-				       int offset, 
-				       int count, 
+				       int offset,
+				       int count,
 				       String arg)
 	throws DOMException {
 	return VAL_FALSE;
     }
 
     public static short canInsertData(CharacterData chardata,
-				      int offset, 
+				      int offset,
 				      String arg)
 	throws DOMException {
 	return VAL_FALSE;
     }
 
     public static short canDeleteData(CharacterData chardata,
-				      int offset, 
+				      int offset,
 				      int count)
 	throws DOMException {
 	return VAL_FALSE;
@@ -487,7 +520,7 @@ public class GuidedEditing {
     private static class NameListImpl
 	implements NameList {
 
-	private ArrayList names, namespaces;
+	private List names, namespaces;
 
 	public NameListImpl() {
 	    names = new ArrayList();
@@ -495,37 +528,41 @@ public class GuidedEditing {
 	}
 
 	public void add(String str) {
-	    if (!contains(str))
+	    if (!contains(str)) {
 		names.add(str);
+	    }
 	}
- 
+
 	public void add(String namespaceURI, String name) {
 	    if (!containsNS(namespaceURI, name)) {
 		names.add(name);
 		namespaces.add(names.size() - 1, namespaceURI);
 	    }
 	}
-	
+
 	public boolean contains(String str) {
 	    return names.contains(str);
 	}
+
 	public boolean containsNS(String namespaceURI, String name) {
-	    for (int i = 0; i < names.size(); i++)
-		if (names.get(i) != null &&
-		    names.get(i).equals(name) &&
-		    namespaces.get(i) != null &&
-		    namespaces.get(i).equals(namespaceURI))
+	    for (int i = 0; i < names.size(); i++) {
+		if (names.get(i) != null
+			&& names.get(i).equals(name)
+			&& namespaces.get(i) != null
+			&& namespaces.get(i).equals(namespaceURI)) {
 		    return true;
+		}
+	    }
 	    return false;
 	}
 	public int getLength() {
 	    return names.size();
 	}
 	public String getName(int index) {
-	    return (String)names.get(index);
+	    return (String) names.get(index);
 	}
 	public String getNamespaceURI(int index) {
-	    return (String)namespaces.get(index);
+	    return (String) namespaces.get(index);
 	}
     }
 
@@ -536,15 +573,16 @@ public class GuidedEditing {
     private static class DOMStringListImpl
 	implements DOMStringList {
 
-	private ArrayList list;
+	private List list;
 
 	public DOMStringListImpl() {
 	    list = new ArrayList();
 	}
 
 	public void add(String str) {
-	    if (!contains(str))
+	    if (!contains(str)) {
 		list.add(str);
+	    }
 	}
 
 	public boolean contains(String str) {
@@ -554,8 +592,13 @@ public class GuidedEditing {
 	    return list.size();
 	}
 	public String item(int index) {
-	    return (String)list.get(index);
+	    return (String) list.get(index);
 	}
     }
-    
+
+    /**
+     * This class is never created.
+     */
+    private GuidedEditing() {
+    }
 }
