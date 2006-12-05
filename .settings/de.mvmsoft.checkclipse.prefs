@@ -1,0 +1,4 @@
+#Tue Dec 05 07:18:47 CET 2006
+filenames.properties=/argouml-core-tools/checkstyle/checkstyle.properties
+enabled=true
+filenames.config=/argouml-core-tools/checkstyle/checkstyle_argouml.xml
