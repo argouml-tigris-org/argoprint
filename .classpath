@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/argouml"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/argouml-core-lib"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/argouml-core-model"/>
-	<classpathentry kind="src" path="tests"/>
-	<classpathentry kind="output" path="build-eclipse"/>
+	<classpathentry path="src" kind="src"/>
+	<classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.6.0" kind="con"/>
+	<classpathentry path="/argouml" combineaccessrules="false" kind="src"/>
+	<classpathentry path="/argouml-core-lib" combineaccessrules="false" kind="src"/>
+	<classpathentry path="/argouml-core-model" combineaccessrules="false" kind="src"/>
+	<classpathentry path="tests" kind="src"/>
+	<classpathentry path="build-eclipse" kind="output"/>
 </classpath>
