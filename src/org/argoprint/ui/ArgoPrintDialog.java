@@ -3,14 +3,14 @@
 // Rights Reserved. Permission to use, copy, modify, and distribute this
 // software and its documentation without fee, and without a written
 // agreement is hereby granted, provided that the above copyright notice
-// and this paragraph appear in all copies.  This software program and
+// and this paragraph appear in all copies. This software program and
 // documentation are copyrighted by The Regents of the University of
 // California. The software program and documentation are supplied "AS
 // IS", without any accompanying services from The Regents. The Regents
 // does not warrant that the operation of the program will be
 // uninterrupted or error-free. The end-user understands that the program
 // was developed for research purposes and is advised not to rely
-// exclusively on the program for any reason.  IN NO EVENT SHALL THE
+// exclusively on the program for any reason. IN NO EVENT SHALL THE
 // UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
 // SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
 // ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
@@ -24,114 +24,94 @@
 
 package org.argoprint.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 
-import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 
-import javax.xml.transform.TransformerException;
+import org.argoprint.ArgoPrint;
 
-import org.argoprint.ArgoPrintEditorModel;
-import org.argoprint.ArgoPrintManagerModel;
+import org.argouml.i18n.Translator;
+import org.argouml.persistence.ArgoPrintInsider;
 
-public class ArgoPrintDialog extends JDialog {
+/**
+ * The dialog displayed when ArgoPrint is started from the ArgoUML menu.
+ */
 
-    private ArgoPrintManagerModel manager;
-    private ArgoPrintEditorModel editor;
+public class ArgoPrintDialog
+    extends JDialog {
 
-    private AbstractAction
-	actionCloseDialog,
-	actionGenerateOutput;
+    private static final Dimension DEFAULT_SIZE =
+	 new Dimension(640, 480);
 
-    private static ArgoPrintDialog instance;
-
-    private ArgoPrintDialog(Frame parent) {
-	super(parent, true);
-	setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-
-	manager = new ArgoPrintManagerModel();
-	editor = new ArgoPrintEditorModel();
-
-	manager.loadData();
-
-	initActions();
+    public ArgoPrintDialog(Frame parent, String title, boolean modal) {
+	super(parent, title, modal);
 	initComponents();
     }
 
-    private void initActions() {
-	final Component thisComponent = this;
-	actionCloseDialog = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    // TODO: determine location from resource
-		    manager.saveData();
-		    setVisible(false);
-		}
-	    };
-	actionCloseDialog.putValue(AbstractAction.NAME, "Close");
-	actionCloseDialog.putValue(AbstractAction.SHORT_DESCRIPTION,
-				   "Close the dialog.");
+    private void initComponents() {
+	setSize(DEFAULT_SIZE);
+	add(ArgoPrintDialog.createSimpleDialogContent());
+    }
 
-	actionGenerateOutput = new AbstractAction() {
+    /*
+     * Create a panel as described by the use-case in the old documentation.
+     */
+    private static JPanel createSimpleDialogContent() {
+	JPanel result = new JPanel(new GridBagLayout());
+	result.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	GridBagConstraints c = new GridBagConstraints();
+
+	final JTextField template, output;
+
+	c.fill = GridBagConstraints.BOTH;
+	c.weightx = 1;
+	c.gridx = 0;
+	c.gridy = 0;
+	c.gridwidth = 1;
+	result.add(new JLabel(Translator.localize("argoprint.template.label")), c);
+
+	c.gridx = 1;
+	result.add(template = new JTextField(20), c);
+
+	c.gridx = 0;
+	c.gridy = 1;
+	result.add(new JLabel(Translator.localize("argoprint.output.label")), c);
+
+	c.gridx = 1;
+	result.add(output = new JTextField(20), c);
+
+	c.gridx = 1;
+	c.gridy = 2;
+	result.add(new JButton(new AbstractAction(Translator.localize("argoprint.execute.button")) {
 		public void actionPerformed(ActionEvent e) {
 		    try {
-			manager.generateOutput();
-			JOptionPane.showMessageDialog(thisComponent,
-						      "The templates were generated.");
+			InputStream streamTemplate = new FileInputStream(template.getText());
+			OutputStream streamOutput = new FileOutputStream(output.getText());
 
-		    } catch (TransformerException ex) {
-			JOptionPane.showMessageDialog(thisComponent,
-						      ex.getMessageAndLocation(),
-						      "Error",
-						      JOptionPane.ERROR_MESSAGE);
+			ArgoPrint.generate(streamTemplate,
+					   streamOutput);
+		    } catch (FileNotFoundException ex) {
+			//TODO:
 		    }
 		}
-	    };
-	actionGenerateOutput.putValue(AbstractAction.NAME, "Generate");
-	actionGenerateOutput
-	    .putValue(AbstractAction.SHORT_DESCRIPTION,
-		      "Generate the output for the selected jobs.");
-	
-    }
+	    }), c);
 
-    private void initComponents() {
-	setTitle("ArgoPrint");
-	setPreferredSize(new Dimension(640, 480));
-
-	JPanel panel = new JPanel();
-	panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-	panel.setLayout(new BorderLayout());
-
-	JTabbedPane paneTabs = new JTabbedPane(JTabbedPane.TOP);
-	paneTabs.addTab("Manager", new ArgoPrintManager(manager));
-	paneTabs.addTab("Editor", new ArgoPrintEditor(editor));
-	panel.add(paneTabs, BorderLayout.CENTER);
-
-	JPanel paneButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-	paneButtons.add(new JButton(actionCloseDialog));
-	paneButtons.add(new JButton(actionGenerateOutput));
-	panel.add(paneButtons, BorderLayout.SOUTH);
-
-	add(panel);
-	pack();
-    }
-
-    public static ArgoPrintDialog getInstance(Frame parent) {
-	if (instance == null)
-	    instance = new ArgoPrintDialog(parent);
-	
-	return instance;
+	return result;
     }
 }
