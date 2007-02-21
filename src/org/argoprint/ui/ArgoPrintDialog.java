@@ -28,6 +28,7 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 
 import java.io.FileInputStream;
@@ -47,6 +48,8 @@ import javax.swing.JTextField;
 
 import org.argoprint.ArgoPrint;
 
+import org.argouml.application.api.Configuration;
+import org.argouml.application.api.ConfigurationKey;
 import org.argouml.i18n.Translator;
 import org.argouml.persistence.ArgoPrintInsider;
 
@@ -59,6 +62,12 @@ public class ArgoPrintDialog
 
     private static final Dimension DEFAULT_SIZE =
 	 new Dimension(640, 480);
+
+    private static final String prefix = "argoprint";
+    private static final ConfigurationKey CONF_DEFAULT_TEMPLATE
+	= Configuration.makeKey(prefix, "default_template");
+    private static final ConfigurationKey CONF_DEFAULT_OUTPUT
+	= Configuration.makeKey(prefix, "default_output");
 
     public ArgoPrintDialog(Frame parent, String title, boolean modal) {
 	super(parent, title, modal);
@@ -81,24 +90,49 @@ public class ArgoPrintDialog
 	final JTextField template, output;
 
 	c.fill = GridBagConstraints.BOTH;
-	c.weightx = 1;
+	c.insets = new Insets(0, 0, 3, 3);
 	c.gridx = 0;
 	c.gridy = 0;
 	c.gridwidth = 1;
+	c.weightx = 0;
 	result.add(new JLabel(Translator.localize("argoprint.label.template")), c);
 
 	c.gridx = 1;
+	c.weightx = 1;
 	result.add(template = new JTextField(20), c);
+	template.setText(Configuration.getString(CONF_DEFAULT_TEMPLATE));
 
+	c.gridx = 2;
+	c.weightx = 0;
+	result.add(new JButton(new AbstractAction(Translator.localize("argoprint.button.default")) {
+		public void actionPerformed(ActionEvent e) {
+		    Configuration.setString(CONF_DEFAULT_TEMPLATE, template.getText());
+		    Configuration.save();
+		}
+	    }), c);
+	
 	c.gridx = 0;
 	c.gridy = 1;
+	c.weightx = 0;
 	result.add(new JLabel(Translator.localize("argoprint.label.output")), c);
 
 	c.gridx = 1;
+	c.weightx = 1;
 	result.add(output = new JTextField(20), c);
+	output.setText(Configuration.getString(CONF_DEFAULT_OUTPUT));
 
-	c.gridx = 1;
+	c.gridx = 2;
+	c.weightx = 0;
+	result.add(new JButton(new AbstractAction(Translator.localize("argoprint.button.default")) {
+		public void actionPerformed(ActionEvent e) {
+		    Configuration.setString(CONF_DEFAULT_OUTPUT, output.getText());
+		    Configuration.save();
+		}
+	    }), c);
+
+	c.gridx = 2;
 	c.gridy = 2;
+	c.weightx = 0;
 	result.add(new JButton(new AbstractAction(Translator.localize("argoprint.button.execute")) {
 		public void actionPerformed(ActionEvent e) {
 		    InputStream streamTemplate = null;
