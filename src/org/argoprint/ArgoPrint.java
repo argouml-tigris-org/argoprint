@@ -49,7 +49,9 @@ public class ArgoPrint {
      * @param output stream to which the result is written
      */
     public static void generate(InputStream template,
-				OutputStream output) {
+				OutputStream output)
+	throws TransformerException {
+
 	generate(ArgoPrintInsider
 		 .getInstance()
 		 .getProjectInputStream(),
@@ -67,7 +69,9 @@ public class ArgoPrint {
      */
     public static void generate(InputStream input,
 				InputStream template,
-				OutputStream output) {
+				OutputStream output)
+	throws TransformerException {
+
 	try {
 	    Transformer transformer
 		= TransformerFactory
@@ -77,8 +81,6 @@ public class ArgoPrint {
 	    transformer.transform(new StreamSource(input),
 				  new StreamResult(output));
 	} catch (TransformerConfigurationException ex) {
-	    ex.printStackTrace();
-	} catch (TransformerException ex) {
 	    ex.printStackTrace();
 	}
     }

@@ -42,6 +42,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import org.argoprint.ArgoPrint;
@@ -73,7 +74,7 @@ public class ArgoPrintDialog
      * Create a panel as described by the use-case in the old documentation.
      */
     private static JPanel createSimpleDialogContent() {
-	JPanel result = new JPanel(new GridBagLayout());
+	final JPanel result = new JPanel(new GridBagLayout());
 	result.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 	GridBagConstraints c = new GridBagConstraints();
 
@@ -84,31 +85,65 @@ public class ArgoPrintDialog
 	c.gridx = 0;
 	c.gridy = 0;
 	c.gridwidth = 1;
-	result.add(new JLabel(Translator.localize("argoprint.template.label")), c);
+	result.add(new JLabel(Translator.localize("argoprint.label.template")), c);
 
 	c.gridx = 1;
 	result.add(template = new JTextField(20), c);
 
 	c.gridx = 0;
 	c.gridy = 1;
-	result.add(new JLabel(Translator.localize("argoprint.output.label")), c);
+	result.add(new JLabel(Translator.localize("argoprint.label.output")), c);
 
 	c.gridx = 1;
 	result.add(output = new JTextField(20), c);
 
 	c.gridx = 1;
 	c.gridy = 2;
-	result.add(new JButton(new AbstractAction(Translator.localize("argoprint.execute.button")) {
+	result.add(new JButton(new AbstractAction(Translator.localize("argoprint.button.execute")) {
 		public void actionPerformed(ActionEvent e) {
-		    try {
-			InputStream streamTemplate = new FileInputStream(template.getText());
-			OutputStream streamOutput = new FileOutputStream(output.getText());
+		    InputStream streamTemplate = null;
+		    OutputStream streamOutput = null;
 
-			ArgoPrint.generate(streamTemplate,
-					   streamOutput);
+		    try {
+			streamTemplate = new FileInputStream(template.getText());
 		    } catch (FileNotFoundException ex) {
-			//TODO:
+			JOptionPane.showMessageDialog(result,
+						      Translator
+						      .localize("argoprint.message.wrongTemplate"));
+			return;
 		    }
+		    
+		    try {
+			streamOutput = new FileOutputStream(output.getText());
+		    } catch (FileNotFoundException ex) {
+			JOptionPane.showMessageDialog(result,
+						      Translator
+						      .localize("argoprint.message.wrongOutput"));
+			return;
+		    }
+
+		    // something smart to replace this?
+		    final InputStream paramTemplate = streamTemplate;
+		    final OutputStream paramOutput = streamOutput;
+
+		    Thread t = new Thread() {
+			    public void run() {
+				try {
+				    ArgoPrint.generate(paramTemplate,
+						       paramOutput);
+				} catch (javax.xml.transform.TransformerException ex) {
+				    JOptionPane.showMessageDialog(result,
+								  Translator
+								  .localize("argoprint.message.transformationError"));
+				    return;
+				}
+				
+				JOptionPane.showMessageDialog(result,
+							      Translator
+							      .localize("argoprint.message.transformationDone"));
+			    }
+			};
+		    t.start();
 		}
 	    }), c);
 
