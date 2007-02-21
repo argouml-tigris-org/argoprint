@@ -129,18 +129,21 @@ public class ArgoPrintDialog
 		    Thread t = new Thread() {
 			    public void run() {
 				try {
+				    setEnabled(false);
 				    ArgoPrint.generate(paramTemplate,
 						       paramOutput);
+				    JOptionPane.showMessageDialog(result,
+								  Translator
+								  .localize("argoprint.message.transformationDone"));
 				} catch (javax.xml.transform.TransformerException ex) {
 				    JOptionPane.showMessageDialog(result,
 								  Translator
 								  .localize("argoprint.message.transformationError"));
 				    return;
+				} finally {
+				    setEnabled(true);
 				}
 				
-				JOptionPane.showMessageDialog(result,
-							      Translator
-							      .localize("argoprint.message.transformationDone"));
 			    }
 			};
 		    t.start();
