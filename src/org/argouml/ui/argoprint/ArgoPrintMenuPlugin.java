@@ -66,11 +66,20 @@ public class ArgoPrintMenuPlugin
     private JMenuItem menuItem;
 
     /**
+     * The dialog used
+     */
+    private ArgoPrintDialog argoPrintDialog;
+
+    /**
      * The constructor.
      */
     public ArgoPrintMenuPlugin() {
         menuItem = new JMenuItem("ArgoPrint");
 	menuItem.addActionListener(this);
+
+	argoPrintDialog = new ArgoPrintDialog(ArgoFrame.getInstance(),
+					      "ArgoPrint",
+					      true);
     }
 
     ////////////////////////////////////////////////////////////////
@@ -82,13 +91,6 @@ public class ArgoPrintMenuPlugin
      * Just let the tester know that we got executed.
      */
     public void actionPerformed(ActionEvent event) {
-	LOG.info("Starting ArgoPrint");
-
-	// This is where the ArgoPrint GUI frame is created and displayed
-	ArgoPrintDialog argoPrintDialog =
-	    new ArgoPrintDialog(ArgoFrame.getInstance(), "ArgoPrint", true);
-
-	LOG.info("Setting Gui Log");
 	LOG.info("Showing ArgoPrint Dialog");
 	argoPrintDialog.setVisible(true);
     }
