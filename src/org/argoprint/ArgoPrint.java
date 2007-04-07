@@ -41,6 +41,21 @@ import org.argouml.persistence.ArgoPrintInsider;
  */
 public class ArgoPrint {
 
+    private static final String PROP_TRANSFORMER
+	= "javax.xml.transform.TransformerFactory";
+
+    private static final String PROP_TRANSFORMER_XALAN
+	= "org.apache.xalan.processor.TransformerFactoryImpl";
+
+    /*
+     * Make sure that Xalan is uses behind JAXP Transform
+     * in order to allow XSLT extensions.
+     */
+    static {
+	System.setProperty(PROP_TRANSFORMER,
+			   PROP_TRANSFORMER_XALAN);
+    }
+
     /**
      * Generate output by processing the current project using
      * template.

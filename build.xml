@@ -82,6 +82,8 @@
       <pathelement location="${commons-logging.jar.path}"/>
       <pathelement location="${antlrall.jar.path}"/>
       <pathelement location="${argo.build.dir}/argouml-model.jar"/>
+      <pathelement location="${module.lib.dir}/serializer.jar"/>
+      <pathelement location="${module.lib.dir}/xalan.jar"/>
     </path>
 
   </target>
