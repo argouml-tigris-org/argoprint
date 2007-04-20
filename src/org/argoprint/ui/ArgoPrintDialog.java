@@ -48,8 +48,8 @@ import javax.swing.JTextField;
 
 import org.argoprint.ArgoPrint;
 
-import org.argouml.application.api.Configuration;
-import org.argouml.application.api.ConfigurationKey;
+import org.argouml.application.configuration.Configuration;
+import org.argouml.application.configuration.ConfigurationKey;
 import org.argouml.i18n.Translator;
 import org.argouml.persistence.ArgoPrintInsider;
 
