@@ -43,9 +43,9 @@ import org.apache.log4j.Logger;
 import org.argoprint.ui.ArgoPrintDialog;
 
 import org.argouml.moduleloader.ModuleInterface;
-import org.argouml.ui.ArgoFrame;
 import org.argouml.ui.ProjectBrowser;
 import org.argouml.ui.cmd.GenericArgoMenuBar;
+import org.argouml.util.ArgoFrame;
 
 
 /**
