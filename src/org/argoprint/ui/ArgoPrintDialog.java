@@ -30,6 +30,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -40,6 +41,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -49,6 +51,7 @@ import org.argoprint.ArgoPrint;
 import org.argouml.configuration.Configuration;
 import org.argouml.configuration.ConfigurationKey;
 import org.argouml.i18n.Translator;
+import org.argouml.util.ArgoFrame;
 
 /**
  * The dialog displayed when ArgoPrint is started from the ArgoUML menu.
@@ -100,6 +103,19 @@ public class ArgoPrintDialog extends JDialog {
 
         c.gridx = 2;
         c.weightx = 0;
+        result.add(new JButton(new AbstractAction("...") {
+            public void actionPerformed (ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+                int retval = chooser.showOpenDialog(ArgoFrame.getInstance());
+                if (retval == JFileChooser.APPROVE_OPTION) {
+                    template.setText(chooser.getSelectedFile().getAbsolutePath());
+                }
+            }
+        }), c);
+        
+        c.gridx = 3;
+        c.weightx = 0;
         result.add(new JButton(new AbstractAction(
                 Translator.localize("argoprint.button.default")) {
             public void actionPerformed(ActionEvent e) {
@@ -121,6 +137,19 @@ public class ArgoPrintDialog extends JDialog {
         output.setText(Configuration.getString(CONF_DEFAULT_OUTPUT));
 
         c.gridx = 2;
+        c.weightx = 0;
+        result.add(new JButton(new AbstractAction("...") {
+            public void actionPerformed (ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+                int retval = chooser.showOpenDialog(ArgoFrame.getInstance());
+                if (retval == JFileChooser.APPROVE_OPTION) {
+                    output.setText(chooser.getSelectedFile().getAbsolutePath());
+                }
+            }
+        }), c);
+        
+        c.gridx = 3;
         c.weightx = 0;
         result.add(new JButton(new AbstractAction(
                 Translator.localize("argoprint.button.default")) {
