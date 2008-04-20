@@ -37,60 +37,58 @@ UPDATES, ENHANCEMENTS, OR MODIFICATIONS. -->
  </xsl:template>
 
  <xsl:template match="pgml">
-  <svg:svg version="1.1">
-    <xsl:call-template name="attr.rules" />
+  <svg version="1.1">
     <xsl:apply-templates />
-  </svg:svg>
+  </svg>
  </xsl:template>
 
  <xsl:template match="group">
-  <svg:g>
+  <g>
    <xsl:call-template name="attr.rules" />
    <xsl:apply-templates />
-  </svg:g>
+  </g>
  </xsl:template>
 
  <xsl:template match="rectangle">
-  <svg:rect>
+  <rect>
    <xsl:call-template name="attr.rules" />
    <xsl:apply-templates />
-  </svg:rect>
+  </rect>
  </xsl:template>
 
  <xsl:template match="circle">
-  <svg:rect>
+  <rect>
    <xsl:call-template name="attr.rules" />
    <xsl:apply-templates />
-  </svg:rect>
+  </rect>
  </xsl:template>
 
  <xsl:template match="ellipse">
-  <svg:ellipse>
+  <ellipse>
    <xsl:call-template name="attr.rules" />
    <xsl:apply-templates />
-  </svg:ellipse>
+  </ellipse>
  </xsl:template>
 
  <xsl:template match="text">
-  <svg:text>
+  <text>
    <xsl:call-template name="attr.rules" />
-
    <xsl:attribute name="dominant-baseline">
-    <xsl:text>hanging</xsl:text>
+   <xsl:text>hanging</xsl:text>
    </xsl:attribute>
 
    <xsl:value-of select="text()" />
    <xsl:apply-templates />
-  </svg:text>
+  </text>
  </xsl:template>
 
  <xsl:template match="path">
-  <svg:path>
+  <path>
    <xsl:call-template name="attr.rules" />
    <xsl:attribute name="d">
     <xsl:apply-templates />
    </xsl:attribute>
-  </svg:path>
+  </path>
  </xsl:template>
 
  <xsl:template match="moveto">
