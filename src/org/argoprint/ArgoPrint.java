@@ -62,6 +62,7 @@ public class ArgoPrint {
      *
      * @param template stream containg an XSLT template
      * @param output stream to which the result is written
+     * @throws TransformerException If the document generation fails. 
      */
     public static void generate(InputStream template,
 				OutputStream output)
@@ -81,22 +82,20 @@ public class ArgoPrint {
      * @param input stream containg an XML documet
      * @param template stream containg an XSLT template
      * @param output stream to which the result is written
+     * @throws TransformerException If the document generation fails.
      */
     public static void generate(InputStream input,
-				InputStream template,
-				OutputStream output)
-	throws TransformerException {
+            InputStream template,
+            OutputStream output) throws TransformerException {
 
-	try {
-	    Transformer transformer
-		= TransformerFactory
-		.newInstance()
-		.newTransformer(new StreamSource(template));
+        try {
+            Transformer transformer = TransformerFactory.newInstance()
+                .newTransformer(new StreamSource(template));
 
-	    transformer.transform(new StreamSource(input),
-				  new StreamResult(output));
-	} catch (TransformerConfigurationException ex) {
-	    ex.printStackTrace();
-	}
+            transformer.transform(new StreamSource(input),
+                    new StreamResult(output));
+        } catch (TransformerConfigurationException ex) {
+            ex.printStackTrace();
+        }
     }
 }
