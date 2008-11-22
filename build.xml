@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="argouml-module" default="usage" basedir=".">
+<project name="argoprint" default="usage" basedir=".">
 
   <!-- =================================================================== -->
   <!-- Initialization target                                               -->
@@ -19,11 +19,13 @@
 
     <echo message="------------------- ${Name} ${version} [${year}] ----------------"/>
 
-    <property name="argo.root" value="../argouml"/>
+    <property name="argo.root" value="../argouml-app"/>
      
     <!-- Load ArgoUML properties -->
     <property name="argo.root.dir" value="${argo.root}"/>
-    <property file="${argo.root.dir}/src_new/default.properties"/>
+    <property file="${argo.root.dir}/default.properties"/>
+ 	<property name="gef.jar.dir" value="${argo.root.dir}/build"/>
+ 	<property name="argo.core.model" value="../argouml-core-model"/>
 
     <property name="module.root" value="."/>
     <property name="module.src.dir" value="${module.root}/src"/>
@@ -75,15 +77,15 @@
     <path id="module.compile.classpath">
       <pathelement location="${argo.build.dir}/argouml.jar"/>
       <pathelement location="${ocl-argo.jar.path}"/>
-      <pathelement location="${gef.jar.path}"/>
+      <pathelement location="${argo.build.dir}/gef-0.12.4.jar"/>
       <pathelement location="${log4j.jar.path}"/>
       <pathelement location="${swidgets.jar.path}"/>
       <pathelement location="${toolbar.jar.path}"/>
       <pathelement location="${commons-logging.jar.path}"/>
       <pathelement location="${antlrall.jar.path}"/>
       <pathelement location="${argo.build.dir}/argouml-model.jar"/>
-      <pathelement location="${module.lib.dir}/serializer.jar"/>
-      <pathelement location="${module.lib.dir}/xalan.jar"/>
+      <fileset dir="${module.lib.dir}" includes="*.jar " />
+      <pathelement location="${argo.core.model}/build/argouml-model.jar"/>
     </path>
 
   </target>
@@ -119,7 +121,7 @@
   <!-- =================================================================== -->
   <!-- Prepares the build directory                                        -->
   <!-- =================================================================== -->
-  <target name="prepare" depends="init">
+  <target name="prepare" depends="init" description="Prepares the build directory">
     <!-- create directories -->
     <echo message="Preparing the build directories"/>
     <!-- These must be there already -->
@@ -138,7 +140,7 @@
   <!-- =================================================================== -->
   <!-- <target name="compile" depends="generateparser,prepare"> -->
 
-  <target name="compile" depends="prepare"> 
+  <target name="compile" depends="prepare" description="Compiles the source directory"> 
 
     <echo message="Compiling the sources"/>
 
@@ -161,7 +163,7 @@
   <!-- =================================================================== -->
   <!-- Creates the class package                                           -->
   <!-- =================================================================== -->
-  <target name="package" depends="compile">
+  <target name="package" depends="compile" description="Creates the ArgoPrint JAR file">
     <filter token="version" value="${version}"/>
     <copy file="${manifest.src}" tofile="${module.build.dest}/${manifest}" filtering="on" overwrite="on" />
     <copy todir="${module.build.dest}/${i18n.dir}" overwrite="on">
@@ -177,7 +179,7 @@
   <!-- =================================================================== -->
   <!-- Run ArgoUML from compiled sources                                   -->
   <!-- =================================================================== -->
-  <target name="run" depends="install">
+  <target name="run" depends="install" description="Runs ArgoUML with ArgoPrint">
     <echo message="--- Executing ${Name} ---"/>
     <java classname="org.argouml.application.Main"
           fork="yes">
@@ -203,13 +205,25 @@
   <!-- =================================================================== -->
   <!-- Move the jar file into the extension directory.                     -->
   <!-- =================================================================== -->
-  <target name="install" depends="package">
-    <copy todir="${argo.build.dir}/ext">
+  <target name="install" depends="package" description="Installs ArgoPrint JAR into ArgoUML ">
+    
+  	<!-- Copy argoprint jar to ext dir -->
+  	<copy todir="${argo.build.dir}/ext">
       <fileset dir="${module.build.dir}" includes="${module.jarfile.name}"/>
     </copy>
+  	
+  	<!-- Copy argoprint dependencies to argouml dir -->
+  	<copy todir="${argo.build.dir}">
+  		<fileset dir="${module.lib.dir}" includes="*.jar"/>
+  	</copy>
+  	
+  	
     <copy todir="${developer.lib.dir}/ext">
       <fileset dir="${module.build.dir}" includes="${module.jarfile.name}"/>
     </copy>
+  	
+  	
+  	
   </target>
 
   <!-- =================================================================== -->
