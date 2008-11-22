@@ -35,7 +35,7 @@
 
     <property name="packages" value="org.argouml.*"/>
     <property name="manifest" value="manifest.mf"/>
-    <property name="manifest.src" value="${module.src.dir}/org/${manifest}"/>
+    <property name="manifest.src" value="${module.src.dir}/META-INF/${manifest}"/>
 
     <property name="module.build.dir" value="${module.root}/build"/>
     <property name="module.build.src" value="${module.src.dir}"/>
