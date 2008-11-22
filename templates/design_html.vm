@@ -1,0 +1,51 @@
+<html>
+<head>
+<title></title>
+</head>
+<body
+<h1>Introduction</h1>
+<p>
+$project.getDescription()
+</p>
+
+
+
+
+<h2>Use Cases</h2>
+#foreach( $diagram in $DiagramUtil.getUseCaseDiagrams($project))
+  <h3>$diagram.getName() </h3>
+  $DiagramUtil.getDiagramAsSVG($diagram);
+  
+  #foreach($usecase in $DiagramUtil.getUseCases($diagram))
+  <h4>$usecase.getName()</h4>
+  <p>
+  $DiagramUtil.getMemberDescription($usecase)
+  </p>
+  #end
+  
+#end
+
+<h2>Classes</h2>
+#foreach ($diagram in $DiagramUtil.getClassDiagrams($project))
+  <h3>$diagram.getName()</h3>
+  
+  #foreach($class in $DiagramUtil.getInterfaces($diagram))
+  <h4>$class.getName()</h4>
+  <p>
+  $DiagramUtil.getMemberDescription($class)
+  </p>
+  #end
+  
+  
+  #foreach($class in $DiagramUtil.getClasses($diagram))
+  <h4>$class.getName()</h4>
+  <p>
+  $DiagramUtil.getMemberDescription($class)
+  </p>
+  #end
+#end
+
+
+
+</body>
+</html>
