@@ -3,6 +3,7 @@
  */
 package org.argoprint.util;
 
+import java.awt.Rectangle;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,9 +12,12 @@ import java.util.List;
 
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.iterators.FilterIterator;
+import org.apache.log4j.Logger;
 import org.argouml.kernel.Project;
 import org.argouml.model.Model;
+import org.argouml.ui.targetmanager.TargetManager;
 import org.argouml.uml.diagram.ArgoDiagram;
+import org.argouml.uml.diagram.DiagramUtils;
 import org.argouml.uml.diagram.collaboration.ui.UMLCollaborationDiagram;
 import org.argouml.uml.diagram.deployment.ui.FigComponent;
 import org.argouml.uml.diagram.deployment.ui.UMLDeploymentDiagram;
@@ -26,7 +30,11 @@ import org.argouml.uml.diagram.static_structure.ui.FigInterface;
 import org.argouml.uml.diagram.static_structure.ui.UMLClassDiagram;
 import org.argouml.uml.diagram.use_case.ui.FigUseCase;
 import org.argouml.uml.diagram.use_case.ui.UMLUseCaseDiagram;
+import org.tigris.gef.base.Editor;
+import org.tigris.gef.base.Globals;
+import org.tigris.gef.base.Layer;
 import org.tigris.gef.persistence.SVGWriter;
+import org.tigris.gef.persistence.export.SvgWriter;
 import org.tigris.gef.presentation.Fig;
 
 
@@ -39,6 +47,13 @@ import org.tigris.gef.presentation.Fig;
  */
 public class DiagramUtil {
 
+    /**
+     * Logger.
+     */
+    private static final Logger LOG =
+        Logger.getLogger(DiagramUtil.class);
+    
+    
 	public static final String USE_CASE_DIAGRAM = "UseCaseDiagram";
 	public static final String CLASS_DIAGRAM = "ClassDiagram";
 	public static final String DEPLOYMENT_DIAGRAM = "DeploymentDiagram";
@@ -192,18 +207,31 @@ public class DiagramUtil {
 	 * @return	An SVG document containing the diagram.
 	 */
 	public static String getDiagramAsSVG(ArgoDiagram diagram){
-		ByteArrayOutputStream buff = new ByteArrayOutputStream();
-		try {
-			SVGWriter svgwriter = new SVGWriter(buff, diagram.getLayer().calcDrawingArea());
-		
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return buff.toString();
+	    // this is ugly, but it is the only way for now.
+	    // we need to simulate that the diagram is active,
+	    // then we save our graphics, and lately we leave all as it was
+	    // before.
+	    final ArgoDiagram activeDiagram = DiagramUtils.getActiveDiagram();
+	    TargetManager.getInstance().setTarget(diagram);
+    
+	    ByteArrayOutputStream buff = new ByteArrayOutputStream();
+	    Layer layer = diagram.getLayer();
+	    Editor ce = Globals.curEditor();
+	    Rectangle drawingArea = layer.calcDrawingArea();
+	    LOG.debug (drawingArea.toString());
+	    try {
+	        SvgWriter writer = new SvgWriter(buff, layer.calcDrawingArea());
+	        if (writer != null) {
+	            ce.print(writer);
+	            writer.dispose();
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    TargetManager.getInstance().setTarget(activeDiagram);
+	    return buff.toString();
 	}
 
 	/**
