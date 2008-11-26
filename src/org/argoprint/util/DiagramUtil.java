@@ -87,7 +87,7 @@ public class DiagramUtil {
 
 		List<ArgoDiagram> diagramList = new ArrayList<ArgoDiagram>();
 
-		Iterator diagIt = new FilterIterator(project.getDiagrams().iterator(),
+		Iterator diagIt = new FilterIterator(project.getDiagramList().iterator(),
 				new Predicate() {
 
 					public boolean evaluate(Object diagram) {
@@ -118,7 +118,7 @@ public class DiagramUtil {
 
 		List<ArgoDiagram> diagramList = new ArrayList<ArgoDiagram>();
 
-		Iterator rawIt = project.getDiagrams().iterator();
+		Iterator rawIt = project.getDiagramList().iterator();
 		Iterator diagIt = new FilterIterator(rawIt, new Predicate() {
 
 			public boolean evaluate(Object diagram) {
