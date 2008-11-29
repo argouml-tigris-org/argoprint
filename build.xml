@@ -77,7 +77,7 @@
     <path id="module.compile.classpath">
       <pathelement location="${argo.build.dir}/argouml.jar"/>
       <pathelement location="${ocl-argo.jar.path}"/>
-      <pathelement location="${argo.build.dir}/gef-0.12.4.jar"/>
+      <pathelement location="${argo.build.dir}/gef-0.13M1.jar"/>
       <pathelement location="${log4j.jar.path}"/>
       <pathelement location="${swidgets.jar.path}"/>
       <pathelement location="${toolbar.jar.path}"/>
