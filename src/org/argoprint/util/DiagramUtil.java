@@ -33,6 +33,7 @@ import org.argouml.uml.diagram.use_case.ui.UMLUseCaseDiagram;
 import org.tigris.gef.base.Editor;
 import org.tigris.gef.base.Globals;
 import org.tigris.gef.base.Layer;
+import org.tigris.gef.base.SaveSVGAction;
 import org.tigris.gef.persistence.SVGWriter;
 import org.tigris.gef.persistence.export.SvgWriter;
 import org.tigris.gef.presentation.Fig;
@@ -215,12 +216,11 @@ public class DiagramUtil {
 	    TargetManager.getInstance().setTarget(diagram);
     
 	    ByteArrayOutputStream buff = new ByteArrayOutputStream();
-	    Layer layer = diagram.getLayer();
 	    Editor ce = Globals.curEditor();
+	    Layer layer = ce.getLayerManager().getActiveLayer();
 	    Rectangle drawingArea = layer.calcDrawingArea();
-	    LOG.debug (drawingArea.toString());
 	    try {
-	        SvgWriter writer = new SvgWriter(buff, layer.calcDrawingArea());
+	        SvgWriter writer = new SvgWriter(buff, drawingArea, true);
 	        if (writer != null) {
 	            ce.print(writer);
 	            writer.dispose();
