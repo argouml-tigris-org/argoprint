@@ -60,7 +60,9 @@ public class XSLTTemplateEngine implements TemplateEngine {
 		try {
 			ArgoPrint.generate(paramTemplate, paramOutput);
 		} catch (TransformerException e) {
-			throw new IOException(e);
+		    // TODO: Why are we throwing an exception which is unrelated
+		    // to the actual error? - tfm
+		    throw new IOException(e.toString());
 		}
 
 	}

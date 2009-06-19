@@ -83,7 +83,9 @@ public class VelocityTemplateEngine implements TemplateEngine {
 			throw new TemplateEngineException(mie);
 		}
 		catch (Exception e) {
-			throw new IOException(e);
+		    // TODO: Why are we throwing an exception which is unrelated
+		    // to the actual error? - tfm
+		    throw new IOException(e.toString());
 		}
 	}
 
