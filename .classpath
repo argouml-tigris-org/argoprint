@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="lib/velocity-1.5.jar"/>
 	<classpathentry kind="lib" path="lib/werken-xpath-0.9.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/argouml-core-model-mdr"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/argouml-core-diagrams-sequence2"/>
 	<classpathentry kind="output" path="build-eclipse"/>
 </classpath>
