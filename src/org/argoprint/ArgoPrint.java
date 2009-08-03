@@ -60,7 +60,7 @@ public class ArgoPrint {
      * Generate output by processing the current project using
      * template.
      *
-     * @param template stream containg an XSLT template
+     * @param template stream containing an XSLT template
      * @param output stream to which the result is written
      * @throws TransformerException If the document generation fails. 
      */
@@ -79,8 +79,8 @@ public class ArgoPrint {
     /**
      * Generate output by processing input using template.
      *
-     * @param input stream containg an XML documet
-     * @param template stream containg an XSLT template
+     * @param input stream containing an XML document
+     * @param template stream containing an XSLT template
      * @param output stream to which the result is written
      * @throws TransformerException If the document generation fails.
      */
