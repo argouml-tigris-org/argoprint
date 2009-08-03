@@ -25,19 +25,16 @@
 package org.argoprint.ui;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -46,10 +43,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.apache.log4j.Logger;
+import org.argoprint.persistence.PostProcessor;
+import org.argoprint.persistence.PostProcessorFactory;
+import org.argoprint.persistence.PostProcessorNotFoundException;
 import org.argoprint.persistence.TemplateEngine;
 import org.argoprint.persistence.TemplateEngineException;
 import org.argoprint.persistence.TemplateEngineFactory;
 import org.argoprint.persistence.TemplateEngineNotFoundException;
+import org.argoprint.util.FileUtil;
 import org.argouml.configuration.Configuration;
 import org.argouml.configuration.ConfigurationKey;
 import org.argouml.i18n.Translator;
@@ -60,209 +62,263 @@ import org.argouml.util.ArgoFrame;
  * The dialog displayed when ArgoPrint is started from the ArgoUML menu.
  */
 public class ArgoPrintDialog extends JDialog {
+    
+    private static final Logger LOG = 
+        Logger.getLogger(ArgoPrintDialog.class);
 
-	private static final Dimension DEFAULT_SIZE = new Dimension(640, 480);
 
-	private static final String PREFIX = "argoprint";
-	private static final ConfigurationKey CONF_DEFAULT_TEMPLATE = Configuration
-			.makeKey(PREFIX, "default_template");
-	private static final ConfigurationKey CONF_DEFAULT_OUTPUT = Configuration
-			.makeKey(PREFIX, "default_output");
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2720567509558127637L;
 
-	public ArgoPrintDialog(Frame parent, String title, boolean modal) {
-		super(parent, title, modal);
-		initComponents();
-	}
+    private static final String PREFIX = "argoprint";
 
-	private void initComponents() {
-		setSize(DEFAULT_SIZE);
-		add(ArgoPrintDialog.createSimpleDialogContent());
-	}
+    private static final ConfigurationKey CONF_DEFAULT_TEMPLATE = Configuration
+            .makeKey(PREFIX, "default_template");
 
-	/*
-	 * Create a panel as described by the use-case in the old documentation.
-	 */
-	private static JPanel createSimpleDialogContent() {
-		final JPanel result = new JPanel(new GridBagLayout());
-		result.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		GridBagConstraints c = new GridBagConstraints();
+    private static final ConfigurationKey CONF_DEFAULT_OUTPUT = Configuration
+            .makeKey(PREFIX, "default_output");
+    
+    JPanel panel = new JPanel();
+    
+    JTextField templateFld = new JTextField();
+    JTextField outputFld = new JTextField();
+    
 
-		final JTextField template, output;
+    public ArgoPrintDialog(Frame parent, String title, boolean modal) {
+        super(parent, title, modal);
+        initComponents();
+    }
 
-		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(0, 0, 3, 3);
-		c.gridx = 0;
-		c.gridy = 0;
-		c.gridwidth = 1;
-		c.weightx = 0;
-		result.add(new JLabel(Translator.localize("argoprint.label.template")),
-				c);
+    @SuppressWarnings("serial")
+    private void initComponents() {
+        
+        this.setSize(new Dimension(494, 265));
+        
+        this.setTitle(Translator
+                .localize("argoprint.dialog.title"));
+        this.setContentPane(panel);
+        
+        this.panel.setLayout(null);
+        
+        this.templateFld.setSize(new Dimension(305, 22));
+        this.templateFld.setLocation(new Point(26, 61));
+        
+        this.outputFld.setSize(new Dimension(306, 22));
+        this.outputFld.setLocation(new Point(25, 125));
+        
+        JButton closeBtn = new JButton();
+        closeBtn.setAction(new AbstractAction(Translator
+                .localize("argoprint.button.close")) {
+            public void actionPerformed(ActionEvent e) {
+                ArgoPrintDialog.this.setVisible(false);
+            };
+        });
+        closeBtn.setSize(new Dimension(115, 24));
+        closeBtn.setLocation(new Point(195, 180));
+        this.panel.add(closeBtn);
+       
 
-		c.gridx = 1;
-		c.weightx = 1;
-		result.add(template = new JTextField(20), c);
-		template.setText(Configuration.getString(CONF_DEFAULT_TEMPLATE));
+        JLabel dialogLbl = new JLabel(Translator
+                .localize("argoprint.label.dialog"));
+        dialogLbl.setBounds(new Rectangle(14, 14, 440, 22));
+        Font font = dialogLbl.getFont();
+        font = font.deriveFont(Font.BOLD,12.0f);
+        dialogLbl.setFont(font);
+        
+        JLabel templateLbl = new JLabel(Translator
+                .localize("argoprint.label.template"));
+        templateLbl.setBounds(new Rectangle(25, 45, 100, 15));
+        
+        JButton templateBtn = new JButton();
+        templateBtn.setAction(new AbstractAction(Translator
+                .localize("argoprint.button.browse")) {
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+                int retval = chooser.showOpenDialog(ArgoFrame.getFrame());
+                if (retval == JFileChooser.APPROVE_OPTION) {
+                    templateFld.setText(chooser.getSelectedFile()
+                            .getAbsolutePath());
+                }
+            };
+        });
+        templateBtn.setSize(new Dimension(113, 23));
+        templateBtn.setLocation(new Point(345, 60));
+        
+        JButton configBtn = new JButton(new AbstractAction(Translator
+                .localize("argoprint.button.default")) {
+            public void actionPerformed(ActionEvent e) {
+                Configuration.setString(CONF_DEFAULT_TEMPLATE, templateFld
+                        .getText());
+                Configuration.setString(CONF_DEFAULT_OUTPUT, outputFld.getText());
+                Configuration.save();
+            }
+        });
+        this.panel.add(templateLbl, templateLbl.getName());
+        this.panel.add(dialogLbl);
+        this.panel.add(configBtn);
+        this.panel.add(templateFld);
+        this.panel.add(outputFld);
+        
+        JLabel outputLbl = new JLabel(Translator
+                .localize("argoprint.label.output"));
+        outputLbl.setBounds(new Rectangle(26, 107, 100, 15));
+        this.panel.add(outputLbl, null);
+        
+        // set defaults
+        this.outputFld.setText(Configuration.getString(CONF_DEFAULT_OUTPUT));
+        this.templateFld.setText(Configuration.getString(CONF_DEFAULT_TEMPLATE));
+        
+        JButton outputBtn = new JButton();
+        outputBtn.setAction(new AbstractAction(Translator
+                .localize("argoprint.button.browse")) {
+            
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+                int retval = chooser.showOpenDialog(ArgoFrame.getFrame());
+                if (retval == JFileChooser.APPROVE_OPTION) {
+                    outputFld.setText(chooser.getSelectedFile().getAbsolutePath());
+                }
+            }
+        });
+        
+        outputBtn.setLocation(new Point(345, 120));
+        outputBtn.setSize(new Dimension(115, 24));
+        
+        this.panel.add(templateBtn, null);
+        this.panel.add(outputBtn, null);
+        
+        JButton defaultBtn = new JButton();
+        defaultBtn.setSize(new Dimension(115, 24));
+        defaultBtn.setLocation(new Point(345, 180));
+        defaultBtn.setAction(new AbstractAction(Translator
+                .localize("argoprint.button.default")) {
+            public void actionPerformed(ActionEvent e) {
+                Configuration.setString(CONF_DEFAULT_OUTPUT, outputFld.getText());
+                Configuration.setString(CONF_DEFAULT_TEMPLATE, templateFld
+                        .getText());
+                Configuration.save();
+            }
+        });
 
-		c.gridx = 2;
-		c.weightx = 0;
-		result.add(new JButton(new AbstractAction("...") {
-			public void actionPerformed(ActionEvent e) {
-				JFileChooser chooser = new JFileChooser();
-				chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-				int retval = chooser.showOpenDialog(ArgoFrame.getInstance());
-				if (retval == JFileChooser.APPROVE_OPTION) {
-					template.setText(chooser.getSelectedFile()
-							.getAbsolutePath());
-				}
-			}
-		}), c);
+        this.panel.add(defaultBtn, null);
+        JButton execBtn = new JButton();
+        execBtn.setSize(new Dimension(115, 24));
+        execBtn.setLocation(new Point(30, 180));
+        execBtn.setAction(new AbstractAction(Translator
+                .localize("argoprint.button.execute")) {
 
-		c.gridx = 3;
-		c.weightx = 0;
-		result.add(new JButton(new AbstractAction(Translator
-				.localize("argoprint.button.default")) {
-			public void actionPerformed(ActionEvent e) {
-				Configuration.setString(CONF_DEFAULT_TEMPLATE, template
-						.getText());
-				Configuration.save();
-			}
-		}), c);
+            public void actionPerformed(ActionEvent e) {
 
-		c.gridx = 0;
-		c.gridy = 1;
-		c.weightx = 0;
-		result
-				.add(new JLabel(Translator.localize("argoprint.label.output")),
-						c);
+                Thread t = new Thread() {
+                    public void run() {
+                        try {
+                            setEnabled(false);
+                            //InputStream streamTemplate = null;
 
-		c.gridx = 1;
-		c.weightx = 1;
-		result.add(output = new JTextField(20), c);
-		output.setText(Configuration.getString(CONF_DEFAULT_OUTPUT));
+                            // verify that the template exists
+                            String templateFile = templateFld.getText();
+                            String templateExt = null;
 
-		c.gridx = 2;
-		c.weightx = 0;
-		result.add(new JButton(new AbstractAction("...") {
-			public void actionPerformed(ActionEvent e) {
-				JFileChooser chooser = new JFileChooser();
-				chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-				int retval = chooser.showOpenDialog(ArgoFrame.getInstance());
-				if (retval == JFileChooser.APPROVE_OPTION) {
-					output.setText(chooser.getSelectedFile().getAbsolutePath());
-				}
-			}
-		}), c);
+                            String outputFile = outputFld.getText();
 
-		c.gridx = 3;
-		c.weightx = 0;
-		result.add(new JButton(new AbstractAction(Translator
-				.localize("argoprint.button.default")) {
-			public void actionPerformed(ActionEvent e) {
-				Configuration.setString(CONF_DEFAULT_OUTPUT, output.getText());
-				Configuration.save();
-			}
-		}), c);
+                            TemplateEngine templateEngine = null;
 
-		c.gridx = 2;
-		c.gridy = 2;
-		c.weightx = 0;
-		result.add(new JButton(new AbstractAction(Translator
-				.localize("argoprint.button.execute")) {
+                            // get the file extension and find the
+                            // appropriate template engine
+                            templateExt = FileUtil.getExtension(templateFile);
 
-			public void actionPerformed(ActionEvent e) {
+                            // verify that the template has been specified
+                            if (templateExt == null || templateExt == "") {
+                                throw new FileNotFoundException(
+                                        "No template specified");
+                            }
 
-				Thread t = new Thread() {
-					public void run() {
-						try {
-							setEnabled(false);
-							InputStream streamTemplate = null;
-							OutputStream streamOutput = null;
+                            templateEngine = TemplateEngineFactory
+                                    .getInstance(templateExt);
 
-							// verify that the template exists
-							String templateFile = template.getText();
-							String templateExt = null;
-							
-							String outputFile = output.getText();
+                            if (templateEngine == null) {
+                                throw new TemplateEngineNotFoundException(
+                                        "Unable to find a compatible template engine for template: "
+                                                + templateFile);
+                            }
 
-							TemplateEngine templateEngine = null;
+                            // verify that the template exists
+                            File tempFile = new File(templateFile);
+                            if (!tempFile.exists()){
+                                throw new FileNotFoundException("The specified template file does not exist");
+                            }
 
-							
-							// get the file extension and find the
-							// appropriate template engine
-							templateExt = templateFile.substring(templateFile
-									.lastIndexOf(".") + 1);
-							
-							// verify that the template has been specified
-							if (templateExt == null || templateExt == "") {
-								throw new FileNotFoundException(
-										"No template specified");
-							}
-							
-							templateEngine = TemplateEngineFactory
-									.getInstance(templateExt);
+                            templateEngine.generate(ProjectManager.getManager()
+                                    .getCurrentProject(), outputFile,
+                                    templateFile);
+                            
+                            String ext = FileUtil.getExtension(outputFile);
+                            PostProcessor postProcessor = PostProcessorFactory.getInstance(ext);
+                            if (postProcessor == null){
+                                throw new PostProcessorNotFoundException("Unable to find a compatible post processor engine for output file: " + outputFile);
+                            }
 
-							if (templateEngine == null) {
-								throw new TemplateEngineNotFoundException(
-										"Unable to find a compatible template engine for template: "
-												+ templateFile);
-							}
+                            // show "generation complete" message
+                            JOptionPane
+                                    .showMessageDialog(
+                                            panel,
+                                            Translator
+                                                    .localize("argoprint.message.transformationDone"));
+                        } catch (FileNotFoundException ex) {
+                            LOG.error(ex.getMessage(), ex);
+                            JOptionPane
+                                    .showMessageDialog(
+                                            panel,
+                                            Translator
+                                                    .localize("argoprint.message.wrongTemplate"));
+                            return;
+                        } catch (TemplateEngineNotFoundException te) {
+                            LOG.error(te.getMessage(), te);
+                            JOptionPane
+                                    .showMessageDialog(
+                                            panel,
+                                            Translator
+                                                    .localize("argoprint.message.wrongTemplate"));
+                            return;
 
-							// verify that the template exists
-							streamTemplate = new FileInputStream(templateFile);
-							
-							templateEngine.generate(ProjectManager.getManager().getCurrentProject(), outputFile, templateFile);
+                        } catch (TemplateEngineException ex) {
+                            LOG.error(ex.getMessage(), ex);
+                            JOptionPane
+                                    .showMessageDialog(
+                                            panel,
+                                            Translator
+                                                    .localize("argoprint.message.transformationError"));
+                            return;
+                        } catch (IOException e) {
+                            LOG.error(e.getMessage(), e);
+                            JOptionPane
+                                    .showMessageDialog(
+                                            ArgoPrintDialog.this,
+                                            Translator
+                                                    .localize("argoprint.message.transformationError"));
+                        } catch (PostProcessorNotFoundException e) {
+                            LOG.error(e.getMessage(), e);
+                            JOptionPane.showMessageDialog(ArgoPrintDialog.this, Translator
+                                                    .localize("argoprint.message.transformationError"));
+                        } finally {
+                            setEnabled(true);
+                        }
 
-							// show "generation complete" message
-							JOptionPane
-									.showMessageDialog(
-											result,
-											Translator
-													.localize("argoprint.message.transformationDone"));
-						} catch (FileNotFoundException ex) {
-							ex.printStackTrace();
-							JOptionPane
-									.showMessageDialog(
-											result,
-											Translator
-													.localize("argoprint.message.wrongTemplate"));
-							return;
-						} catch (TemplateEngineNotFoundException te) {
-							te.printStackTrace();
-							JOptionPane
-									.showMessageDialog(
-											result,
-											Translator
-													.localize("argoprint.message.wrongTemplate"));
-							return;
+                    }
+                };
+                t.start();
+            }
 
-						} catch (TemplateEngineException ex) {
-							ex.printStackTrace();
-							JOptionPane
-									.showMessageDialog(
-											result,
-											Translator
-													.localize("argoprint.message.transformationError"));
-							return;
-						} catch (IOException e) {
-							e.printStackTrace();
-							JOptionPane
-							.showMessageDialog(
-									result,
-									Translator
-											.localize("argoprint.message.transformationError"));
-						} finally {
-							setEnabled(true);
-						}
+        });
 
-					}
-				};
-				t.start();
-			}
+        this.panel.add(execBtn, null);
+       
+        
+        
+    }
 
-		}), c);
-		
-		
-
-		return result;
-	}
-}
+} // @jve:decl-index=0:visual-constraint="10,10"

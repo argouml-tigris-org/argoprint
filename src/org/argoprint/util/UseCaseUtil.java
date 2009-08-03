@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.argoprint.util;
 
 import java.util.ArrayList;

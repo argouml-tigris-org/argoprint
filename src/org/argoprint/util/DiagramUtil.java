@@ -211,7 +211,9 @@ public class DiagramUtil {
 	    // then we save our graphics, and lately we leave all as it was
 	    // before.
 	    final ArgoDiagram activeDiagram = DiagramUtils.getActiveDiagram();
-	    TargetManager.getInstance().setTarget(diagram);
+	    TargetManager tm = TargetManager.getInstance();
+	   
+	    tm.setTarget(diagram);
     
 	    ByteArrayOutputStream buff = new ByteArrayOutputStream();
 	    Editor ce = Globals.curEditor();
@@ -224,11 +226,13 @@ public class DiagramUtil {
 	            writer.dispose();
 	        }
 	    } catch (IOException e) {
-	        e.printStackTrace();
+	        LOG.error(e.getMessage(), e);
 	    } catch (Exception e) {
-	        e.printStackTrace();
+	        LOG.error(e.getMessage(), e);
 	    }
-	    TargetManager.getInstance().setTarget(activeDiagram);
+	    
+	    //tm.setTarget(activeDiagram);
+	    
 	    return buff.toString();
 	}
 
