@@ -38,6 +38,7 @@
 
 package org.argoprint.persistence.xslt;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -60,32 +61,60 @@ import org.argouml.kernel.Project;
  */
 public class XSLTTemplateEngine implements TemplateEngine {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void generate(Project project, String outputFile, String templateFile)
-			throws IOException, TemplateEngineException {
-		InputStream streamTemplate = new FileInputStream(templateFile);
-		OutputStream streamOutput = new FileOutputStream(outputFile);
+    /**
+     * {@inheritDoc}
+     */
+    public void generate(Project project, String outputFile, String templateFile)
+        throws IOException, TemplateEngineException {
+        InputStream streamTemplate = new FileInputStream(templateFile);
+        OutputStream streamOutput = new FileOutputStream(outputFile);
 
-		InputStream paramTemplate = streamTemplate;
-		OutputStream paramOutput = streamOutput;
+        InputStream paramTemplate = streamTemplate;
+        OutputStream paramOutput = streamOutput;
 
-		try {
-			ArgoPrint.generate(paramTemplate, paramOutput);
-		} catch (TransformerException e) {
-		    // TODO: Why are we throwing an exception which is unrelated
-		    // to the actual error? - tfm
-		    throw new IOException(e.toString());
-		}
+        try {
+            ArgoPrint.generate(paramTemplate, paramOutput);
+        } catch (TransformerException e) {
+            throw new TemplateEngineException(e);
+        }
 
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String[] getTemplateExtensions() {
-		return new String[] { "xsl", "xslt" };
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public String[] getTemplateExtensions() {
+        return new String[] { "xsl", "xslt" };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void generate(Project project, File outputFile, File templatefile)
+        throws IOException, TemplateEngineException {
+ 
+        try {
+            ArgoPrint.generate(new FileInputStream(templatefile), new FileOutputStream(outputFile));
+        } catch (TransformerException e) {
+            throw new TemplateEngineException(e);
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void generate(Project project, OutputStream outputFile,
+            InputStream templatefile) throws IOException,
+        TemplateEngineException {
+        
+        try {
+            ArgoPrint.generate(templatefile, outputFile);
+        } catch (TransformerException e) {
+            throw new TemplateEngineException(e);
+        }
+       
+
+    }
 
 }

@@ -38,9 +38,16 @@
 
 package org.argoprint.persistence.velocity;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import org.apache.velocity.VelocityContext;
@@ -51,7 +58,6 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.argoprint.persistence.TemplateEngine;
 import org.argoprint.persistence.TemplateEngineException;
 import org.argoprint.util.DiagramUtil;
-import org.argoprint.util.UseCaseUtil;
 import org.argouml.kernel.Project;
 
 /**
@@ -62,52 +68,92 @@ import org.argouml.kernel.Project;
  */
 public class VelocityTemplateEngine implements TemplateEngine {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void generate(Project project, String outputFile, String templateFile)
-			throws IOException, TemplateEngineException {
+    /**
+     * {@inheritDoc}
+     */
+    public void generate(Project project, String outputFile, String templateFile)
+        throws IOException, TemplateEngineException {
 
-		try {
+        try {
 
-			Velocity.init();
+            Velocity.init();
 
-			VelocityContext context = new VelocityContext();
+            VelocityContext context = new VelocityContext();
 
-			context.put("project", project);
-			context.put("DiagramUtil", new DiagramUtil());
-			context.put("UseCaseUtil", new UseCaseUtil());
-			
-			
-			Writer writer = new FileWriter(outputFile);
-			
-			//evaluate( Context context, Writer writer, String logTag, InputStream instream )
-			Velocity.evaluate(context, writer, "VELOCITY", new FileReader(templateFile));
+            context.put("project", project);
+            context.put("DiagramUtil", new DiagramUtil());
 
-			writer.flush();
-			writer.close();
-			
+            Writer writer = new FileWriter(outputFile);
 
-		} catch (ResourceNotFoundException rnfe) {
-			throw new TemplateEngineException(rnfe);
-		} catch (ParseErrorException pee) {
-			throw new TemplateEngineException(pee);
-		}
-		catch (MethodInvocationException mie) {
-			throw new TemplateEngineException(mie);
-		}
-		catch (Exception e) {
-		    // TODO: Why are we throwing an exception which is unrelated
-		    // to the actual error? - tfm
-		    throw new IOException(e.toString());
-		}
-	}
+            // evaluate( Context context, Writer writer, String logTag,
+            // InputStream instream )
+            Velocity.evaluate(context, writer, "VELOCITY", new FileReader(
+                    templateFile));
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String[] getTemplateExtensions() {
-		return new String[] { "vm" };
-	}
+            writer.flush();
+            writer.close();
+
+        } catch (ResourceNotFoundException rnfe) {
+            throw new TemplateEngineException(rnfe);
+        } catch (ParseErrorException pee) {
+            throw new TemplateEngineException(pee);
+        } catch (MethodInvocationException mie) {
+            throw new TemplateEngineException(mie);
+        } catch (Exception e) {
+            throw new TemplateEngineException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String[] getTemplateExtensions() {
+        return new String[] { "vm","txt","html","htm","xml" };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void generate(Project project, File outputFile, File templateFile)
+        throws IOException, TemplateEngineException {
+        generate(project, new FileOutputStream(outputFile),
+                new FileInputStream(templateFile));
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void generate(Project project, OutputStream outputFile,
+            InputStream templateFile) throws IOException,
+        TemplateEngineException {
+
+        try {
+
+            Velocity.init();
+
+            VelocityContext context = new VelocityContext();
+
+            context.put("project", project);
+            context.put("DiagramUtil", new DiagramUtil());
+
+            Writer writer = new OutputStreamWriter(outputFile);
+
+            Velocity.evaluate(context, writer, "VELOCITY",
+                    new InputStreamReader(templateFile));
+
+            writer.flush();
+            writer.close();
+
+        } catch (ResourceNotFoundException rnfe) {
+            throw new TemplateEngineException(rnfe);
+        } catch (ParseErrorException pee) {
+            throw new TemplateEngineException(pee);
+        } catch (MethodInvocationException mie) {
+            throw new TemplateEngineException(mie);
+        } catch (Exception e) {
+            throw new TemplateEngineException(e);
+        }
+    }
 
 }
