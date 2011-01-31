@@ -46,24 +46,39 @@ package org.argoprint.persistence;
  */
 public class PostProcessorNotFoundException extends Exception {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8164410806507413598L;
+
+    /**
+     * {@inheritDoc}
+     */
     public PostProcessorNotFoundException() {
         super();
-        // TODO: Auto-generated constructor stub
+       
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public PostProcessorNotFoundException(String message, Throwable cause) {
         super(message, cause);
-        // TODO: Auto-generated constructor stub
+        
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public PostProcessorNotFoundException(String message) {
-        super(message);
-        // TODO: Auto-generated constructor stub
+        super(message);      
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public PostProcessorNotFoundException(Throwable cause) {
         super(cause);
-        // TODO: Auto-generated constructor stub
     }
 
 }

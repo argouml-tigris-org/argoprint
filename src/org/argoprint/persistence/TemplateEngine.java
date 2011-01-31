@@ -38,7 +38,10 @@
 
 package org.argoprint.persistence;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.argouml.kernel.Project;
 
@@ -53,29 +56,56 @@ import org.argouml.kernel.Project;
  */
 public interface TemplateEngine {
 
-	/**
-	 * This method gets the template file extensions supported by this template
-	 * engine.
-	 * 
-	 * @return an array of supported template extensions (i.e. xslt, vm). The
-	 *         extension should not include the period.
-	 */
-	public String[] getTemplateExtensions();
+    /**
+     * This method gets the template file extensions supported by this template
+     * engine.
+     * 
+     * @return an array of supported template extensions (i.e. xslt, vm). The
+     *         extension should not include the period.
+     */
+    public String[] getTemplateExtensions();
 
-	/**
-	 * This method takes the contents of a project and uses the templateFile to
-	 * generate the content of the outputFile.
-	 * 
-	 * @param project
-	 *            The currently selected project
-	 * @param outputFile
-	 *            The output file
-	 * @param templateFile
-	 *            The template file
-	 * @throws IOException
-	 *             if there is a problem generating the file.
-	 */
-	public void generate(Project project, String outputFile, String templateFile)
-			throws IOException, TemplateEngineException;
+    /**
+     * This method takes the contents of a project and uses the templateFile to
+     * generate the content of the outputFile.
+     * 
+     * @param project The currently selected project
+     * @param outputFile The output file
+     * @param templateFile The template file
+     * @throws IOException if there is a problem generating the file.
+     * @throws TemplateEngineException if any other exceptions are thrown by the
+     *             underlying template engine.
+     */
+    public void generate(Project project, String outputFile, String templateFile)
+        throws IOException, TemplateEngineException;
+
+    /**
+     * This method takes the contents of a project and uses the templateFile to
+     * generate the content of the outputFile.
+     * 
+     * @param project The currently selected project
+     * @param outputFile The output file
+     * @param templateFile The template file
+     * @throws IOException if there is a problem generating the file.
+     * @throws TemplateEngineException if any other exceptions are thrown by the
+     *             underlying template engine.
+      */
+    public void generate(Project project, File outputFile, File templateFile)
+        throws IOException, TemplateEngineException;
+
+    /**
+     * This method takes the contents of a project and uses the templateFile to
+     * generate the content of the outputFile.
+     *
+     * @param project The currently selected project
+     * @param outputFile The output file
+     * @param templateFile The template file
+     * @throws IOException if there is a problem generating the file.
+     * @throws TemplateEngineException if any other exceptions are thrown by the
+     *             underlying template engine.
+     */
+    public void generate(Project project, OutputStream outputFile,
+            InputStream templateFile) throws IOException,
+        TemplateEngineException;
 
 }

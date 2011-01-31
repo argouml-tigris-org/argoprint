@@ -54,50 +54,54 @@ import sun.misc.Service;
  * @see http://java.sun.com/j2se/1.4.2/docs/guide/jar/jar.html#Service%20Provider
  */
 public class TemplateEngineFactory {
-	
-	private static List<TemplateEngine> templateEngineList = new ArrayList<TemplateEngine>();
-	private static Map<String, TemplateEngine> templateEngineMap = new HashMap<String, TemplateEngine>();
-	
-	static{
-		Iterator<TemplateEngine> it = Service.providers(org.argoprint.persistence.TemplateEngine.class);
-		
-		TemplateEngine engine = null;
-		while(it.hasNext()){
-			engine = it.next();
-			templateEngineList.add(engine);
-			String[] exts = engine.getTemplateExtensions();
-			for (int i=0; i < exts.length; i++){
-				templateEngineMap.put(exts[i], engine);
-			}
-		}
-	}
-	
-	/**
-	 * This method gets a list of all installed templating engines.
-	 * @return
-	 */
-	public static List<TemplateEngine> getTemplateEngines(){
-		return templateEngineList;
-	}
-	
-	/**
-	 * This method gets an instance of the template engine supported by this
-	 * template engine.
-	 * 
-	 * @param ext  The file extension for a template.
-	 * @return	An instance of the templating engine, or null if not found.
-	 * @throws IllegalArgumentException if the extension parameter is null
-	 */
-	public static TemplateEngine getInstance(String ext){
-		TemplateEngine engine = null;
-		
-		if (ext == null){
-			throw new IllegalArgumentException("The extension cannot be null");
-		}
-		
-		engine = templateEngineMap.get(ext);
-		
-		return engine;
-	}
+
+    private static List<TemplateEngine> templateEngineList = new ArrayList<TemplateEngine>();
+
+    private static Map<String, TemplateEngine> templateEngineMap = new HashMap<String, TemplateEngine>();
+
+    static {
+
+        Iterator<TemplateEngine> it = Service
+                .providers(org.argoprint.persistence.TemplateEngine.class);
+
+        TemplateEngine engine = null;
+        while (it.hasNext()) {
+            engine = it.next();
+            templateEngineList.add(engine);
+            String[] exts = engine.getTemplateExtensions();
+            for (int i = 0; i < exts.length; i++) {
+                templateEngineMap.put(exts[i], engine);
+            }
+        }
+    }
+
+    /**
+     * This method gets a list of all installed templating engines.
+     * 
+     * @return
+     */
+    public static List<TemplateEngine> getTemplateEngines() {
+        return templateEngineList;
+    }
+
+    /**
+     * This method gets an instance of the template engine supported by this
+     * template engine.
+     * 
+     * @param ext The file extension for a template.
+     * @return An instance of the templating engine, or null if not found.
+     * @throws IllegalArgumentException if the extension parameter is null
+     */
+    public static TemplateEngine getInstance(String ext) {
+        TemplateEngine engine = null;
+
+        if (ext == null) {
+            throw new IllegalArgumentException("The extension cannot be null");
+        }
+
+        engine = templateEngineMap.get(ext);
+
+        return engine;
+    }
 
 }
