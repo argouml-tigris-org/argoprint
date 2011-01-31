@@ -49,22 +49,23 @@ package org.argouml.ui.argoprint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 
 import org.apache.log4j.Logger;
-
 import org.argoprint.ui.ArgoPrintDialog;
-
+import org.argouml.i18n.Translator;
 import org.argouml.moduleloader.ModuleInterface;
 import org.argouml.ui.ProjectBrowser;
 import org.argouml.ui.cmd.GenericArgoMenuBar;
-import org.argouml.util.ArgoFrame;
 
 
 /**
+ * This menu plugin adds support for the ArgoPrint module.
+ * 
  * @author Mattias Danielsson
- * @since  0.0.1
+ * @author mfortner
+ * @since  0.0.2
  */
 public class ArgoPrintMenuPlugin
     implements ModuleInterface, ActionListener {
@@ -82,6 +83,7 @@ public class ArgoPrintMenuPlugin
     /**
      * The dialog used
      */
+//    private ArgoPrintDialog argoPrintDialog;
     private ArgoPrintDialog argoPrintDialog;
 
     /**
@@ -90,10 +92,11 @@ public class ArgoPrintMenuPlugin
     public ArgoPrintMenuPlugin() {
         menuItem = new JMenuItem("ArgoPrint");
 	menuItem.addActionListener(this);
-
-	argoPrintDialog = new ArgoPrintDialog(ArgoFrame.getInstance(),
-					      "ArgoPrint",
-					      true);
+	
+	argoPrintDialog = new ArgoPrintDialog();
+	argoPrintDialog.setLocationRelativeTo(ProjectBrowser.getInstance());
+	argoPrintDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	
     }
 
     ////////////////////////////////////////////////////////////////
@@ -106,6 +109,7 @@ public class ArgoPrintMenuPlugin
      */
     public void actionPerformed(ActionEvent event) {
 	LOG.info("Showing ArgoPrint Dialog");
+	
 	argoPrintDialog.setVisible(true);
     }
 

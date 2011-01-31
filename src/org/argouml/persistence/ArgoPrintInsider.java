@@ -57,6 +57,10 @@ public class ArgoPrintInsider {
     private ArgoPrintInsider() {
     }
 
+    /**
+     * Gets the singleton instance of the ArgoPrintInsider
+     * @return
+     */
     public static ArgoPrintInsider getInstance() {
 	if (instance == null)
 	    instance = new ArgoPrintInsider();
@@ -66,7 +70,7 @@ public class ArgoPrintInsider {
     
     /**
      * Returns an InputStream from which the XML representation of the
-     * current project can be retrived.
+     * current project can be retrieved.
      */
     public InputStream getProjectInputStream() {
 	PipedInputStream result = null;
