@@ -2,313 +2,321 @@
 
 <project name="argoprint" default="usage" basedir=".">
 
-  <!-- =================================================================== -->
-  <!-- Initialization target                                               -->
-  <!-- =================================================================== -->
+	<!-- =================================================================== -->
+	<!-- Initialization target                                               -->
+	<!-- =================================================================== -->
 
- <target name="init">
+	<target name="init">
 
-    <tstamp/>
+		<tstamp/>
 
-    <property file="module.properties"/>
+		<property file="module.properties"/>
 
-    <property name="Name" value="ArgoModule-${argo.module.name}"/>
-    <property name="name" value="argomodule-${argo.module.name}"/>
-    <property name="version" value="0.1.0-${DSTAMP}-${TSTAMP}"/>
-    <property name="year" value="2006"/>
+		<property name="Name" value="ArgoModule-${argo.module.name}"/>
+		<property name="name" value="argomodule-${argo.module.name}"/>
+		<property name="version" value="0.1.0-${DSTAMP}-${TSTAMP}"/>
+		<property name="year" value="2009"/>
 
-    <echo message="------------------- ${Name} ${version} [${year}] ----------------"/>
+		<echo message="------------------- ${Name} ${version} [${year}] ----------------"/>
 
-    <property name="argo.root" value="../argouml-app"/>
-     
-    <!-- Load ArgoUML properties -->
-    <property name="argo.root.dir" value="${argo.root}"/>
-    <property file="${argo.root.dir}/default.properties"/>
- 	<property name="gef.jar.dir" value="${argo.root.dir}/build"/>
- 	<property name="argo.core.model" value="../argouml-core-model"/>
+		<property name="argo.root" value="../argouml-app"/>
 
-    <property name="module.root" value="."/>
-    <property name="module.src.dir" value="${module.root}/src"/>
+		<!-- Load ArgoUML properties -->
+		<property name="argo.root.dir" value="${argo.root}"/>
+		<property file="${argo.root.dir}/default.properties"/>
+		<property name="gef.jar.dir" value="${argo.root.dir}/build"/>
+		<property name="argo.core.model" value="../argouml-core-model"/>
 
-    <property name="module.lib.dir" value="${module.root}/lib"/>
-    <property name="ant.xml-libs" value="${ANT_HOME}/lib/jaxp.jar:${ANT_HOME}/lib/parser.jar"/>
+		<property name="module.root" value="."/>
+		<property name="module.src.dir" value="${module.root}/src"/>
 
-    <property name="packages" value="org.argouml.*"/>
-    <property name="manifest" value="manifest.mf"/>
-    <property name="manifest.src" value="${module.src.dir}/META-INF/${manifest}"/>
+		<property name="module.lib.dir" value="${module.root}/lib"/>
+		<property name="ant.xml-libs" value="${ANT_HOME}/lib/jaxp.jar:${ANT_HOME}/lib/parser.jar"/>
 
-    <property name="module.build.dir" value="${module.root}/build"/>
-    <property name="module.build.src" value="${module.src.dir}"/>
-    <property name="module.build.dest" value="${module.build.dir}/classes"/>
+		<property name="packages" value="org.argouml.*"/>
+		<property name="manifest" value="MANIFEST.MF"/>
+		<property name="manifest.src" value="${module.src.dir}/META-INF/${manifest}"/>
 
-    <property name="module.tests.src" value="${module.root}/tests"/>
-    <property name="module.tests.dest" value="${module.build.dir}/tests"/>
-    <property name="module.tests.res" value="${module.tests.dest}/org/argoprint/resources"/>
+		<property name="module.build.dir" value="${module.root}/build"/>
+		<property name="module.build.src" value="${module.src.dir}"/>
+		<property name="module.build.dest" value="${module.build.dir}"/>
 
-    <property name="i18n.dir" value="org/argouml/i18n/"/>
+		<property name="module.tests.src" value="${module.root}/tests"/>
+		<property name="module.tests.dest" value="${module.build.dir}/tests"/>
+		<property name="module.tests.res" value="${module.tests.dest}/org/argoprint/resources"/>
 
-    <property name="xmlunit.jar.path" value="${module.root}/tools/xmlunit/lib/xmlunit1.0.jar"/>
+		<property name="i18n.dir" value="org/argouml/i18n/"/>
 
-    <!--     Fix the problem with junit.jar and ant-junit.jar not being -->
-    <!--     in the same dir or in the classpath -->
-    <taskdef name="junit"
+		<property name="xmlunit.jar.path" value="${module.root}/tools/xmlunit/lib/xmlunit1.0.jar"/>
+
+		<!--     Fix the problem with junit.jar and ant-junit.jar not being -->
+		<!--     in the same dir or in the classpath -->
+		<taskdef name="junit"
             classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
-      <classpath>
-        <pathelement location="${junit.jar.path}"/>
-        <pathelement location="${ant.home}/libopt/ant-junit.jar"/>
-      </classpath>
-    </taskdef>
+			<classpath>
+				<pathelement location="${junit.jar.path}"/>
+				<pathelement location="${ant.home}/libopt/ant-junit.jar"/>
+			</classpath>
+		</taskdef>
 
-    <property name="argo.jarfile"
+		<property name="argo.jarfile"
               value="${argo.build.dir}/argouml.jar"/>
-    <property name="module.jarfile.name"
+		<property name="module.jarfile.name"
               value="${argo.module.jarfile}.jar"/>
-    <property name="module.jarfile"
+		<property name="module.jarfile"
               value="${module.build.dir}/${module.jarfile.name}"/>
 
-    <property file="${user.home}/.argo.ant.properties"/>
-    <property file="${user.home}/.ant.properties"/>
+		<property file="${user.home}/.argo.ant.properties"/>
+		<property file="${user.home}/.ant.properties"/>
 
-    <property name="debug" value="on"/>
-    <property name="optimize" value="on"/>
-    <property name="deprecation" value="on"/>
-    <property name="developer.lib.dir" value="${argo.build.dir}"/>
+		<property name="debug" value="on"/>
+		<property name="optimize" value="on"/>
+		<property name="deprecation" value="on"/>
+		<property name="developer.lib.dir" value="${argo.build.dir}"/>
 
-    <path id="module.compile.classpath">
-      <pathelement location="${argo.build.dir}/argouml.jar"/>
-      <pathelement location="${ocl-argo.jar.path}"/>
-      <pathelement location="${argo.build.dir}/gef-0.13M4.jar"/>
-      <pathelement location="${log4j.jar.path}"/>
-      <pathelement location="${swidgets.jar.path}"/>
-      <pathelement location="${toolbar.jar.path}"/>
-      <pathelement location="${commons-logging.jar.path}"/>
-      <pathelement location="${antlrall.jar.path}"/>
-      <pathelement location="${argo.build.dir}/argouml-model.jar"/>
-      <fileset dir="${module.lib.dir}" includes="*.jar " />
-      <pathelement location="${argo.core.model}/build/argouml-model.jar"/>
-    </path>
+		<path id="module.compile.classpath">
+			<pathelement location="${argo.build.dir}/argouml.jar"/>
+			<pathelement location="${ocl-argo.jar.path}"/>
+			
+			<pathelement location="${log4j.jar.path}"/>
+			<pathelement location="${swidgets.jar.path}" />
+			<pathelement location="${toolbar.jar.path}"/>
+			<pathelement location="${commons-logging.jar.path}"/>
+			<pathelement location="${antlrall.jar.path}"/>
+			<pathelement location="${argo.build.dir}/argouml-model.jar"/>
+			<pathelement location="${argo.core.model}/build/argouml-model.jar"/>
+			<pathelement location="../argouml-core-diagrams-sequence2/build/argouml-diagrams-sequence.jar" />
+			<pathelement location="../argouml-core-model-mdr/build"/>
+			<pathelement location="lib/gef-0.13.1M3.jar"/>
+			<pathelement location="../argouml-app/build/classes"/>
+			<fileset dir="${module.lib.dir}" includes="*.jar " />
 
-  </target>
+		</path>
 
-  <!-- Note this file can only make Ant display values set in the file correctly, -->
-  <!-- but external values in the environment or properties file will be operational.  -->
+	</target>
 
-  <!-- =================================================================== -->
-  <!-- Help on usage                                                       -->
-  <!-- =================================================================== -->
-  <target name="usage" depends="init">
-    <echo message=""/>
-    <echo message=""/>
-    <echo message="${Name} Build file"/>
-    <echo message="-------------------------------------------------------------"/>
-    <echo message=""/>
-    <echo message=" available targets are:"/>
-    <echo message=""/>
-    <echo message="   compile      --> compiles the source code to the tree under ${module.build.dir}"/>
-    <echo message="   package      --> generates the ${argo.module.jarfile}.jar file"/>
-    <echo message="   run          --> runs ArgoUML ${argo.module.jarfile}.jar"/>
-    <echo message="   install      --> merges ./org into ../src_new/org tree"/>
-    <echo message="   checkstyle   --> runs checkstyle on all sources."/>
-    <echo message="   tests        --> runs all the tests.            "/>
-    <echo message="   usage        --> show this message (default)"/>
-    <echo message=""/>
-    <echo message=" See the comments inside the build.xml file for more details."/>
-    <echo message="-------------------------------------------------------------"/>
-    <echo message=""/>
-    <echo message=""/>
-  </target>
+	<!-- Note this file can only make Ant display values set in the file correctly, -->
+	<!-- but external values in the environment or properties file will be operational.  -->
 
-  <!-- =================================================================== -->
-  <!-- Prepares the build directory                                        -->
-  <!-- =================================================================== -->
-  <target name="prepare" depends="init" description="Prepares the build directory">
-    <!-- create directories -->
-    <echo message="Preparing the build directories"/>
-    <!-- These must be there already -->
+	<!-- =================================================================== -->
+	<!-- Help on usage                                                       -->
+	<!-- =================================================================== -->
+	<target name="usage" depends="init">
+		<echo message=""/>
+		<echo message=""/>
+		<echo message="${Name} Build file"/>
+		<echo message="-------------------------------------------------------------"/>
+		<echo message=""/>
+		<echo message=" available targets are:"/>
+		<echo message=""/>
+		<echo message="   compile      --> compiles the source code to the tree under ${module.build.dir}"/>
+		<echo message="   package      --> generates the ${argo.module.jarfile}.jar file"/>
+		<echo message="   run          --> runs ArgoUML ${argo.module.jarfile}.jar"/>
+		<echo message="   install      --> merges ./org into ../src_new/org tree"/>
+		<echo message="   checkstyle   --> runs checkstyle on all sources."/>
+		<echo message="   tests        --> runs all the tests.            "/>
+		<echo message="   usage        --> show this message (default)"/>
+		<echo message=""/>
+		<echo message=" See the comments inside the build.xml file for more details."/>
+		<echo message="-------------------------------------------------------------"/>
+		<echo message=""/>
+		<echo message=""/>
+	</target>
 
-    <copy todir="${module.build.dest}/org/argoprint/Images">
-     <fileset dir="${module.src.dir}/org/argoprint/Images" includes="**/**"/>
-    </copy>
+	<!-- =================================================================== -->
+	<!-- Prepares the build directory                                        -->
+	<!-- =================================================================== -->
+	<target name="prepare" depends="init" description="Prepares the build directory">
+		<!-- create directories -->
+		<echo message="Preparing the build directories"/>
+		<!-- These must be there already -->
 
-    <copy todir="${module.build.dest}/org/argoprint/Schemas">
-     <fileset dir="${module.src.dir}/org/argoprint/Schemas" includes="**/**"/>
-    </copy>
-  </target>
+		<copy todir="${module.build.dest}/org/argoprint/Images">
+			<fileset dir="${module.src.dir}/org/argoprint/Images" includes="**/**"/>
+		</copy>
 
-  <!-- =================================================================== -->
-  <!-- Compiles the source directory                                       -->
-  <!-- =================================================================== -->
-  <!-- <target name="compile" depends="generateparser,prepare"> -->
+		<copy todir="${module.build.dest}/org/argoprint/Schemas">
+			<fileset dir="${module.src.dir}/org/argoprint/Schemas" includes="**/**"/>
+		</copy>
+	</target>
 
-  <target name="compile" depends="prepare" description="Compiles the source directory"> 
+	<!-- =================================================================== -->
+	<!-- Compiles the source directory                                       -->
+	<!-- =================================================================== -->
+	<!-- <target name="compile" depends="generateparser,prepare"> -->
 
-    <echo message="Compiling the sources"/>
+	<target name="compile" depends="prepare" description="Compiles the source directory">
 
-    <!-- create directories -->
-    <mkdir dir="${module.build.dest}"/>
+		<echo message="Compiling the sources"/>
 
-    <javac srcdir="${module.build.src}"
+		<!-- create directories -->
+		<mkdir dir="${module.build.dest}"/>
+
+		<javac srcdir="${module.build.src}"
            destdir="${module.build.dest}"
            excludes="*.txt,*.bat,*.xml,*.sh"
            debug="${debug}"
            deprecation="${deprecation}"
            optimize="${optimize}">
-        <classpath>
-	 <path refid="module.compile.classpath"/>
-        </classpath>
-     </javac>
-  </target>
+			<classpath>
+				<path refid="module.compile.classpath"/>
+			</classpath>
+		</javac>
+	</target>
 
 
-  <!-- =================================================================== -->
-  <!-- Creates the class package                                           -->
-  <!-- =================================================================== -->
-  <target name="package" depends="compile" description="Creates the ArgoPrint JAR file">
-    <filter token="version" value="${version}"/>
-    <copy file="${manifest.src}" tofile="${module.build.dest}/${manifest}" filtering="on" overwrite="on" />
-    <copy todir="${module.build.dest}/${i18n.dir}" overwrite="on">
-        <fileset dir="${module.src.dir}/${i18n.dir}"/>
-    </copy>
-    <jar jarfile="${module.jarfile}"
+	<!-- =================================================================== -->
+	<!-- Creates the class package                                           -->
+	<!-- =================================================================== -->
+	<target name="package" depends="compile" description="Creates the ArgoPrint JAR file">
+		<filter token="version" value="${version}"/>
+		<copy file="${manifest.src}" tofile="${module.build.dest}/META-INF/${manifest}" filtering="on" overwrite="on" />
+		<copy todir="${module.build.dest}/${i18n.dir}" overwrite="on">
+			<fileset dir="${module.src.dir}/${i18n.dir}"/>
+		</copy>
+
+
+		<jar jarfile="${module.jarfile}"
          basedir="${module.build.dest}"
          includes="org/argouml/**, org/argoprint/**"
          excludes="*.txt,*.bat,*.xml,*.sh,${manifest}"
-         manifest="${module.build.dest}/${manifest}"/>
-  </target>
+         manifest="${module.build.dest}/META-INF/${manifest}"/>
+	</target>
 
-  <!-- =================================================================== -->
-  <!-- Run ArgoUML from compiled sources                                   -->
-  <!-- =================================================================== -->
-  <target name="run" depends="install" description="Runs ArgoUML with ArgoPrint">
-    <echo message="--- Executing ${Name} ---"/>
-    <java classname="org.argouml.application.Main"
+	<!-- =================================================================== -->
+	<!-- Run ArgoUML from compiled sources                                   -->
+	<!-- =================================================================== -->
+	<target name="run" depends="install" description="Runs ArgoUML with ArgoPrint">
+		<echo message="--- Executing ${Name} ---"/>
+		<java classname="org.argouml.application.Main"
           fork="yes">
-        <classpath>
-            <fileset dir="${module.build.dir}">
-                <include name="${module.jarfile.name}" />
-	    </fileset>
-	    <path refid="module.compile.classpath"/>
-        </classpath>
+			<sysproperty id="" value=""/>
+			<classpath>
+				<fileset dir="${module.build.dir}">
+					<include name="${module.jarfile.name}" />
+				</fileset>
+				<path refid="module.compile.classpath"/>
+			</classpath>
 
-    </java>
-  </target>
+		</java>
+	</target>
 
-  <!-- =================================================================== -->
-  <!-- Clean targets                                                       -->
-  <!-- =================================================================== -->
-  <target name="clean" depends="init">
-    <delete file="${developer.lib.dir}/ext/${module.jarfile.name}"/>
-    <delete file="${argo.build.dir}/ext/${module.jarfile.name}"/>
-    <delete dir="${module.build.dir}"/>
-  </target>
+	<!-- =================================================================== -->
+	<!-- Clean targets                                                       -->
+	<!-- =================================================================== -->
+	<target name="clean" depends="init">
+		<delete file="${developer.lib.dir}/ext/${module.jarfile.name}"/>
+		<delete file="${argo.build.dir}/ext/${module.jarfile.name}"/>
+		<delete dir="${module.build.dir}"/>
+	</target>
 
-  <!-- =================================================================== -->
-  <!-- Move the jar file into the extension directory.                     -->
-  <!-- =================================================================== -->
-  <target name="install" depends="package" description="Installs ArgoPrint JAR into ArgoUML ">
-    
-  	<!-- Copy argoprint jar to ext dir -->
-  	<copy todir="${argo.build.dir}/ext">
-      <fileset dir="${module.build.dir}" includes="${module.jarfile.name}"/>
-    </copy>
-  	
-  	<!-- Copy argoprint dependencies to argouml dir -->
-  	<copy todir="${argo.build.dir}">
-  		<fileset dir="${module.lib.dir}" includes="*.jar"/>
-  	</copy>
-  	
-  	
-    <copy todir="${developer.lib.dir}/ext">
-      <fileset dir="${module.build.dir}" includes="${module.jarfile.name}"/>
-    </copy>
-  	
-  	
-  	
-  </target>
+	<!-- =================================================================== -->
+	<!-- Move the jar file into the extension directory.                     -->
+	<!-- =================================================================== -->
+	<target name="install" depends="package" description="Installs ArgoPrint JAR into ArgoUML ">
 
-  <!-- =================================================================== -->
-  <!-- Run checkstyle with the ArgoUML settings.                           -->
-  <!-- =================================================================== -->
-  <target name="checkstyle" depends="init"
+		<!-- Copy argoprint jar to ext dir -->
+		<copy todir="${argo.build.dir}/ext">
+			<fileset dir="${module.build.dir}" includes="${module.jarfile.name}"/>
+		</copy>
+
+		<!-- Copy argoprint dependencies to argouml dir -->
+		<copy todir="${argo.build.dir}">
+			<fileset dir="${module.lib.dir}" includes="*.jar"/>
+		</copy>
+
+
+		<copy todir="${developer.lib.dir}/ext">
+			<fileset dir="${module.build.dir}" includes="${module.jarfile.name}"/>
+		</copy>
+
+
+
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Run checkstyle with the ArgoUML settings.                           -->
+	<!-- =================================================================== -->
+	<target name="checkstyle" depends="init"
           description="Run checkstyle on all source.">
-    <java classname="com.puppycrawl.tools.checkstyle.Main"
+		<java classname="com.puppycrawl.tools.checkstyle.Main"
           failonerror="false" fork="true" maxmemory="32M">
-      <sysproperty key="checkstyle.header.file"
+			<sysproperty key="checkstyle.header.file"
                    value="../argouml/tools/checkstyle/java.header"/>
-      <classpath>
-        <fileset dir="${argo.tools.dir}/checkstyle-3.3">
-          <include name="*.jar"/>
-        </fileset>
-      </classpath>
-      <arg value="-c"/>
-      <arg value="${argo.tools.dir}/checkstyle/checkstyle_argouml.xml"/>
-      <arg value="-r"/>
-      <arg value="src"/>
-      <arg value="-r"/>
-      <arg value="tests"/>
-    </java>
-  </target>
+			<classpath>
+				<fileset dir="${argo.tools.dir}/checkstyle-3.3">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+			<arg value="-c"/>
+			<arg value="${argo.tools.dir}/checkstyle/checkstyle_argouml.xml"/>
+			<arg value="-r"/>
+			<arg value="src"/>
+			<arg value="-r"/>
+			<arg value="tests"/>
+		</java>
+	</target>
 
-  <!-- =================================================================== -->
-  <!-- Prepare for tests.                                                  -->
-  <!-- =================================================================== -->
-  <target name="prepare.tests" depends="init,compile">
-    <copy todir="${module.tests.res}">
-     <fileset dir="${module.tests.src}/org/argoprint/resources" includes="**/**"/>
-    </copy>
-  </target>
+	<!-- =================================================================== -->
+	<!-- Prepare for tests.                                                  -->
+	<!-- =================================================================== -->
+	<target name="prepare.tests" depends="init,compile">
+		<copy todir="${module.tests.res}">
+			<fileset dir="${module.tests.src}/org/argoprint/resources" includes="**/**"/>
+		</copy>
+	</target>
 
-  <!-- =================================================================== -->
-  <!-- Compile all the tests.                                              -->
-  <!-- =================================================================== -->
-  <target name="compile.tests" depends="init,compile,prepare.tests"> 
+	<!-- =================================================================== -->
+	<!-- Compile all the tests.                                              -->
+	<!-- =================================================================== -->
+	<target name="compile.tests" depends="init,compile,prepare.tests">
 
-    <echo message="Compiling the tests"/>
+		<echo message="Compiling the tests"/>
 
-    <!-- create directories -->
-    <mkdir dir="${module.tests.dest}"/>
+		<!-- create directories -->
+		<mkdir dir="${module.tests.dest}"/>
 
-    <javac srcdir="${module.tests.src}"
+		<javac srcdir="${module.tests.src}"
            destdir="${module.tests.dest}"
            excludes="*.txt,*.bat,*.xml,*.sh"
            debug="${debug}"
            deprecation="${deprecation}"
            optimize="${optimize}">
-        <classpath>
-	    <pathelement location="${module.build.dest}"/>
-	    <path refid="module.compile.classpath"/>
-	    <pathelement location="${junit.jar.path}"/>
-      	    <pathelement location="${xmlunit.jar.path}"/>
-        </classpath>
-     </javac>
-  </target>
+			<classpath>
+				<pathelement location="${module.build.dest}"/>
+				<path refid="module.compile.classpath"/>
+				<pathelement location="${junit.jar.path}"/>
+				<pathelement location="${xmlunit.jar.path}"/>
+			</classpath>
+		</javac>
+	</target>
 
-  <!-- =================================================================== -->
-  <!-- Run all the tests.                                                  -->
-  <!-- =================================================================== -->
-  <target name="tests" depends="compile.tests"
+	<!-- =================================================================== -->
+	<!-- Run all the tests.                                                  -->
+	<!-- =================================================================== -->
+	<target name="tests" depends="compile.tests"
           description="Run all the tests.">
-	  <junit printsummary="on"
+		<junit printsummary="on"
 	         fork="yes"
 		 haltonfailure="on">
-	    <classpath>
-	      <pathelement location="${module.build.dest}"/>
-	      <pathelement location="${module.tests.dest}"/>
-	      <pathelement location="${junit.jar.path}"/>
-      	      <pathelement location="${xmlunit.jar.path}"/>
-	      <path refid="module.compile.classpath"/>
-	    </classpath>
+			<classpath>
+				<pathelement location="${module.build.dest}"/>
+				<pathelement location="${module.tests.dest}"/>
+				<pathelement location="${junit.jar.path}"/>
+				<pathelement location="${xmlunit.jar.path}"/>
+				<path refid="module.compile.classpath"/>
+			</classpath>
 
-	    <formatter type="brief" usefile="false"/>
-	    
-	    <batchtest>
-	     <fileset dir="${module.tests.dest}">
-	      <include name="**/Test*.class"/>
-	     </fileset>
-	    </batchtest>
+			<formatter type="brief" usefile="false"/>
 
-	  </junit>
-  </target>
+			<batchtest>
+				<fileset dir="${module.tests.dest}">
+					<include name="**/Test*.class"/>
+				</fileset>
+			</batchtest>
+
+		</junit>
+	</target>
 
 </project>
 
