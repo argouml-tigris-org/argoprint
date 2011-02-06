@@ -252,7 +252,7 @@ public class TemplateMetaFile implements Cloneable, Serializable{
         InputStream is = null;
         if (this.templateFile != null) {
             if (this.templateFile.startsWith("/template")) {
-                is = TemplateMetaFile.class.getResourceAsStream(this.templateFile);
+                is = ClassLoader.getSystemClassLoader().getResourceAsStream(this.templateFile);
                 if (is == null) {
                     throw new IOException("Unable to retrieve template: "
                             + this.templateFile);

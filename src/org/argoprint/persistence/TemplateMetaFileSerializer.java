@@ -113,8 +113,7 @@ public class TemplateMetaFileSerializer {
     public static TemplateMetaFile readTemplateFromClassPath(String file)
         throws IOException {
         TemplateMetaFile metafile = null;
-        InputStream is = TemplateMetaFileSerializer.class
-        .getResourceAsStream(file);
+        InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(file);
         if (is == null){
             throw new IOException("Unable to find resource: " + file);
         }

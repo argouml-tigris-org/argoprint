@@ -108,7 +108,7 @@ public class ArgoPrintDialog extends JDialog {
     }
 
     private void init() {
-        Translator.addClassLoader(Thread.currentThread().getContextClassLoader());
+        Translator.addClassLoader(this.getClass().getClassLoader());
 
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         Container contentPane = this.getContentPane();
@@ -119,7 +119,9 @@ public class ArgoPrintDialog extends JDialog {
 
         File userHome = new File(System.getProperty("user.home"));
         templateRoot = new File(userHome, ".argouml/templates");
-        templateRoot.mkdirs();
+        if (!templateRoot.exists()){
+            templateRoot.mkdirs();
+        }
 
         this.setTitle(Translator.localize("argoprint.dialog.title"));
 
