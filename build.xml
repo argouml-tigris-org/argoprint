@@ -178,7 +178,7 @@
 
 		<jar jarfile="${module.jarfile}"
          basedir="${module.build.dest}"
-         includes="org/argouml/**, org/argoprint/**"
+         includes="org/argouml/**, org/argoprint/**,templates/**"
          excludes="*.txt,*.bat,*.xml,*.sh,${manifest}"
          manifest="${module.build.dest}/META-INF/${manifest}"/>
 	</target>
@@ -190,8 +190,8 @@
 		<echo message="--- Executing ${Name} ---"/>
 		<java classname="org.argouml.application.Main"
           fork="yes">
-			<sysproperty id="" value=""/>
 			<classpath>
+				
 				<fileset dir="${module.build.dir}">
 					<include name="${module.jarfile.name}" />
 				</fileset>
