@@ -24,7 +24,6 @@
 		<!-- Load ArgoUML properties -->
 		<property name="argo.root.dir" value="${argo.root}"/>
 		<property file="${argo.root.dir}/default.properties"/>
-		<property name="gef.jar.dir" value="${argo.root.dir}/build"/>
 		<property name="argo.core.model" value="../argouml-core-model"/>
 
 		<property name="module.root" value="."/>
@@ -59,8 +58,6 @@
 			</classpath>
 		</taskdef>
 
-		<property name="argo.jarfile"
-              value="${argo.build.dir}/argouml.jar"/>
 		<property name="module.jarfile.name"
               value="${argo.module.jarfile}.jar"/>
 		<property name="module.jarfile"
@@ -75,22 +72,9 @@
 		<property name="developer.lib.dir" value="${argo.build.dir}"/>
 
 		<path id="module.compile.classpath">
-			<pathelement location="${argo.build.dir}/argouml.jar"/>
-			<pathelement location="${ocl-argo.jar.path}"/>
-			
-			<pathelement location="${log4j.jar.path}"/>
-			<pathelement location="${swidgets.jar.path}" />
-			<pathelement location="${toolbar.jar.path}"/>
-			<pathelement location="${commons-logging.jar.path}"/>
-			<pathelement location="${antlrall.jar.path}"/>
-			<pathelement location="${argo.build.dir}/argouml-model.jar"/>
-			<pathelement location="${argo.core.model}/build/argouml-model.jar"/>
-			<pathelement location="../argouml-core-diagrams-sequence2/build/argouml-diagrams-sequence.jar" />
-			<pathelement location="../argouml-core-model-mdr/build"/>
-			<pathelement location="lib/gef-0.13.1M3.jar"/>
-			<pathelement location="../argouml-app/build/classes"/>
 			<fileset dir="${module.lib.dir}" includes="*.jar " />
-
+			<fileset dir="${argo.build.dir}" includes="*.jar " />
+                        <fileset dir="${argo.build.dir}/ext" includes="*.jar " />
 		</path>
 
 	</target>
