@@ -24,18 +24,27 @@
 
 package org.argoprint.persistence;
 
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
 import org.apache.log4j.Logger;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * This class is used to serialize (read/write) TemplateMetaFile objects.
@@ -98,9 +107,7 @@ public class TemplateMetaFileSerializer {
         if (!file.exists()) {
             throw new IOException("File not found: " + file.getAbsolutePath());
         }
-        XMLDecoder decoder = new XMLDecoder(new FileInputStream(file));
-        metafile = (TemplateMetaFile) decoder.readObject();
-        return metafile;
+        return readTemplate(new InputSource(new FileInputStream(file)));
     }
 
     /**
@@ -112,14 +119,47 @@ public class TemplateMetaFileSerializer {
      */
     public static TemplateMetaFile readTemplateFromClassPath(String file)
         throws IOException {
-        TemplateMetaFile metafile = null;
         InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(file);
         if (is == null){
             throw new IOException("Unable to find resource: " + file);
         }
-        XMLDecoder decoder = new XMLDecoder(is);
-        metafile = (TemplateMetaFile) decoder.readObject();
-        return metafile;
+        return readTemplate(new InputSource(is));
+    }
+    
+    public static TemplateMetaFile readTemplate(InputStream is){
+        return readTemplate(new InputSource(is));
+    }
+    
+    public static TemplateMetaFile readTemplate(InputSource source){
+        TemplateMetaFile template = new TemplateMetaFile();
+        
+        try {
+            DocumentBuilder builder     = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Element root     = builder.parse(source).getDocumentElement();
+            
+            XPath xpath = XPathFactory.newInstance().newXPath();
+
+            template.name = (String)xpath.evaluate( "/template/@name", root, XPathConstants.STRING );
+            template.group = (String)xpath.evaluate( "/template/@group", root, XPathConstants.STRING );
+            template.category = (String)xpath.evaluate( "/template/@category", root, XPathConstants.STRING );
+            template.description = (String)xpath.evaluate( "/template/@description", root, XPathConstants.STRING );
+            template.outputFile = (String)xpath.evaluate( "/template/@outputFile", root, XPathConstants.STRING );
+            template.templateFile = (String)xpath.evaluate( "/template/@templateFile", root, XPathConstants.STRING );
+        } catch (XPathExpressionException e) {
+            // TODO: Auto-generated catch block
+            logger.error("Exception", e);
+        } catch (ParserConfigurationException e) {
+            // TODO: Auto-generated catch block
+            logger.error("Exception", e);
+        } catch (SAXException e) {
+            // TODO: Auto-generated catch block
+            logger.error("Exception", e);
+        } catch (IOException e) {
+            // TODO: Auto-generated catch block
+            logger.error("Exception", e);
+        }
+         
+        return template;
     }
 
     /**
@@ -143,12 +183,30 @@ public class TemplateMetaFileSerializer {
      */
     public static void write(File file, TemplateMetaFile metaFile)
         throws IOException {
-        FileOutputStream out = new FileOutputStream(file);
-        XMLEncoder encoder = new XMLEncoder(out);
-        encoder.writeObject(metaFile);
-        encoder.flush();
-        encoder.close();
-
+        FileWriter writer = new FileWriter(file);
+        writer.write("<?xml version=\"1.0\"?>");
+        writer.write("<template \n");
+        writeAttribute(writer, "name", 
+                metaFile.getName());
+        writeAttribute(writer, "group", metaFile.getGroup());
+        writer.write("\n");
+        writeAttribute(writer, "category", metaFile.getCategory());
+        writer.write("\n");
+        writeAttribute(writer, "type", metaFile.getType());
+        writer.write("\n");
+        writeAttribute(writer, "description", metaFile.getDescription());
+        writer.write("\n");
+        writeAttribute(writer, "templateFile", metaFile.getTemplateFile());
+        writer.write("\n");
+        writeAttribute(writer, "outputFile", metaFile.getOutputFile());
+        writer.write("/>");
+        
+        writer.flush();
+        writer.close();
+    }
+    
+    private static void writeAttribute(FileWriter writer, String name, String value) throws IOException{
+        writer.write(name+"=\"" + value + "\" ");
     }
 
     /**

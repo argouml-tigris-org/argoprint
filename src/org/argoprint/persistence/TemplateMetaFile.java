@@ -41,56 +41,55 @@ import org.apache.log4j.Logger;
  * 
  * @author mfortner
  */
-@SuppressWarnings("serial")
-public class TemplateMetaFile implements Cloneable, Serializable{
-    
-    public static final Logger LOG = Logger.getLogger(TemplateMetaFile.class);
-    
+public class TemplateMetaFile implements Cloneable, Serializable {
+
+    private transient static final long serialVersionUID = 661847906792479685L;
+
+    public transient static final Logger LOG = Logger.getLogger(TemplateMetaFile.class);
+
     /** Constant defining the default categories for templates */
-    public static final String[] CATEGORIES = new String[]{"Requirements","Design","Deployment"};
-    
+//    public static final String[] CATEGORIES = new String[] { "Requirements",
+//            "Design", "Deployment" };
+
     /** Constant defining the default groups for templates */
-    public static final String[] GROUPS = new String[]{"ArgoUML","Personal"};
+//    public static final String[] GROUPS = new String[] { "ArgoUML", "Personal" };
 
     /** The file name */
-    private String templateFile = null;
+    protected String templateFile = null;
 
     /** The document name */
-    private String name = null;
+    protected String name = null;
 
     /** The description of the template file */
-    private String description = null;
+    protected String description = null;
 
     /** The group that the template belongs to */
-    private String group = null;
+    protected String group = null;
 
     /**
      * Indicates whether the template file has been selected for a batch
      * operation
      */
-    private boolean selected = false;
+    private transient boolean selected = false;
 
     /** The category use for the file. */
-    private String category = null;
+    protected String category = null;
 
     /** The output file */
-    private String outputFile;
-    
-    
+    protected String outputFile = null;
 
     /**
      * Constructor
      * 
-     * @param templateFile      The path to the template file
-     * @param outputFile        The output file name.
-     * @param name              The name of the template.
-     * @param description       A description of the file.
-     * @param group             A grouping used for the template.
-     * @param category          A category used for the template.
+     * @param templateFile The path to the template file
+     * @param outputFile The output file name.
+     * @param name The name of the template.
+     * @param description A description of the file.
+     * @param group A grouping used for the template.
+     * @param category A category used for the template.
      */
-    public TemplateMetaFile(String templateFile, String outputFile, String name, String description,
-            String group, String category) {
-        super();
+    public TemplateMetaFile(String templateFile, String outputFile,
+            String name, String description, String group, String category) {
         this.templateFile = templateFile;
         this.outputFile = outputFile;
         this.name = name;
@@ -105,19 +104,20 @@ public class TemplateMetaFile implements Cloneable, Serializable{
     public TemplateMetaFile() {
 
     }
-    
+
     /**
      * Indicates whether the template file is stored locally.
+     * 
      * @return
      */
-    public boolean isLocalTemplate(){
+    public boolean isLocalTemplate() {
         return this.templateFile.startsWith("file:");
     }
 
     /**
      * Gets the category for the template.
      * 
-     * @return  the category for the template
+     * @return the category for the template
      */
     public String getCategory() {
         return category;
@@ -125,6 +125,7 @@ public class TemplateMetaFile implements Cloneable, Serializable{
 
     /**
      * Sets the category of the template.
+     * 
      * @param category the category of the template
      */
     public void setCategory(String category) {
@@ -133,13 +134,15 @@ public class TemplateMetaFile implements Cloneable, Serializable{
 
     /**
      * Gets the extension of the template file.
+     * 
      * @return the extension of the template file
      */
     public String getType() {
         String filetype = null;
         if (this.templateFile != null) {
-            if (templateFile.lastIndexOf('.') != -1){
-                filetype = templateFile.substring(templateFile.lastIndexOf('.'));
+            if (templateFile.lastIndexOf('.') != -1) {
+                filetype = templateFile
+                        .substring(templateFile.lastIndexOf('.'));
             }
         }
         return filetype;
@@ -147,6 +150,7 @@ public class TemplateMetaFile implements Cloneable, Serializable{
 
     /**
      * Gets the location of the template file.
+     * 
      * @return
      */
     public String getTemplateFile() {
@@ -155,27 +159,34 @@ public class TemplateMetaFile implements Cloneable, Serializable{
 
     /**
      * Sets the location of the template file.
-     * @param templateFile      
+     * 
+     * @param templateFile  The template file.
      */
     public void setTemplateFile(String templateFile) {
         this.templateFile = templateFile;
     }
-    
-    
-    /** 
-     * Gets the name of the output file.  The output directory is supplied at file generation time.
-     * @return  A string containing the output file name.
+
+    /**
+     * Gets the name of the output file. The output directory is supplied at
+     * file generation time.
+     * 
+     * @return A string containing the output file name.
      */
     public String getOutputFile() {
         return outputFile;
     }
 
+    /**
+     * Sets the output file name used by the template.
+     * @param outputFile        The output file.
+     */
     public void setOutputFile(String outputFile) {
         this.outputFile = outputFile;
     }
 
     /**
      * Gets the name for the template.
+     * 
      * @return the name for the template
      */
     public String getName() {
@@ -184,7 +195,8 @@ public class TemplateMetaFile implements Cloneable, Serializable{
 
     /**
      * Sets the name for the template.
-     * @param name   the name for the template
+     * 
+     * @param name the name for the template
      */
     public void setName(String name) {
         this.name = name;
@@ -192,7 +204,8 @@ public class TemplateMetaFile implements Cloneable, Serializable{
 
     /**
      * Gets the description for the template.
-     * @return  the description for the template.
+     * 
+     * @return the description for the template.
      */
     public String getDescription() {
         return description;
@@ -200,6 +213,7 @@ public class TemplateMetaFile implements Cloneable, Serializable{
 
     /**
      * Sets the description of the template.
+     * 
      * @param description the description of the template.
      */
     public void setDescription(String description) {
@@ -208,6 +222,7 @@ public class TemplateMetaFile implements Cloneable, Serializable{
 
     /**
      * Gets the group for the template.
+     * 
      * @return the group for the template
      */
     public String getGroup() {
@@ -216,6 +231,7 @@ public class TemplateMetaFile implements Cloneable, Serializable{
 
     /**
      * Sets the group for the template.
+     * 
      * @param group the group for the template
      */
     public void setGroup(String group) {
@@ -223,7 +239,9 @@ public class TemplateMetaFile implements Cloneable, Serializable{
     }
 
     /**
-     * Indicates whether the template meta file has been selected in a table model.
+     * Indicates whether the template meta file has been selected in a table
+     * model.
+     * 
      * @return true if the template has been selected.
      */
     public boolean isSelected() {
@@ -231,8 +249,10 @@ public class TemplateMetaFile implements Cloneable, Serializable{
     }
 
     /**
-     * Determines whether the template meta file has been selected in a table model.
-     * @param selected
+     * Determines whether the template meta file has been selected in a table
+     * model.
+     * 
+     * @param selected whether or not the template is selected.
      */
     public void setSelected(boolean selected) {
         this.selected = selected;
@@ -246,14 +266,19 @@ public class TemplateMetaFile implements Cloneable, Serializable{
      * @return null if the file protocol attribute is not supported (i.e. not
      *         "file://" or not "http://")
      * @throws IOException If there is a problem creating an input stream.
-     * @throws  
+     * @throws
      */
     public InputStream getTemplateStream() throws IOException {
         InputStream is = null;
         if (this.templateFile != null) {
-            if (this.templateFile.startsWith("/template")) {
-                is = ClassLoader.getSystemClassLoader().getResourceAsStream(this.templateFile);
+            System.out.println("templateFile: " + templateFile);
+            if (this.templateFile.startsWith("/templates")
+                    || this.templateFile.startsWith("jar")) {
+                URL url = this.getClass().getResource(this.templateFile);
+                System.out.println("url: " + url.toString());
+                is = this.getClass().getResourceAsStream(this.templateFile);
                 if (is == null) {
+                    System.out.println("Template stream was null");
                     throw new IOException("Unable to retrieve template: "
                             + this.templateFile);
                 }
@@ -270,25 +295,26 @@ public class TemplateMetaFile implements Cloneable, Serializable{
                 URL url = new URL(this.templateFile);
                 is = url.openStream();
             } else {
-                throw new IOException("Unsupported template location: " + this.templateFile);
+                throw new IOException("Unsupported template location: "
+                        + this.templateFile);
             }
         }
         return is;
     }
-    
+
     @Override
-    public String toString(){
-        return String.format("TemplateMetaFile:[id:%d, selected:%b, name:%s, category:%s]", this.hashCode(), this.selected, this.name, this.category);
+    public String toString() {
+        return String.format(
+                "TemplateMetaFile:[id:%d, selected:%b, name:%s, category:%s]",
+                this.hashCode(), this.selected, this.name, this.category);
     }
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        TemplateMetaFile clone = new TemplateMetaFile(this.templateFile, this.outputFile, this.name, this.description, this.group, this.category);
+        TemplateMetaFile clone = new TemplateMetaFile(this.templateFile,
+                this.outputFile, this.name, this.description, this.group,
+                this.category);
         return clone;
     }
-
-
-    
-    
 
 }

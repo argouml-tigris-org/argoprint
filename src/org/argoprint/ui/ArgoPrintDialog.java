@@ -53,6 +53,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -78,24 +79,33 @@ import org.argoprint.util.FileUtil;
 import org.argouml.i18n.Translator;
 import org.argouml.kernel.Project;
 import org.argouml.kernel.ProjectManager;
+import org.argouml.ui.ProjectBrowser;
+
 /**
  * The dialog displayed when ArgoPrint is started from the ArgoUML menu.
  */
 @SuppressWarnings("serial")
 public class ArgoPrintDialog extends JDialog {
 
-    TemplateTableModel model = null;
+    /** The table model for the template table */
+    private TemplateTableModel model = null;
 
+    /** The logger */
     private static final Logger LOG = Logger.getLogger(ArgoPrintDialog.class);
 
+    /** A list of selected templates */
     private List<TemplateMetaFile> selectedTemplates = null;
 
+    /** A list of buttons */
     private List<JButton> buttonList = new ArrayList<JButton>();
 
+    /** The threadpool used by various template actions */
     private ThreadPoolExecutor threadPool = null;
 
+    /** The root directory for templates */
     private File templateRoot = null;
-    
+
+    /** The template table panel */
     private TemplateTablePanel panel = new TemplateTablePanel();
 
     /**
@@ -108,6 +118,8 @@ public class ArgoPrintDialog extends JDialog {
 
     private void init() {
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.setModal(true);
+        
         Container contentPane = this.getContentPane();
         contentPane.setLayout(new BorderLayout());
         contentPane.setPreferredSize(new Dimension(900, 500));
@@ -116,16 +128,15 @@ public class ArgoPrintDialog extends JDialog {
 
         File userHome = new File(System.getProperty("user.home"));
         templateRoot = new File(userHome, ".argouml/templates");
-        if (!templateRoot.exists()){
+        if (!templateRoot.exists()) {
             templateRoot.mkdirs();
         }
 
         this.setTitle(Translator.localize("argoprint.dialog.title"));
 
         // main panel
-       
-        model = panel.getModel();
 
+        model = panel.getModel();
 
         int numTemplates = model.getRowCount();
 
@@ -175,16 +186,30 @@ public class ArgoPrintDialog extends JDialog {
                         .getSelectedTemplates();
 
                 TemplateMetaFile clone = null;
+                
+                String successMsg = Translator
+                .localize("argoprint.msg.templatesCloned");
+                
+                String failMsg = Translator
+                .localize("argoprint.msg.templatesNotCloned");
+                
+                String failTitle = Translator
+                .localize("argoprint.clone.title");
+        
+                Executor executor = new Executor(ArgoPrintDialog.this, successMsg, failMsg, failTitle);
                 try {
+
+                    List<Future> cloneTaskList = new ArrayList<Future>();
                     for (TemplateMetaFile template : templates) {
                         clone = (TemplateMetaFile) template.clone();
                         model.addTemplate(clone);
                         TemplateCloner cloner = new TemplateCloner(clone);
-                        threadPool.execute(cloner);
+                        executor.addExecutable(cloner);
                     }
-                    JOptionPane.showMessageDialog(ArgoPrintDialog.this,
-                            Translator
-                                    .localize("argoprint.msg.templatesCloned"));
+
+                    executor.execAll();
+                    model.selectAll(false);
+                    
                 } catch (CloneNotSupportedException e1) {
                     LOG.error("Exception", e1);
                 }
@@ -204,20 +229,36 @@ public class ArgoPrintDialog extends JDialog {
             }
         });
         buttonPanel.add(newBtn);
-        
+
         // Update Button
         JButton updateBtn = new JButton();
-        updateBtn.setAction(new AbstractAction(Translator.localize("argoprint.button.update")){
+        updateBtn.setAction(new AbstractAction(Translator
+                .localize("argoprint.button.update")) {
 
             public void actionPerformed(ActionEvent e) {
-                List<TemplateMetaFile>templates = model.getLocalTemplates();
+                List<TemplateMetaFile> templates = model.getLocalTemplates();
                 TemplateUpdater updater = null;
-                for(TemplateMetaFile template:templates){
+                
+                String successMsg = Translator.localize("argoprint.msg.updated");
+                
+                String failMsg = Translator
+                .localize("argoprint.msg.notUpdated");
+                
+                String failTitle = Translator
+                .localize("argoprint.update.title");
+                
+                Executor exec = new Executor(ArgoPrintDialog.this, successMsg, failMsg, failTitle);
+
+                for (TemplateMetaFile template : templates) {
                     updater = new TemplateUpdater(templateRoot, template);
-                    threadPool.execute(updater);
+                    exec.addExecutable(updater);
                 }
-                JOptionPane.showMessageDialog(ArgoPrintDialog.this, "Local Templates Updated");
-            }});
+
+                exec.execAll();
+                model.selectAll(false);
+                
+            }
+        });
         buttonPanel.add(updateBtn);
 
         // generate button
@@ -230,16 +271,30 @@ public class ArgoPrintDialog extends JDialog {
 
             public void actionPerformed(ActionEvent e) {
                 FileGenerator gen = null;
-                
+
                 String outputDir = panel.getOutputDir();
                 File selectedDir = new File(outputDir);
-                
+
                 selectedTemplates = model.getSelectedTemplates();
+                
+                
+                String successMsg = Translator.localize("argoprint.msg.generated");
+                
+                String failMsg = Translator
+                .localize("argoprint.msg.notGenerated");
+                
+                String failTitle = Translator
+                .localize("argoprint.gen.title");
+                
+                Executor exec = new Executor(ArgoPrintDialog.this, successMsg, failMsg, failTitle);
+                
                 for (TemplateMetaFile templateMetaFile : selectedTemplates) {
-                  gen = new FileGenerator(templateMetaFile,
-                          selectedDir);
-                  threadPool.execute(gen);
+                    gen = new FileGenerator(templateMetaFile, selectedDir);
+                    exec.addExecutable(gen);
                 }
+
+                exec.execAll();
+                model.selectAll(false);
 
             }
         });
@@ -258,12 +313,18 @@ public class ArgoPrintDialog extends JDialog {
     /**
      * This class is responsible for generating files.
      */
-    class FileGenerator implements Runnable {
+    class FileGenerator extends AbstractExecutable {
 
         TemplateMetaFile metaFile = null;
 
         File outputDir = null;
 
+        /**
+         * Constructor
+         * 
+         * @param metaFile The template meta file
+         * @param outputDir The output directory
+         */
         public FileGenerator(TemplateMetaFile metaFile, File outputDir) {
             this.metaFile = metaFile;
             this.outputDir = outputDir;
@@ -303,8 +364,8 @@ public class ArgoPrintDialog extends JDialog {
                             metaFile));
                 }
 
-                File outputFile = new File(this.outputDir, metaFile
-                        .getOutputFile());
+                File outputFile = new File(this.outputDir,
+                        metaFile.getOutputFile());
                 Project currProject = ProjectManager.getManager()
                         .getOpenProjects().get(0);
                 templateEngine.generate(currProject, new FileOutputStream(
@@ -319,48 +380,56 @@ public class ArgoPrintDialog extends JDialog {
                                     + outputFile);
                 }
 
-                // show "generation complete" message
-                JOptionPane.showMessageDialog(ArgoPrintDialog.this, Translator
-                        .localize("argoprint.message.transformationDone"));
             } catch (FileNotFoundException ex) {
+                this.setException(ex);
                 LOG.error(ex.getMessage(), ex);
-                JOptionPane.showMessageDialog(ArgoPrintDialog.this, Translator
-                        .localize("argoprint.message.wrongTemplate"));
+                JOptionPane.showMessageDialog(ArgoPrintDialog.this,
+                        Translator.localize("argoprint.message.wrongTemplate"));
                 return;
             } catch (TemplateEngineNotFoundException te) {
+                this.setException(te);
                 LOG.error(te.getMessage(), te);
-                JOptionPane.showMessageDialog(ArgoPrintDialog.this, Translator
-                        .localize("argoprint.message.wrongTemplate"));
+                JOptionPane.showMessageDialog(ArgoPrintDialog.this,
+                        Translator.localize("argoprint.message.wrongTemplate"));
                 return;
 
             } catch (TemplateEngineException ex) {
+                this.setException(ex);
                 LOG.error(ex.getMessage(), ex);
                 JOptionPane.showMessageDialog(ArgoPrintDialog.this, Translator
                         .localize("argoprint.message.transformationError"));
                 return;
             } catch (IOException e) {
+                this.setException(e);
                 LOG.error(e.getMessage(), e);
                 JOptionPane.showMessageDialog(ArgoPrintDialog.this, Translator
                         .localize("argoprint.message.transformationError"));
             } catch (PostProcessorNotFoundException e) {
+                this.setException(e);
                 LOG.error(e.getMessage(), e);
                 JOptionPane.showMessageDialog(ArgoPrintDialog.this, Translator
                         .localize("argoprint.message.transformationError"));
+            } catch (Throwable e) {
+                this.setException(e);
+                LOG.error(e.getMessage(), e);
             } finally {
+
                 setEnabled(true);
             }
 
         }
 
+        public String getName() {
+            return "FileGenerator: " + this.metaFile.getName();
+        }
+
     }
 
     /**
-     * This class is responsible for duplicating a template file
-     * and the associated metadata file.
-     * 
-     * @author mfortner
+     * This class is responsible for duplicating a template file and the
+     * associated metadata file.
      */
-    class TemplateCloner implements Runnable {
+    class TemplateCloner extends AbstractExecutable {
 
         private TemplateMetaFile metaFile;
 
@@ -379,7 +448,8 @@ public class ArgoPrintDialog extends JDialog {
          * Constructor
          * 
          * @param metaFile A template metafile clone.
-         * @param bufferSize
+         * @param bufferSize The number of bytes in the buffer used for file
+         *            copying.
          */
         public TemplateCloner(TemplateMetaFile metaFile, int bufferSize) {
             this.metaFile = metaFile;
@@ -403,7 +473,6 @@ public class ArgoPrintDialog extends JDialog {
                 // initialize byte buffer and begin copying operation.
                 byte[] buffer = new byte[this.bufferSize];
 
-                ;
                 int charsRead = 0;
                 while ((charsRead = buffStream.read(buffer)) > 0) {
                     out.write(buffer, 0, charsRead);
@@ -417,22 +486,25 @@ public class ArgoPrintDialog extends JDialog {
                 this.metaFile.setTemplateFile(cloneFile.toURI().toString());
                 TemplateMetaFileSerializer.write(xmlfile, this.metaFile);
 
-            } catch (IOException e) {
+            } catch (Exception e) {
+                this.setException(e);
                 LOG.error(e.getMessage(), e);
             }
 
         }
 
+        public String getName() {
+            return "TemplateCloner: " + this.metaFile.getName();
+        }
+
     }
 
     /**
-     * This class is responsible for updating the template metadata file.
-     * These files are updated whenever the metadata displayed in the TemplateTable
+     * This class is responsible for updating the template metadata file. These
+     * files are updated whenever the metadata displayed in the TemplateTable
      * are updated.
-     *
-     * @author mfortner
      */
-    class TemplateUpdater implements Runnable {
+    class TemplateUpdater extends AbstractExecutable {
 
         TemplateMetaFile template = null;
 
@@ -452,10 +524,15 @@ public class ArgoPrintDialog extends JDialog {
         public void run() {
             try {
                 TemplateMetaFileSerializer.write(template);
-            } catch (IOException e) {
+            } catch (Exception e) {
+                this.setException(e);
                 LOG.error("Exception", e);
             }
 
+        }
+
+        public String getName() {
+            return "TemplateUpdater: " + this.template.getName();
         }
 
     }
