@@ -138,6 +138,7 @@
 
 		<javac srcdir="${module.build.src}"
            destdir="${module.build.dest}"
+		   
            excludes="*.txt,*.bat,*.xml,*.sh"
            debug="${debug}"
            deprecation="${deprecation}"
@@ -158,7 +159,9 @@
 		<copy todir="${module.build.dest}/${i18n.dir}" overwrite="on">
 			<fileset dir="${module.src.dir}/${i18n.dir}"/>
 		</copy>
-
+		<copy todir="${module.build.dest}/templates" overwrite="on">
+			<fileset dir="${module.src.dir}/templates"/>
+		</copy>
 
 		<jar jarfile="${module.jarfile}"
          basedir="${module.build.dest}"
