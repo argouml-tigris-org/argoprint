@@ -169,6 +169,13 @@
          excludes="*.txt,*.bat,*.xml,*.sh,${manifest}"
          manifest="${module.build.dest}/META-INF/${manifest}"/>
 	</target>
+	
+	<target name="package.zip" description="Make an installable zip" >
+		<zip basedir="." destfile="build/argoprint.zip">			
+			<zipfileset file="${module.jarfile}" />
+			<zipfileset dir="lib" includes="*.jar" />			
+		</zip>
+	</target>
 
 	<!-- =================================================================== -->
 	<!-- Run ArgoUML from compiled sources                                   -->
