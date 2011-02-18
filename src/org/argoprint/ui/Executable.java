@@ -28,11 +28,15 @@ public interface Executable extends Runnable {
      */
     public Throwable getException();
     
+    /**
+     * Sets the exception thrown by the executable.
+     * @param ex  The new exception.
+     */
     public void setException(Throwable ex);
     
     /**
      * Indicates that the thread threw an exception while running.
-     * @return
+     * @return true if an exception has been thrown and the exception variable is set.
      */
     public boolean hasException();
     

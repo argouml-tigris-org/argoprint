@@ -79,7 +79,6 @@ import org.argoprint.util.FileUtil;
 import org.argouml.i18n.Translator;
 import org.argouml.kernel.Project;
 import org.argouml.kernel.ProjectManager;
-import org.argouml.ui.ProjectBrowser;
 
 /**
  * The dialog displayed when ArgoPrint is started from the ArgoUML menu.
@@ -202,6 +201,7 @@ public class ArgoPrintDialog extends JDialog {
                     List<Future> cloneTaskList = new ArrayList<Future>();
                     for (TemplateMetaFile template : templates) {
                         clone = (TemplateMetaFile) template.clone();
+                        clone.setGroup("Personal");
                         model.addTemplate(clone);
                         TemplateCloner cloner = new TemplateCloner(clone);
                         executor.addExecutable(cloner);
@@ -217,6 +217,52 @@ public class ArgoPrintDialog extends JDialog {
         });
         buttonPanel.add(cloneBtn);
         buttonList.add(cloneBtn);
+        
+        
+        // delete button
+        JButton deleteBtn = new JButton();
+        deleteBtn.setEnabled(false);
+        deleteBtn.setAction(new AbstractAction(Translator
+                .localize("argoprint.button.delete")) {
+
+            public void actionPerformed(ActionEvent e) {
+                List<TemplateMetaFile> templates = model
+                        .getSelectedTemplates();
+                
+                // check to see if the user has selected one of the default templates
+                for (TemplateMetaFile temp:templates){
+                    if (temp.isDefaultTemplate()){
+                        String msg = Translator.localize("argoprint.msg.defaultTemplateSelected");
+                        JOptionPane.showMessageDialog(ArgoPrintDialog.this, msg);
+                        return;
+                    }
+                }
+
+                // delete selected templates
+                File templatesDir = new File(System.getProperty("user.home") + "/.argouml/templates");
+                for(TemplateMetaFile deletableFile:templates){
+                    File templateFile = new File(templatesDir, deletableFile.getTemplateFile());
+                    if (!templateFile.delete()){
+                        LOG.error("Unable to delete template file: " + templateFile.getName());
+                    }
+                    
+                    File metaFile = new File(templatesDir, deletableFile.getName() + ".xml");
+                    if (!metaFile.delete()){
+                        LOG.error("Unable to delete metafile: " + metaFile.getName());
+                    }
+                    
+                    model.removeTemplate(deletableFile);
+                   
+                }
+                String msg = Translator.localize("argoprint.msg.deleted");
+                JOptionPane.showMessageDialog(ArgoPrintDialog.this, msg);
+                
+                
+            }
+        });
+        buttonPanel.add(deleteBtn);
+        buttonList.add(deleteBtn);
+        
 
         // register button
         JButton newBtn = new JButton();
@@ -536,5 +582,7 @@ public class ArgoPrintDialog extends JDialog {
         }
 
     }
+    
+   
 
 }

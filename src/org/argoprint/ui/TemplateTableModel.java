@@ -216,7 +216,8 @@ public class TemplateTableModel implements TableModel {
     }
 
     /**
-     * Determines if the cell is editable.
+     * Determines if the cell is editable. Only local templates are considered
+     * editable.
      * 
      * @param rowIndex the index of the row.
      * @param columnIndex the index of the column
@@ -224,7 +225,8 @@ public class TemplateTableModel implements TableModel {
      * @see javax.swing.table.TableModel#isCellEditable(int, int)
      */
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return true;
+        TemplateMetaFile file = this.templateList.get(rowIndex);
+        return !file.isDefaultTemplate() || columnIndex == SELECTED;
     }
 
     /**
@@ -323,6 +325,7 @@ public class TemplateTableModel implements TableModel {
      */
     public void removeTemplate(TemplateMetaFile template) {
         templateList.remove(template);
+        fireTableDataChanged();
     }
 
     /**
@@ -379,9 +382,9 @@ public class TemplateTableModel implements TableModel {
         }
         return localTemplates;
     }
-    
-    public void selectAll(boolean selected){
-        for(TemplateMetaFile template:this.templateList){
+
+    public void selectAll(boolean selected) {
+        for (TemplateMetaFile template : this.templateList) {
             template.setSelected(selected);
         }
         fireTableDataChanged();
