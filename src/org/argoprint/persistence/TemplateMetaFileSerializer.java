@@ -62,16 +62,16 @@ public class TemplateMetaFileSerializer {
         TemplateMetaFile designTemplate = new TemplateMetaFile(
                 "/templates/design_html.vm", "DesignDoc.html", "DesignDocSVG",
                 "A software design document with SVG diagrams", "ArgoUML",
-                "Design");
+                "Design", true);
 
         TemplateMetaFile designTemplate2 = new TemplateMetaFile(
                 "/templates/design_html2.vm", "DesignDoc.html", "DesignDoc",
-                "A software design document", "ArgoUML", "Design");
+                "A software design document", "ArgoUML", "Design", true);
 
         TemplateMetaFile reqTemplate = new TemplateMetaFile(
                 "/templates/requirements_html.vm", "RequirementsDoc.html",
                 "RequirementsDoc", "A software requirements document",
-                "ArgoUML", "Requirements");
+                "ArgoUML", "Requirements", true);
         defaultTemplates.add(designTemplate);
         defaultTemplates.add(designTemplate2);
         defaultTemplates.add(reqTemplate);

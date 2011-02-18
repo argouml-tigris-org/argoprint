@@ -71,6 +71,11 @@ public class TemplateMetaFile implements Cloneable, Serializable {
      * operation
      */
     private transient boolean selected = false;
+    
+    /**
+     * Indicates whether or not this template is one of the default templates.
+     */
+    private transient boolean isDefaultTemplate = false;
 
     /** The category use for the file. */
     protected String category = null;
@@ -87,15 +92,17 @@ public class TemplateMetaFile implements Cloneable, Serializable {
      * @param description A description of the file.
      * @param group A grouping used for the template.
      * @param category A category used for the template.
+     * @param isDefaultTemplate Indicates that the template is a default template.
      */
     public TemplateMetaFile(String templateFile, String outputFile,
-            String name, String description, String group, String category) {
+            String name, String description, String group, String category, boolean isDefaultTemplate) {
         this.templateFile = templateFile;
         this.outputFile = outputFile;
         this.name = name;
         this.description = description;
         this.group = group;
         this.category = category;
+        this.isDefaultTemplate = isDefaultTemplate;
     }
 
     /**
@@ -257,6 +264,26 @@ public class TemplateMetaFile implements Cloneable, Serializable {
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
+    
+    /**
+     * Indicates whether or not the template is one of the default templates
+     * and thus cannot be deleted or modified.
+     * 
+     * @return
+     */
+    public boolean isDefaultTemplate() {
+        return isDefaultTemplate;
+    }
+
+    /**
+     * Determines whether or not the template is one of the default templates
+     * and thus cannot be deleted or modified.
+     * 
+     * @param isDefaultTemplate
+     */
+    public void setDefaultTemplate(boolean isDefaultTemplate) {
+        this.isDefaultTemplate = isDefaultTemplate;
+    }
 
     /**
      * Read the template out of a file in the classpath. The template may be one
@@ -313,7 +340,7 @@ public class TemplateMetaFile implements Cloneable, Serializable {
     public Object clone() throws CloneNotSupportedException {
         TemplateMetaFile clone = new TemplateMetaFile(this.templateFile,
                 this.outputFile, this.name, this.description, this.group,
-                this.category);
+                this.category, false);
         return clone;
     }
 
