@@ -170,10 +170,10 @@
          manifest="${module.build.dest}/META-INF/${manifest}"/>
 	</target>
 	
-	<target name="package.zip" description="Make an installable zip" >
-		<zip basedir="." destfile="build/argoprint.zip">			
+	<target name="package.zip" depends="package" description="Make an installable zip" >
+		<zip destfile="${module.build.dest}/argoprint.zip" >			
 			<zipfileset file="${module.jarfile}" />
-			<zipfileset dir="lib" includes="*.jar" />			
+			<zipfileset dir="${module.lib.dir}" includes="*.jar" />			
 		</zip>
 	</target>
 
