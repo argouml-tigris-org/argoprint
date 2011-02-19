@@ -1,0 +1,9 @@
+org.argoprint
+org.argoprint.ext
+org.argoprint.persistence
+org.argoprint.persistence.velocity
+org.argoprint.persistence.xslt
+org.argoprint.ui
+org.argoprint.util
+org.argouml.persistence
+org.argouml.ui.argoprint

@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ArgoPrint User Documentation</title>
+</head>
+<body>
+<h1>User Documentation</h1>
+<p>ArgoPrint is a template-based documentation generation plugin for
+ArgoUML. It is designed to generate project documentation artifacts such
+as requirements and design documents from an ArgoUML model.</p>
+
+<p>The following sections describe how to install and use ArgoPrint.</p>
+
+<ul>
+	<li><a href=#installation">Installation</a></li>
+	<li><a href="#using">Using ArgoPrint</a></li>
+	<li><a href="#templates">Creating Templates</a></li>
+</ul>
+
+<h1><a name="installation">Installation</a></h1>
+<p>To install ArgoPrint, unzip the <b>argoprint.zip</b> file into
+your <b>$ARGOUML_HOME/ext</b> directory where <b>ARGOUML_HOME</b> is the
+directory where you previously installed ArgoUML. When you start
+ArgoUML, the Tools menu should now contain an ArgoPrint menu item.</p>
+
+<h1><a name="using">Using ArgoPrint</a></h1>
+In order to use ArgoPrint you must first open an ArgoUML project.
+
+<h2>Generating Documentation</h2>
+To generate documentation from your ArgoUML model:
+
+<ol>
+	<li>Select the templates that you want to use.</li>
+	<li>Enter the output directory.</li>
+	<li>Click the <b>Generate</b> button.</li>
+</ol>
+
+<h2>Cloning Templates</h2>
+<p>Cloning a template allows you to customize it to meet your own
+needs. To clone a template into your local template repository.</p>
+
+<ol>
+	<li>Select the templates that you want to use.</li>
+	<li>Click the <b>Clone</b> button.</li>
+</ol>
+<p>The cloned templates will now appear in your local template
+repository. This is located in your ~/.argouml/templates on Linux & Mac
+OS X, and in /Users/&lt;username&gt; in Windows 7.</p>
+
+<h2>Editing Template Metadata</h2>
+You may edit the information about any of the non-default templates.
+Simply click on any of the fields in the row, and edit the information.
+
+
+<h2>Deleting Templates</h2>
+<p>To delete a template and its associated template metadata file
+from your local template repository:</p>
+
+<ol>
+	<li>Click on the <b>Tools/ArgoPrint</b> menu item. The ArgoPrint
+	dialog will then appear listing all of the currently registered
+	templates</li>
+	<li>Select the templates that you want to delete</li>
+	<li>Click the <b>Delete</b> button. The selected templates will
+	then be deleted.</li>
+</ol>
+
+<p>Note that you cannot delete the default templates. You may only
+delete the templates found in your local template repository. This
+repository is located in your &lt;User Home&gt;/.argouml/templates
+directory. Where <b>User Home</b> is:
+<table>
+	<tr>
+		<th>Operating System</th>
+		<th>Location</th>
+	</tr>
+	<tr>
+		<td>Linux</td>
+		<td>/home/myUserName</td>
+	</tr>
+
+	<tr>
+		<td>Mac OS X</td>
+		<td>/Users/myUserName</td>
+	</tr>
+
+	<tr>
+		<td>Windows 7</td>
+		<td>/Users/myUserName</td>
+	</tr>
+
+</table>
+
+</p>
+
+<h1><a name="templates">Creating Templates</a></h1>
+<p>The default templating engine for ArgoPrint is Apache's Velocity.
+In the examples which follow, you'll see how to create your own
+templates.</p>
+
+<p>By default, Velocity's context contains the an ArgoUML <b>project</b>
+object, and a <b>DiagramUtil</b> object. With these two objects you can
+easily extract information from your ArgoUML project file.</p>
+
+<p>Let's say that we want to iterate through each of the use case
+diagrams, and extract each of the use cases. We want to print the name
+and description of each use case.</p>
+
+<xmp> 
+#foreach( $diagram in $DiagramUtil.getUseCaseDiagrams($project)) 
+	$diagram.getName()
+	$DiagramUtil.getDiagramAsSVG($diagram) 
+	
+	#foreach ($usecase in $DiagramUtil.getUseCases($diagram)) 
+		$usecase.getName()
+		$DiagramUtil.getMemberDescription($usecase) 
+	#end 
+#end	
+</xmp>
+
+<p>In the first line, we extract each of the use case diagrams from
+the project using the <b>DiagramUtil.getUseCaseDiagrams</b> method, and iterate
+over them using the <b>foreach</b> construct from the Velocity
+templating language.  The <b>getUseCaseDiagrams</b> method returns a list of 
+<b>ArgoDiagram</b> objects.</p>
+
+<p>In the third line, we convert the use case diagram to SVG.  ArgoPrint 
+currently supports two types of diagrams (SVG, and embedded base64 images).  
+To embed an image in base64, simply use embed an img tag as shown below:</p>
+
+<xmp>
+<img src="data:image/jpeg;base64,$DiagramUtil.getDiagramAsJPEG($diagram)"/>
+</xmp>
+
+You'll find complete documentation for the DiagramUtil class
+<a href="../javadoc/index.html">here</a>.  
+
+</body>
+</html>
