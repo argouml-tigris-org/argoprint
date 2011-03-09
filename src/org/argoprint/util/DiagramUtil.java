@@ -473,6 +473,11 @@ public class DiagramUtil {
         return getMembersByType(diagram, FigClass.class);
     }
     
+    /** 
+     * Gets the methods for a particular interface.
+     * @param figClass  The interface class
+     * @return
+     */
     public static Map<String, String> getMethods(FigInterface figClass){
         Map<String, String> methodMap = new HashMap<String, String>();
         List methodList = Model.getFacade().getOperations(figClass.getOwner());
@@ -498,6 +503,11 @@ public class DiagramUtil {
         return methodMap;
     }
     
+    /**
+     * Gets the methods for a particular class.
+     * @param figClass  The class being interrogated.
+     * @return a map of methods and their descriptions.
+     */
     public static Map<String, String> getMethods(FigClass figClass){
         Map<String, String> methodMap = new HashMap<String, String>();
         List methodList = Model.getFacade().getOperations(figClass.getOwner());

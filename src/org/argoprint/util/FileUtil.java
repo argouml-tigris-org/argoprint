@@ -38,7 +38,19 @@
 
 package org.argoprint.util;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+
+import org.apache.log4j.Logger;
 
 /**
  * This class contains file-related utility methods.
@@ -46,6 +58,8 @@ import java.io.File;
  * @author mfortner
  */
 public class FileUtil {
+
+    private static final Logger LOG = Logger.getLogger(FileUtil.class);
 
     /**
      * This method gets the extension of a file.
@@ -70,5 +84,66 @@ public class FileUtil {
             ext = filename.substring(index + 1);
         }
         return ext;
+    }
+
+    /**
+     * This method reads the contents of an input stream and returns them as a
+     * String.
+     * 
+     * @param is The input stream.
+     * @return The contents of the input stream.
+     */
+    public static String readTextStream(InputStream is) {
+        Writer writer = new StringWriter();
+
+        char[] buffer = new char[1024];
+        try {
+            Reader reader = new BufferedReader(new InputStreamReader(is,
+                    "UTF-8"));
+
+            int n;
+
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+
+            }
+
+        } catch (IOException ex) {
+            LOG.error(ex);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                LOG.error("Exception", e);
+            }
+
+        }
+
+        return writer.toString();
+
+    }
+
+    /**
+     * This method reads the contents of a file and returns them as a String.
+     * 
+     * @param file The file to be read.
+     * @return The contents of the file.
+     * @throws FileNotFoundException If the file is not found.
+     */
+    public static String readTextFile(File file) throws FileNotFoundException {
+        return readTextStream(new FileInputStream(file));
+    }
+    
+    /**
+     * This method writes a String out to the specified file.
+     * @param outputFile        The output file
+     * @param contents          The contents of the output file.
+     * @throws IOException      If there is a problem writing out the file.
+     */
+    public static void writeString(File outputFile, String contents) throws IOException{
+        FileWriter writer = new FileWriter(outputFile);
+        writer.write(contents);
+        writer.flush();
+        writer.close();
     }
 }
