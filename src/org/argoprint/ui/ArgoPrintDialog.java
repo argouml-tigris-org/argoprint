@@ -77,6 +77,7 @@ import org.argoprint.persistence.TemplateEngineFactory;
 import org.argoprint.persistence.TemplateEngineNotFoundException;
 import org.argoprint.persistence.TemplateMetaFile;
 import org.argoprint.persistence.TemplateMetaFileSerializer;
+import org.argoprint.ui.edit.TemplateEditorDialog;
 import org.argoprint.util.FileUtil;
 import org.argouml.i18n.Translator;
 import org.argouml.kernel.Project;
@@ -219,6 +220,22 @@ public class ArgoPrintDialog extends JDialog {
         });
         buttonPanel.add(cloneBtn);
         buttonList.add(cloneBtn);
+        
+        JButton editBtn = new JButton();
+        editBtn.setEnabled(false);
+        editBtn.setAction(new AbstractAction(Translator.localize("argoprint.button.edit")){
+
+            public void actionPerformed(ActionEvent e) {
+                List<TemplateMetaFile> templates = model.getSelectedTemplates();
+                TemplateMetaFile template = templates.get(0);
+                System.out.println("Editing template: "+template.getName());
+                TemplateEditorDialog dialog = new TemplateEditorDialog(ArgoPrintDialog.this, template);
+                dialog.setVisible(true);
+            }
+            
+        });
+        buttonPanel.add(editBtn);
+        buttonList.add(editBtn);
 
         // delete button
         JButton deleteBtn = new JButton();
