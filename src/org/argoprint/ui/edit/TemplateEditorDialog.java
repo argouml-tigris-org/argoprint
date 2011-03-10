@@ -18,6 +18,10 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -28,8 +32,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.apache.log4j.Logger;
+import org.argoprint.persistence.PostProcessor;
+import org.argoprint.persistence.PostProcessorFactory;
+import org.argoprint.persistence.PostProcessorNotFoundException;
+import org.argoprint.persistence.TemplateEngine;
+import org.argoprint.persistence.TemplateEngineException;
+import org.argoprint.persistence.TemplateEngineFactory;
+import org.argoprint.persistence.TemplateEngineNotFoundException;
 import org.argoprint.persistence.TemplateMetaFile;
+import org.argoprint.ui.ArgoPrintDialog;
+import org.argoprint.util.FileUtil;
 import org.argouml.i18n.Translator;
+import org.argouml.kernel.Project;
+import org.argouml.kernel.ProjectManager;
 
 /**
  * This dialog box displays the template editor.
@@ -77,13 +92,12 @@ public class TemplateEditorDialog extends JDialog {
                 // create the Preview Button
                 JButton previewBtn = new JButton(new AbstractAction("Preview") {
                     public void actionPerformed(ActionEvent e) {
-                        File tmpFile = new File(System.getProperty("java.io.tmpdir"), template.getOutputFile());
-                        // TODO: generate contents
+                        generate(template, System.getProperty("java.io.tmpdir"));
                         editor.preview(template);
                     }
 
                 });
-                previewBtn.setEnabled(false);
+                previewBtn.setEnabled(true);
                 buttonPanel.add(previewBtn);
 
                 JButton saveBtn = new JButton(new AbstractAction("Save") {
@@ -123,5 +137,90 @@ public class TemplateEditorDialog extends JDialog {
         buttonPanel.add(closeBtn, BorderLayout.SOUTH);
         pack();
 
+    }
+    
+    private void generate(TemplateMetaFile metaFile, String outputDir){
+        File outputFile = null;
+        
+        try {
+            // verify that the template exists
+            String templateFile = metaFile.getTemplateFile();
+            String templateExt = null;
+
+            TemplateEngine templateEngine = null;
+
+            // get the file extension and find the
+            // appropriate template engine
+            templateExt = FileUtil.getExtension(templateFile);
+
+            // verify that the template has been specified
+            if (templateExt == null || templateExt == "") {
+                throw new FileNotFoundException("No template specified");
+            }
+
+            templateEngine = TemplateEngineFactory.getInstance(templateExt);
+
+            if (templateEngine == null) {
+                throw new TemplateEngineNotFoundException(
+                        "Unable to find a compatible template engine for template: "
+                                + templateFile);
+            }
+
+            InputStream templateStream = metaFile.getTemplateStream();
+            if (templateStream == null) {
+                throw new IOException(String.format("%s not found",
+                        metaFile));
+            }
+
+            outputFile = new File(outputDir, metaFile
+                    .getOutputFile());
+            Project currProject = ProjectManager.getManager()
+                    .getOpenProjects().get(0);
+            templateEngine.generate(currProject, new FileOutputStream(
+                    outputFile), templateStream);
+
+            String ext = FileUtil.getExtension(outputFile);
+            PostProcessor postProcessor = PostProcessorFactory
+                    .getInstance(ext);
+            if (postProcessor == null) {
+                throw new PostProcessorNotFoundException(
+                        "Unable to find a compatible post processor engine for output file: "
+                                + outputFile);
+            }
+
+        } catch (FileNotFoundException ex) {
+            
+            LOG.error(ex.getMessage(), ex);
+            JOptionPane.showMessageDialog(TemplateEditorDialog.this, Translator
+                    .localize("argoprint.message.wrongTemplate"));
+            
+        } catch (TemplateEngineNotFoundException te) {
+           
+            LOG.error(te.getMessage(), te);
+            JOptionPane.showMessageDialog(TemplateEditorDialog.this, Translator
+                    .localize("argoprint.message.wrongTemplate"));
+           
+
+        } catch (TemplateEngineException ex) {
+            
+            LOG.error(ex.getMessage(), ex);
+            JOptionPane.showMessageDialog(TemplateEditorDialog.this, Translator
+                    .localize("argoprint.message.transformationError"));
+            
+        } catch (IOException e) {
+           
+            LOG.error(e.getMessage(), e);
+            JOptionPane.showMessageDialog(TemplateEditorDialog.this, Translator
+                    .localize("argoprint.message.transformationError"));
+        } catch (PostProcessorNotFoundException e) {
+           
+            LOG.error(e.getMessage(), e);
+            JOptionPane.showMessageDialog(TemplateEditorDialog.this, Translator
+                    .localize("argoprint.message.transformationError"));
+        } catch (Throwable e) {
+           
+            LOG.error(e.getMessage(), e);
+        } 
+       
     }
 }

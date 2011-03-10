@@ -58,6 +58,7 @@ public class TemplatePreviewerDialog extends JDialog {
             final TemplatePreviewer previewer = TemplatePreviewerFactory
                     .getPreviewer(template);
             if (previewer != null) {
+                previewer.init(template);
                 contentPane.add(previewer.getPreviewerComponent(),
                         BorderLayout.CENTER);
 

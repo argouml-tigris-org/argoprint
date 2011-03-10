@@ -13,15 +13,21 @@
 
 package org.argoprint.ui.preview;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 
+import org.apache.log4j.Logger;
 import org.argoprint.persistence.TemplateMetaFile;
+import org.argoprint.util.FileUtil;
 
 public class HTMLPreviewer implements TemplatePreviewer {
+    
+    private static final Logger LOG = Logger.getLogger(HTMLPreviewer.class);
     
     private static final String[] exts = new String[]{"html","htm","xml","xhtml","txt"};
     
@@ -37,6 +43,9 @@ public class HTMLPreviewer implements TemplatePreviewer {
     
     private JEditorPane editor = new JEditorPane();
     
+    /**
+     * Constructor
+     */
     public HTMLPreviewer(){
         editor.setEditable(true);
     }
@@ -54,7 +63,14 @@ public class HTMLPreviewer implements TemplatePreviewer {
         type = (type == null)?"text/plain":type;
         editor.setContentType(type);
         
-        System.getProperty("java.io.tmpdir");
+        File outputFile = new File(System.getProperty("java.io.tmpdir"), template.getOutputFile());
+        String contents = "";
+        try {
+            contents = FileUtil.readTextFile(outputFile);
+        } catch (FileNotFoundException e) {
+            LOG.error("Exception", e);
+        }
+        editor.setText(contents);
 
     }
 
