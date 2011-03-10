@@ -24,11 +24,14 @@
 
 package org.argoprint.persistence;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
-import sun.misc.Service;
+import org.argouml.cognitive.Translator;
 
 /**
  * This factory creates instances of PostProcessors which take a raw XML file
@@ -42,10 +45,42 @@ import sun.misc.Service;
 public class PostProcessorFactory {
 
     static Map<String, PostProcessor> postProcessorMap = new HashMap<String, PostProcessor>();
-
+    static List<PostProcessor> processorList = new ArrayList<PostProcessor>();
+    
+    
     static {
-        Iterator<PostProcessor> it = Service
-                .providers(org.argoprint.persistence.PostProcessor.class);
+        
+        postProcessorMap = loadProcessors(null);
+        if (postProcessorMap.isEmpty()){
+            postProcessorMap = loadProcessors(Translator.class.getClassLoader());
+        }
+        
+        if (postProcessorMap.isEmpty()){
+            postProcessorMap = loadProcessors(ClassLoader.getSystemClassLoader());
+        }
+        
+        if (postProcessorMap.isEmpty()){
+            processorList.add(new OpenOfficePostProcessor());
+            processorList.add(new NullPostProcessor());
+            
+            for(PostProcessor proc: processorList){
+                String[] exts = proc.getSupportedExtensions();
+                for (int i = 0; i < exts.length; i++) {
+                    postProcessorMap.put(exts[i], proc);
+                }
+            }
+        }
+
+    }
+
+    private static Map<String, PostProcessor> loadProcessors(ClassLoader loader) {
+        Map<String, PostProcessor> processorMap = new HashMap<String, PostProcessor>();
+        ServiceLoader svcLoader = (loader != null)?
+            ServiceLoader.load(
+                PostProcessor.class, loader):
+            ServiceLoader.load(PostProcessor.class);
+                
+        Iterator<PostProcessor> it = svcLoader.iterator(); 
 
         PostProcessor proc = null;
         while (it.hasNext()) {
@@ -54,10 +89,11 @@ public class PostProcessorFactory {
             if (proc != null) {
                 exts = proc.getSupportedExtensions();
                 for (int i = 0; i < exts.length; i++) {
-                    postProcessorMap.put(exts[i], proc);
+                    processorMap.put(exts[i], proc);
                 }
             }
         }
+        return processorMap;
     }
 
     /**

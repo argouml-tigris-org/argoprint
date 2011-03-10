@@ -24,11 +24,16 @@
 
 package org.argoprint.persistence;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -45,14 +50,16 @@ public class TemplateMetaFile implements Cloneable, Serializable {
 
     private transient static final long serialVersionUID = 661847906792479685L;
 
-    public transient static final Logger LOG = Logger.getLogger(TemplateMetaFile.class);
+    public transient static final Logger LOG = Logger
+            .getLogger(TemplateMetaFile.class);
 
     /** Constant defining the default categories for templates */
-//    public static final String[] CATEGORIES = new String[] { "Requirements",
-//            "Design", "Deployment" };
+    // public static final String[] CATEGORIES = new String[] { "Requirements",
+    // "Design", "Deployment" };
 
     /** Constant defining the default groups for templates */
-//    public static final String[] GROUPS = new String[] { "ArgoUML", "Personal" };
+    // public static final String[] GROUPS = new String[] { "ArgoUML",
+    // "Personal" };
 
     /** The file name */
     protected String templateFile = null;
@@ -71,7 +78,7 @@ public class TemplateMetaFile implements Cloneable, Serializable {
      * operation
      */
     private transient boolean selected = false;
-    
+
     /**
      * Indicates whether or not this template is one of the default templates.
      */
@@ -92,10 +99,12 @@ public class TemplateMetaFile implements Cloneable, Serializable {
      * @param description A description of the file.
      * @param group A grouping used for the template.
      * @param category A category used for the template.
-     * @param isDefaultTemplate Indicates that the template is a default template.
+     * @param isDefaultTemplate Indicates that the template is a default
+     *            template.
      */
     public TemplateMetaFile(String templateFile, String outputFile,
-            String name, String description, String group, String category, boolean isDefaultTemplate) {
+            String name, String description, String group, String category,
+            boolean isDefaultTemplate) {
         this.templateFile = templateFile;
         this.outputFile = outputFile;
         this.name = name;
@@ -167,7 +176,7 @@ public class TemplateMetaFile implements Cloneable, Serializable {
     /**
      * Sets the location of the template file.
      * 
-     * @param templateFile  The template file.
+     * @param templateFile The template file.
      */
     public void setTemplateFile(String templateFile) {
         this.templateFile = templateFile;
@@ -185,7 +194,8 @@ public class TemplateMetaFile implements Cloneable, Serializable {
 
     /**
      * Sets the output file name used by the template.
-     * @param outputFile        The output file.
+     * 
+     * @param outputFile The output file.
      */
     public void setOutputFile(String outputFile) {
         this.outputFile = outputFile;
@@ -264,10 +274,10 @@ public class TemplateMetaFile implements Cloneable, Serializable {
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
-    
+
     /**
-     * Indicates whether or not the template is one of the default templates
-     * and thus cannot be deleted or modified.
+     * Indicates whether or not the template is one of the default templates and
+     * thus cannot be deleted or modified.
      * 
      * @return
      */
@@ -283,6 +293,36 @@ public class TemplateMetaFile implements Cloneable, Serializable {
      */
     public void setDefaultTemplate(boolean isDefaultTemplate) {
         this.isDefaultTemplate = isDefaultTemplate;
+    }
+
+    /**
+     * Gets the file extension for the output file.
+     * 
+     * @return the file extension for the output file
+     */
+    public String getOutputFileExtension() {
+        return getFileExtension(this.outputFile);
+    }
+
+    /**
+     * Gets the file extension for the template file.
+     * 
+     * @return the file extension for the template file.
+     */
+    public String getTemplateFileExtension() {
+        return getFileExtension(this.templateFile);
+    }
+
+    /**
+     * Gets the extension for the specified file
+     * 
+     * @param file The file you want to examine.
+     * @return The extension of the specified file or an empty string if there
+     *         is no extension
+     */
+    private String getFileExtension(String file) {
+        int loc = file.lastIndexOf(".");
+        return (loc != -1) ? file.substring(loc) : "";
     }
 
     /**
@@ -327,6 +367,44 @@ public class TemplateMetaFile implements Cloneable, Serializable {
             }
         }
         return is;
+    }
+
+    /**
+     * Gets the template as a String.
+     * @return
+     */
+    public String getTemplateAsString() {
+        Writer writer = new StringWriter();
+
+        char[] buffer = new char[1024];
+        InputStream is = null;
+        
+
+        try {
+            is = this.getTemplateStream();
+            Reader reader = new BufferedReader(
+            new InputStreamReader(is, "UTF-8"));
+
+            int n;
+
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+
+            }
+
+        }catch(IOException ex){
+            LOG.error(ex);
+        }finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                LOG.error("Exception", e);
+            }
+
+        }
+
+        return writer.toString();
+
     }
 
     @Override

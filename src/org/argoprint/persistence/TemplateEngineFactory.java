@@ -43,15 +43,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
-import sun.misc.Service;
+import org.argoprint.persistence.velocity.VelocityTemplateEngine;
+import org.argoprint.persistence.xslt.XSLTTemplateEngine;
+import org.argouml.application.Main;
 
 /**
  * This class is responsible for instantiating instances of templating engines.
  * All templating engines must be registered via the standard Java SPI mechanism
  * 
  * @author mfortner
- * @see http://java.sun.com/j2se/1.4.2/docs/guide/jar/jar.html#Service%20Provider
+ * @see http
+ *      ://java.sun.com/j2se/1.4.2/docs/guide/jar/jar.html#Service%20Provider
  */
 public class TemplateEngineFactory {
 
@@ -60,18 +64,50 @@ public class TemplateEngineFactory {
     private static Map<String, TemplateEngine> templateEngineMap = new HashMap<String, TemplateEngine>();
 
     static {
+        templateEngineMap = loadTemplateEngines(null);
+        
+        if (templateEngineMap.isEmpty()){
+            templateEngineMap = loadTemplateEngines(Main.class.getClassLoader());
+        }
+        
+        if (templateEngineMap.isEmpty()){
+            templateEngineMap = loadTemplateEngines(ClassLoader.getSystemClassLoader());
+        }
+        
+        if (templateEngineMap.isEmpty()){
+            templateEngineList.add(new VelocityTemplateEngine());
+            templateEngineList.add(new XSLTTemplateEngine());
+            
+            for(TemplateEngine te:templateEngineList){
+                String[] exts = te.getTemplateExtensions();
+                for(String ext:exts){
+                    templateEngineMap.put(ext, te);
+                }
+            }
+        }
+    }
 
-        Iterator<TemplateEngine> it = Service
-                .providers(org.argoprint.persistence.TemplateEngine.class);
+    private static Map<String, TemplateEngine> loadTemplateEngines(
+            ClassLoader loader) {
+        Map<String, TemplateEngine> map = new HashMap<String, TemplateEngine>();
+
+        Iterator<TemplateEngine> it = ServiceLoader.load(org.argoprint.persistence.TemplateEngine.class, loader).iterator();
 
         TemplateEngine engine = null;
+       
         while (it.hasNext()) {
             engine = it.next();
             templateEngineList.add(engine);
-            String[] exts = engine.getTemplateExtensions();
-            for (int i = 0; i < exts.length; i++) {
-                templateEngineMap.put(exts[i], engine);
-            }
+            addToMap(engine, map);
+        }
+
+        return map;
+    }
+    
+    private static void addToMap(TemplateEngine engine, Map<String, TemplateEngine> map){
+        String[] exts = engine.getTemplateExtensions();
+        for (int i = 0; i < exts.length; i++) {
+            map.put(exts[i], engine);
         }
     }
 
