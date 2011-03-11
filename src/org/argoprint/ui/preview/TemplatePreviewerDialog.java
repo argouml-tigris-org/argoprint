@@ -62,8 +62,7 @@ public class TemplatePreviewerDialog extends JDialog {
                 contentPane.add(previewer.getPreviewerComponent(),
                         BorderLayout.CENTER);
 
-                JButton closeBtn = new JButton(new AbstractAction(Translator
-                        .localize("templatePreviewerDialog.close")) {
+                JButton closeBtn = new JButton(new AbstractAction("Close") {
 
                     public void actionPerformed(ActionEvent e) {
                         setVisible(false);
@@ -74,10 +73,10 @@ public class TemplatePreviewerDialog extends JDialog {
 
             } else {
                 JPanel panel = new JPanel();
-                panel.add(new JLabel(Translator
-                        .localize("templatePreviewDialog.previewNotFound")));
+                panel.add(new JLabel("Previewer Not Found"));
                 contentPane.add(panel);
             }
+            this.pack();
 
         } catch (InstantiationException e) {
             LOG.error("Exception", e);

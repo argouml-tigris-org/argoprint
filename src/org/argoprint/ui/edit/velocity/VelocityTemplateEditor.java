@@ -14,6 +14,7 @@
 package org.argoprint.ui.edit.velocity;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileWriter;
@@ -24,6 +25,7 @@ import java.net.URISyntaxException;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import org.apache.log4j.Logger;
 import org.argoprint.persistence.TemplateMetaFile;
@@ -36,7 +38,7 @@ public class VelocityTemplateEditor extends JPanel implements TemplateEditor {
     private static final Logger LOG = Logger
             .getLogger(VelocityTemplateEditor.class);
 
-    private static final String[] extensions = new String[] { ".vm" };
+    private static final String[] extensions = new String[] { "vm" };
 
     private JEditorPane editorPane = new JEditorPane();
 
@@ -48,7 +50,11 @@ public class VelocityTemplateEditor extends JPanel implements TemplateEditor {
         this.setLayout(new BorderLayout());
         editorPane.setContentType("text/plain");
         editorPane.setPreferredSize(new Dimension(500, 400));
-        this.add(editorPane, BorderLayout.CENTER);
+        editorPane.setEditable(true);
+        editorPane.setBackground(Color.WHITE);
+        JScrollPane scroller = new JScrollPane();
+        scroller.getViewport().add(editorPane);
+        this.add(scroller, BorderLayout.CENTER);
     }
 
     public String[] getSupportedFileExtensions() {
@@ -61,7 +67,11 @@ public class VelocityTemplateEditor extends JPanel implements TemplateEditor {
 
     public void preview(TemplateMetaFile template) {
         TemplatePreviewerDialog dialog = new TemplatePreviewerDialog(template);
+        dialog.pack();
+        
+        //dialog.setModal(true);
         dialog.setVisible(true);
+        
     }
 
     public void save(TemplateMetaFile template) {

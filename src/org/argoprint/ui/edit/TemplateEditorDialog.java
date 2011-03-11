@@ -84,16 +84,15 @@ public class TemplateEditorDialog extends JDialog {
                     .getTemplateEditor(template);
             System.out.println("editor: "+editor);
             if (editor != null) {
-                JScrollPane scroller = new JScrollPane();
-                scroller.getViewport().add(editor.getEditorComponent());
-                contentPane.add(scroller,
+                
+                contentPane.add(editor.getEditorComponent(),
                         BorderLayout.CENTER);
 
                 // create the Preview Button
                 JButton previewBtn = new JButton(new AbstractAction("Preview") {
                     public void actionPerformed(ActionEvent e) {
                         generate(template, System.getProperty("java.io.tmpdir"));
-                        editor.preview(template);
+                        editor.preview(template);         
                     }
 
                 });

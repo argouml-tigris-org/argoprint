@@ -13,19 +13,22 @@
 
 package org.argoprint.ui.preview;
 
+import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import org.apache.log4j.Logger;
 import org.argoprint.persistence.TemplateMetaFile;
 import org.argoprint.util.FileUtil;
+import org.xhtmlrenderer.simple.XHTMLPanel;
 
-public class HTMLPreviewer implements TemplatePreviewer {
+public class HTMLPreviewer extends JPanel implements TemplatePreviewer {
     
     private static final Logger LOG = Logger.getLogger(HTMLPreviewer.class);
     
@@ -41,17 +44,23 @@ public class HTMLPreviewer implements TemplatePreviewer {
         mimeTypeMap.put("xhtml", "text/xml");		
     }
     
-    private JEditorPane editor = new JEditorPane();
+    //private JEditorPane editor = new JEditorPane();
+    private XHTMLPanel editor = new XHTMLPanel();
     
     /**
      * Constructor
      */
     public HTMLPreviewer(){
-        editor.setEditable(true);
+        //editor.setEditable(false);
+        editor.setEnabled(true);
+        JScrollPane scroller = new JScrollPane();
+        scroller.getViewport().add(editor);
+        this.setLayout(new BorderLayout());
+        this.add(scroller, BorderLayout.CENTER);
     }
 
     public JComponent getPreviewerComponent() {
-        return editor;
+        return this;
     }
 
     public String[] getSupportedFileExtensions() {
@@ -61,16 +70,21 @@ public class HTMLPreviewer implements TemplatePreviewer {
     public void init(TemplateMetaFile template) {
         String type = mimeTypeMap.get(template.getTemplateFileExtension());
         type = (type == null)?"text/plain":type;
-        editor.setContentType(type);
+        //editor.setContentType(type);
         
         File outputFile = new File(System.getProperty("java.io.tmpdir"), template.getOutputFile());
         String contents = "";
+//        try {
+//            contents = FileUtil.readTextFile(outputFile);
+//        } catch (FileNotFoundException e) {
+//            LOG.error("Exception", e);
+//        }
+        //editor.setText(contents);
         try {
-            contents = FileUtil.readTextFile(outputFile);
-        } catch (FileNotFoundException e) {
+            editor.setDocument(outputFile);
+        } catch (Exception e) {
             LOG.error("Exception", e);
         }
-        editor.setText(contents);
 
     }
 
