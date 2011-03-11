@@ -91,7 +91,9 @@ public class TemplateEngineFactory {
             ClassLoader loader) {
         Map<String, TemplateEngine> map = new HashMap<String, TemplateEngine>();
 
-        Iterator<TemplateEngine> it = ServiceLoader.load(org.argoprint.persistence.TemplateEngine.class, loader).iterator();
+        Iterator<TemplateEngine> it = (loader == null)?
+                ServiceLoader.load(TemplateEngine.class).iterator():
+                ServiceLoader.load(TemplateEngine.class, loader).iterator();
 
         TemplateEngine engine = null;
        

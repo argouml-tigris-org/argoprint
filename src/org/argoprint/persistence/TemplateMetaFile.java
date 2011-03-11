@@ -322,7 +322,7 @@ public class TemplateMetaFile implements Cloneable, Serializable {
      */
     private String getFileExtension(String file) {
         int loc = file.lastIndexOf(".");
-        return (loc != -1) ? file.substring(loc) : "";
+        return (loc != -1) ? file.substring(loc+1) : "";
     }
 
     /**
