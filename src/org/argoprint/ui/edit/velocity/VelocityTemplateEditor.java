@@ -67,9 +67,6 @@ public class VelocityTemplateEditor extends JPanel implements TemplateEditor {
 
     public void preview(TemplateMetaFile template) {
         TemplatePreviewerDialog dialog = new TemplatePreviewerDialog(template);
-        dialog.pack();
-        
-        //dialog.setModal(true);
         dialog.setVisible(true);
         
     }

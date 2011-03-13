@@ -41,6 +41,7 @@ public class TemplatePreviewerFactory {
         }
         
         if (previewerMap.isEmpty()){
+            previewerList.add(new TextPreviewer());
             previewerList.add(new HTMLPreviewer());
             
             for(TemplatePreviewer previewer:previewerList){

@@ -15,6 +15,7 @@ package org.argoprint.ui.preview;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -25,7 +26,6 @@ import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 import org.argoprint.persistence.TemplateMetaFile;
-import org.argouml.i18n.Translator;
 
 /**
  * This dialog displays the previewer component.
@@ -46,9 +46,11 @@ public class TemplatePreviewerDialog extends JDialog {
     }
 
     private void init(TemplateMetaFile template) {
-
+        this.setTitle("Template Preview");
+        this.setPreferredSize(new Dimension(500,400));
         Container contentPane = this.getContentPane();
         contentPane.setLayout(new BorderLayout());
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         // create the button panel
         JPanel buttonPanel = new JPanel();
@@ -62,21 +64,14 @@ public class TemplatePreviewerDialog extends JDialog {
                 contentPane.add(previewer.getPreviewerComponent(),
                         BorderLayout.CENTER);
 
-                JButton closeBtn = new JButton(new AbstractAction("Close") {
-
-                    public void actionPerformed(ActionEvent e) {
-                        setVisible(false);
-                        dispose();
-                    }
-
-                });
-
+                
             } else {
                 JPanel panel = new JPanel();
                 panel.add(new JLabel("Previewer Not Found"));
                 contentPane.add(panel);
             }
-            this.pack();
+            
+            
 
         } catch (InstantiationException e) {
             LOG.error("Exception", e);
@@ -85,7 +80,7 @@ public class TemplatePreviewerDialog extends JDialog {
         }
 
         // create the close Button
-        JButton closeBtn = new JButton(new AbstractAction() {
+        JButton closeBtn = new JButton(new AbstractAction("Close") {
 
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -95,6 +90,8 @@ public class TemplatePreviewerDialog extends JDialog {
         });
 
         buttonPanel.add(closeBtn);
+        contentPane.add(buttonPanel, BorderLayout.SOUTH);
+        this.pack();
     }
 
 }

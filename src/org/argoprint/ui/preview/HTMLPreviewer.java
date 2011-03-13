@@ -13,54 +13,33 @@
 
 package org.argoprint.ui.preview;
 
-import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import org.apache.log4j.Logger;
 import org.argoprint.persistence.TemplateMetaFile;
-import org.argoprint.util.FileUtil;
-import org.xhtmlrenderer.simple.XHTMLPanel;
 
 public class HTMLPreviewer extends JPanel implements TemplatePreviewer {
     
+    private static final String[] exts = {"html","htm","xhtml","xml"};
+    
     private static final Logger LOG = Logger.getLogger(HTMLPreviewer.class);
     
-    private static final String[] exts = new String[]{"html","htm","xml","xhtml","txt"};
+    private JPanel component = new JPanel();
     
-    private static Map<String, String> mimeTypeMap = new HashMap<String, String>();
-    
-    static {
-        mimeTypeMap.put("html", "text/html");
-        mimeTypeMap.put("htm", "text/html");
-        mimeTypeMap.put("xml", "text/xml");
-        mimeTypeMap.put("txt", "text/plain");
-        mimeTypeMap.put("xhtml", "text/xml");		
-    }
-    
-    //private JEditorPane editor = new JEditorPane();
-    private XHTMLPanel editor = new XHTMLPanel();
-    
-    /**
-     * Constructor
-     */
     public HTMLPreviewer(){
-        //editor.setEditable(false);
-        editor.setEnabled(true);
-        JScrollPane scroller = new JScrollPane();
-        scroller.getViewport().add(editor);
-        this.setLayout(new BorderLayout());
-        this.add(scroller, BorderLayout.CENTER);
+        JLabel label = new JLabel("Previewing Document In Browser");
+        component.add(label);
     }
 
     public JComponent getPreviewerComponent() {
-        return this;
+        return component;
+        
     }
 
     public String[] getSupportedFileExtensions() {
@@ -68,21 +47,13 @@ public class HTMLPreviewer extends JPanel implements TemplatePreviewer {
     }
 
     public void init(TemplateMetaFile template) {
-        String type = mimeTypeMap.get(template.getTemplateFileExtension());
-        type = (type == null)?"text/plain":type;
-        //editor.setContentType(type);
         
         File outputFile = new File(System.getProperty("java.io.tmpdir"), template.getOutputFile());
-        String contents = "";
-//        try {
-//            contents = FileUtil.readTextFile(outputFile);
-//        } catch (FileNotFoundException e) {
-//            LOG.error("Exception", e);
-//        }
-        //editor.setText(contents);
+        
+        Desktop desktop = Desktop.getDesktop();
         try {
-            editor.setDocument(outputFile);
-        } catch (Exception e) {
+            desktop.browse(outputFile.toURI());
+        } catch (IOException e) {
             LOG.error("Exception", e);
         }
 

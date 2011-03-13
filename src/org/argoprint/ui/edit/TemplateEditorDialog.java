@@ -75,9 +75,6 @@ public class TemplateEditorDialog extends JDialog {
         // create the button panel
         JPanel buttonPanel = new JPanel();
 
-        this.setModal(true);
-        this.setAlwaysOnTop(true);
-
         // create the template editor
         try {
             final TemplateEditor editor = TemplateEditorFactory

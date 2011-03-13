@@ -120,7 +120,6 @@ public class ArgoPrintDialog extends JDialog {
 
     private void init() {
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        this.setModal(true);
 
         Container contentPane = this.getContentPane();
         contentPane.setLayout(new BorderLayout());
