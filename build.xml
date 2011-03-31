@@ -22,9 +22,7 @@
 		<property name="argo.root" value="../argouml-app"/>
 
 		<!-- Load ArgoUML properties -->
-		<property name="argo.root.dir" value="${argo.root}"/>
-		<property file="${argo.root.dir}/default.properties"/>
-		<property name="argo.core.model" value="../argouml-core-model"/>
+		<property file="${argo.root}/default.properties"/>
 
 		<property name="module.root" value="."/>
 		<property name="module.src.dir" value="${module.root}/src"/>
@@ -43,6 +41,17 @@
 		<property name="module.tests.src" value="${module.root}/tests"/>
 		<property name="module.tests.dest" value="${module.build.dir}/tests"/>
 		<property name="module.tests.res" value="${module.tests.dest}/org/argoprint/resources"/>
+
+    <!-- figure out where main ArgoUML build directory is -->
+    <!-- Build directory used when compiling in the repository layout: -->
+    <available file="../argouml/build" 
+               type="dir" property="argo.build.dir"
+               value="../argouml/build"/>
+   <!-- Eclipse PDE build configuration -->
+   <available file="../argouml-build/build" 
+              type="dir" property="argo.build.dir"
+              value="../argouml-build/build"/>
+
 
 		<property name="i18n.dir" value="org/argouml/i18n/"/>
 
@@ -69,7 +78,6 @@
 		<property name="debug" value="on"/>
 		<property name="optimize" value="on"/>
 		<property name="deprecation" value="on"/>
-		<property name="developer.lib.dir" value="${argo.build.dir}"/>
 
 		<path id="module.compile.classpath">
 			<fileset dir="${module.lib.dir}" includes="*.jar " />
@@ -93,13 +101,12 @@
 		<echo message=""/>
 		<echo message=" available targets are:"/>
 		<echo message=""/>
-		<echo message="   compile      --> compiles the source code to the tree under ${module.build.dir}"/>
-		<echo message="   package      --> generates the ${argo.module.jarfile}.jar file"/>
-		<echo message="   run          --> runs ArgoUML ${argo.module.jarfile}.jar"/>
-		<echo message="   install      --> merges ./org into ../src_new/org tree"/>
-		<echo message="   checkstyle   --> runs checkstyle on all sources."/>
-		<echo message="   tests        --> runs all the tests.            "/>
-		<echo message="   usage        --> show this message (default)"/>
+		<echo message="   compile   --> compiles the source code to the tree under ${module.build.dir}"/>
+		<echo message="   package   --> generates the ${argo.module.jarfile}.jar file"/>
+		<echo message="   run       --> runs ArgoUML with the ${argo.module.jarfile}.jar"/>
+		<echo message="   install   --> builds and installs within the argouml ext dir"/>
+		<echo message="   tests     --> runs all the tests.            "/>
+		<echo message="   usage     --> show this message (default)"/>
 		<echo message=""/>
 		<echo message=" See the comments inside the build.xml file for more details."/>
 		<echo message="-------------------------------------------------------------"/>
@@ -160,7 +167,7 @@
 			<fileset dir="${module.src.dir}/${i18n.dir}"/>
 		</copy>
 		<copy todir="${module.build.dest}/templates" overwrite="on">
-			<fileset dir="${module.src.dir}/templates"/>
+			<fileset dir="${module.root}/templates"/>
 		</copy>
 
 		<jar jarfile="${module.jarfile}"
@@ -199,7 +206,6 @@
 	<!-- Clean targets                                                       -->
 	<!-- =================================================================== -->
 	<target name="clean" depends="init">
-		<delete file="${developer.lib.dir}/ext/${module.jarfile.name}"/>
 		<delete file="${argo.build.dir}/ext/${module.jarfile.name}"/>
 		<delete dir="${module.build.dir}"/>
 	</target>
@@ -216,39 +222,10 @@
 
 		<!-- Copy argoprint dependencies to argouml dir -->
 		<copy todir="${argo.build.dir}">
-			<fileset dir="${module.lib.dir}" includes="*.jar"/>
+			<fileset dir="${module.lib.dir}" includes="*.jar"
+                                 excludes="log4j-* antlr-*"/>
 		</copy>
 
-
-		<copy todir="${developer.lib.dir}/ext">
-			<fileset dir="${module.build.dir}" includes="${module.jarfile.name}"/>
-		</copy>
-
-
-
-	</target>
-
-	<!-- =================================================================== -->
-	<!-- Run checkstyle with the ArgoUML settings.                           -->
-	<!-- =================================================================== -->
-	<target name="checkstyle" depends="init"
-          description="Run checkstyle on all source.">
-		<java classname="com.puppycrawl.tools.checkstyle.Main"
-          failonerror="false" fork="true" maxmemory="32M">
-			<sysproperty key="checkstyle.header.file"
-                   value="../argouml/tools/checkstyle/java.header"/>
-			<classpath>
-				<fileset dir="${argo.tools.dir}/checkstyle-3.3">
-					<include name="*.jar"/>
-				</fileset>
-			</classpath>
-			<arg value="-c"/>
-			<arg value="${argo.tools.dir}/checkstyle/checkstyle_argouml.xml"/>
-			<arg value="-r"/>
-			<arg value="src"/>
-			<arg value="-r"/>
-			<arg value="tests"/>
-		</java>
 	</target>
 
 	<!-- =================================================================== -->
