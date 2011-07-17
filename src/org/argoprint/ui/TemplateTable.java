@@ -53,7 +53,27 @@ import org.argoprint.persistence.TemplateMetaFile;
 
 @SuppressWarnings("serial")
 public class TemplateTable extends JTable {
+    
+    /** The width of the selected column */
+    private static final int SELECTED_WIDTH = 30;
+    
+    /** The width of the group column */
+    private static final int GROUP_WIDTH = 60;
 
+    /** The width of the category column */
+    private static final int CATEGORY_WIDTH = 80;
+
+    /** The width of the template column */
+    private static final int TEMPLATE_WIDTH = 120;
+    
+    /** The width of the output column */
+    private static final int OUTPUT_WIDTH = 120;
+
+    /** The width of the description column */
+    private static final int DESC_WIDTH = 210;
+    
+   
+    
     private static final Logger LOG = Logger.getLogger(TemplateTable.class);
 
     public TemplateTable(TemplateTableModel model) {
@@ -67,27 +87,30 @@ public class TemplateTable extends JTable {
 
         TableColumn selectedColumn = this.getColumnModel().getColumn(
                 TemplateTableModel.SELECTED);
-        selectedColumn.setPreferredWidth(50);
+        selectedColumn.setPreferredWidth(SELECTED_WIDTH);
+        selectedColumn.setMaxWidth(SELECTED_WIDTH);
 
         // create group column editor
         TableColumn groupColumn = this.getColumnModel().getColumn(
                 TemplateTableModel.GROUP);
         groupColumn.setCellEditor(new ComboBoxEditor(
                 TemplateTableModel.DEFAULT_GROUPS));
-        groupColumn.setPreferredWidth(60);
+        groupColumn.setPreferredWidth(GROUP_WIDTH);
+        groupColumn.setMaxWidth(GROUP_WIDTH);
 
         // create category column editor
         TableColumn catColumn = this.getColumnModel().getColumn(
                 TemplateTableModel.CATEGORY);
         catColumn.setCellEditor(new ComboBoxEditor(
                 TemplateTableModel.DEFAULT_CATEGORIES));
-        catColumn.setPreferredWidth(80);
+        catColumn.setPreferredWidth(CATEGORY_WIDTH);
+        catColumn.setMaxWidth(CATEGORY_WIDTH);
 
         // create output file renderer
         TableColumn outputColumn = this.getColumnModel().getColumn(
                 TemplateTableModel.OUTPUT_FILE);
         outputColumn.setCellRenderer(new ToolTipRenderer());
-        outputColumn.setPreferredWidth(120);
+        outputColumn.setPreferredWidth(OUTPUT_WIDTH);
 
         // create template renderer
         TableColumn templateColumn = this.getColumnModel().getColumn(
@@ -95,13 +118,13 @@ public class TemplateTable extends JTable {
         templateColumn.setCellRenderer(new ToolTipRenderer());
         templateColumn.setCellEditor(new FileBrowseEditor(
                 "Select Template File"));
-        templateColumn.setPreferredWidth(120);
+        templateColumn.setPreferredWidth(TEMPLATE_WIDTH);
 
         // create description column
         TableColumn descColumn = this.getColumnModel().getColumn(
                 TemplateTableModel.DESCRIPTION);
         descColumn.setCellRenderer(new ToolTipRenderer());
-        descColumn.setPreferredWidth(210);
+        descColumn.setPreferredWidth(DESC_WIDTH);
     }
 
     /**
