@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -231,6 +232,8 @@ public class DiagramUtil {
                 project.getCurrentNamespace(), tagname);
         return val;
     }
+    
+    
 
     /**
      * This is a convenience method for returning the project author name.
@@ -462,6 +465,37 @@ public class DiagramUtil {
     public static List<Fig> getUseCases(ArgoDiagram diagram) {
         return getMembersByType(diagram, FigUseCase.class);
     }
+    
+    /**
+     * This method gets the extension points associated with a given usecase.
+     * @param usecase  The usecase whose extension points you want.
+     * @return  a map of extension points, and their descriptions
+     */
+    public static Map<String, String> getUseCaseExtensionPoints(FigUseCase figUseCase){
+        
+        Map<String, String> methodMap = new HashMap<String, String>();
+        Collection<Object> eps = Model.getFacade().getExtensionPoints(figUseCase.getOwner());
+        Iterator<Object> epIterator = eps.iterator();
+        Object currEp = null;
+        
+        while(epIterator.hasNext()){
+            currEp = epIterator.next(); 
+            String doc = "";
+            String name = Model.getFacade().getName(currEp);
+            Object taggedValue = Model.getFacade().getTaggedValue(currEp, Argo.DOCUMENTATION_TAG);
+            
+            if (taggedValue != null) {
+                doc = Model.getFacade().getValueOfTag(taggedValue);
+                if (doc != null){
+                    methodMap.put(name, doc);
+                }else {
+                    methodMap.put(name, "");
+                }
+            }
+            
+        }
+        return methodMap;
+    }
 
     /**
      * This method gets the classes for a class diagram.
@@ -480,8 +514,8 @@ public class DiagramUtil {
      */
     public static Map<String, String> getMethods(FigInterface figClass){
         Map<String, String> methodMap = new HashMap<String, String>();
-        List methodList = Model.getFacade().getOperations(figClass.getOwner());
-        Iterator methodIt = methodList.iterator();
+        List<Object> methodList = Model.getFacade().getOperations(figClass.getOwner());
+        Iterator<Object> methodIt = methodList.iterator();
         Object currMethod = null;
         
         while(methodIt.hasNext()){
@@ -510,8 +544,8 @@ public class DiagramUtil {
      */
     public static Map<String, String> getMethods(FigClass figClass){
         Map<String, String> methodMap = new HashMap<String, String>();
-        List methodList = Model.getFacade().getOperations(figClass.getOwner());
-        Iterator methodIt = methodList.iterator();
+        List<Object> methodList = Model.getFacade().getOperations(figClass.getOwner());
+        Iterator<Object> methodIt = methodList.iterator();
         Object currMethod = null;
         
         while(methodIt.hasNext()){
@@ -542,8 +576,8 @@ public class DiagramUtil {
      */
     public static Map<String, String> getAttributes(FigClass figClass){
         Map<String, String> attrMap = new HashMap<String, String>();
-        List attrList = Model.getFacade().getAttributes(figClass.getOwner());
-        Iterator attrIt = attrList.iterator();
+        List<Object> attrList = Model.getFacade().getAttributes(figClass.getOwner());
+        Iterator<Object> attrIt = attrList.iterator();
         Object currAttr = null;
         
         while(attrIt.hasNext()){
