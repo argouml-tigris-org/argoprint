@@ -21,6 +21,7 @@ import org.apache.commons.collections.iterators.FilterIterator;
 import org.apache.log4j.Logger;
 import org.argouml.application.api.Argo;
 import org.argouml.kernel.Project;
+import org.argouml.model.ClassDiagram;
 import org.argouml.model.Model;
 import org.argouml.sequence2.diagram.UMLSequenceDiagram;
 import org.argouml.uml.diagram.ArgoDiagram;
@@ -144,7 +145,7 @@ public class DiagramUtil {
      */
     public static List<ArgoDiagram> getDiagramsByType(Project project,
             final Class diagramType) {
-
+        
         List<ArgoDiagram> diagramList = new ArrayList<ArgoDiagram>();
 
         Iterator<ArgoDiagram> rawIt = project.getDiagramList().iterator();
@@ -408,11 +409,30 @@ public class DiagramUtil {
     /**
      * Gets the components found in a deployment diagram.
      * 
-     * @param diagram
-     * @return
+     * @param diagram The deployment diagram
+     * @return  a map of the component names and descriptions
      */
-    public static List<Fig> getComponents(ArgoDiagram diagram) {
-        return getMembersByType(diagram, FigComponent.class);
+    public static Map<String, String> getComponents(ArgoDiagram diagram) {
+        List<Fig> components = getMembersByType(diagram, FigComponent.class);
+        
+        Map<String, String> compMap = new HashMap<String, String>();
+        
+        String doc = "";
+        for(Fig statefig: components){
+            String name = Model.getFacade().getName(statefig.getOwner());
+            Object taggedValue = Model.getFacade().getTaggedValue(statefig.getOwner(), Argo.DOCUMENTATION_TAG);
+            
+            if (taggedValue != null) {
+                doc = Model.getFacade().getValueOfTag(taggedValue);
+                if (doc != null){
+                    compMap.put(name, doc);
+                }else {
+                    compMap.put(name, "");
+                }
+            }
+        }
+        
+        return compMap;
     }
 
     /**
@@ -454,6 +474,34 @@ public class DiagramUtil {
      */
     public static List<Fig> getStates(ArgoDiagram diagram) {
         return getMembersByType(diagram, FigState.class);
+    }
+    
+    /**
+     * Gets the states found in a State diagram
+     * @param diagram   the State diagram
+     * @return  a map of state names and descriptions
+     */
+    public static Map<String, String> getStatesAsMap(ArgoDiagram diagram){
+        List<Fig> stateFigList =  getStates(diagram);
+        
+        Map<String, String> states = new HashMap<String, String>();
+        
+        String doc = "";
+        for(Fig statefig: stateFigList){
+            String name = Model.getFacade().getName(statefig.getOwner());
+            Object taggedValue = Model.getFacade().getTaggedValue(statefig.getOwner(), Argo.DOCUMENTATION_TAG);
+            
+            if (taggedValue != null) {
+                doc = Model.getFacade().getValueOfTag(taggedValue);
+                if (doc != null){
+                    states.put(name, doc);
+                }else {
+                    states.put(name, "");
+                }
+            }
+        }
+       
+        return states;
     }
 
     /**
