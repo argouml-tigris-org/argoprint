@@ -13,6 +13,11 @@
 
 package org.argoprint.ui;
 
+import java.awt.Component;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 /**
  * Default implementation of an Executable.s
  *
@@ -53,6 +58,15 @@ public abstract class AbstractExecutable implements Executable {
         this.name = name;
     }
     
-    
+    public void showException(final Component parent, final String message){
+        SwingUtilities.invokeLater(new Runnable(){
+
+            public void run() {
+                JOptionPane.showMessageDialog(parent, message, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
+           
+        });
+    }
 
 }

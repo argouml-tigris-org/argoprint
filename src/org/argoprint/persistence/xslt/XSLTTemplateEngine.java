@@ -60,6 +60,11 @@ import org.argouml.kernel.Project;
  * 
  */
 public class XSLTTemplateEngine implements TemplateEngine {
+    
+    /** The location of the output dir */
+    private String outputdir = null;
+    
+    
 
     /**
      * {@inheritDoc}
@@ -115,6 +120,10 @@ public class XSLTTemplateEngine implements TemplateEngine {
         }
        
 
+    }
+
+    public void setOutputDir(String outputdir) {
+       this.outputdir = outputdir;
     }
 
 }

@@ -155,6 +155,7 @@ public class TemplateEditorDialog extends JDialog {
             }
 
             templateEngine = TemplateEngineFactory.getInstance(templateExt);
+            templateEngine.setOutputDir(outputDir);
 
             if (templateEngine == null) {
                 throw new TemplateEngineNotFoundException(

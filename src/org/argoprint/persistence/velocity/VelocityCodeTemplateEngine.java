@@ -158,6 +158,7 @@ public class VelocityCodeTemplateEngine implements CodeTemplateEngine {
                 context.put("DiagramUtil", new DiagramUtil());
                 context.put("pkg", pkg);
                 context.put("name", name);
+                context.put("outputdir", this.outputDir);
 
                 Writer writer = new OutputStreamWriter(new FileOutputStream(outputFile));
 

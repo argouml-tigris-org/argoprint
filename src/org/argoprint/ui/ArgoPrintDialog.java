@@ -429,6 +429,7 @@ public class ArgoPrintDialog extends JDialog {
                 }
 
                 templateEngine = TemplateEngineFactory.getInstance(templateExt);
+                templateEngine.setOutputDir(this.outputDir.getAbsolutePath());
 
                 if (templateEngine == null) {
                     throw new TemplateEngineNotFoundException(
@@ -461,35 +462,37 @@ public class ArgoPrintDialog extends JDialog {
             } catch (FileNotFoundException ex) {
                 this.setException(ex);
                 LOG.error(ex.getMessage(), ex);
-                JOptionPane.showMessageDialog(ArgoPrintDialog.this, Translator
+                showException(ArgoPrintDialog.this, Translator
                         .localize("argoprint.message.wrongTemplate"));
                 return;
             } catch (TemplateEngineNotFoundException te) {
                 this.setException(te);
                 LOG.error(te.getMessage(), te);
-                JOptionPane.showMessageDialog(ArgoPrintDialog.this, Translator
+                showException(ArgoPrintDialog.this, Translator
                         .localize("argoprint.message.wrongTemplate"));
                 return;
 
             } catch (TemplateEngineException ex) {
                 this.setException(ex);
                 LOG.error(ex.getMessage(), ex);
-                JOptionPane.showMessageDialog(ArgoPrintDialog.this, Translator
+                
+               showException(ArgoPrintDialog.this, Translator
                         .localize("argoprint.message.transformationError"));
                 return;
             } catch (IOException e) {
                 this.setException(e);
                 LOG.error(e.getMessage(), e);
-                JOptionPane.showMessageDialog(ArgoPrintDialog.this, Translator
+                showException(ArgoPrintDialog.this, Translator
                         .localize("argoprint.message.transformationError"));
             } catch (PostProcessorNotFoundException e) {
                 this.setException(e);
                 LOG.error(e.getMessage(), e);
-                JOptionPane.showMessageDialog(ArgoPrintDialog.this, Translator
+                showException(ArgoPrintDialog.this, Translator
                         .localize("argoprint.message.transformationError"));
             } catch (Throwable e) {
                 this.setException(e);
                 LOG.error(e.getMessage(), e);
+                showException(ArgoPrintDialog.this, e.getMessage());
             } finally {
 
                 setEnabled(true);
@@ -500,6 +503,7 @@ public class ArgoPrintDialog extends JDialog {
         public String getName() {
             return "FileGenerator: " + this.metaFile.getName();
         }
+        
 
     }
 
@@ -543,7 +547,10 @@ public class ArgoPrintDialog extends JDialog {
                 File destdir = new File(System.getProperty("user.home")
                         + "/.argouml");
                 destdir.mkdirs();
-                File cloneFile = new File(destdir, metaFile.getTemplateFile());
+                
+                String cloneFileName = metaFile.getTemplateFile();
+                cloneFileName = cloneFileName.substring(cloneFileName.lastIndexOf("/"));
+                File cloneFile = new File(destdir, cloneFileName);
 
                 // copy the template file
                 FileOutputStream out = new FileOutputStream(cloneFile);
@@ -567,6 +574,7 @@ public class ArgoPrintDialog extends JDialog {
             } catch (Exception e) {
                 this.setException(e);
                 LOG.error(e.getMessage(), e);
+                showException(ArgoPrintDialog.this, e.getMessage());
             }
 
         }
@@ -605,6 +613,7 @@ public class ArgoPrintDialog extends JDialog {
             } catch (Exception e) {
                 this.setException(e);
                 LOG.error("Exception", e);
+                showException(ArgoPrintDialog.this, e.getMessage());
             }
 
         }

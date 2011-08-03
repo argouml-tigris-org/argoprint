@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 
 import org.apache.commons.collections.Predicate;
@@ -21,7 +23,6 @@ import org.apache.commons.collections.iterators.FilterIterator;
 import org.apache.log4j.Logger;
 import org.argouml.application.api.Argo;
 import org.argouml.kernel.Project;
-import org.argouml.model.ClassDiagram;
 import org.argouml.model.Model;
 import org.argouml.sequence2.diagram.UMLSequenceDiagram;
 import org.argouml.uml.diagram.ArgoDiagram;
@@ -78,6 +79,7 @@ public class DiagramUtil {
 
     /** A constant used to identify a state diagram */
     public static final String STATE_DIAGRAM = "StateDiagram";
+        
 
     /**
      * This method determines what the type of diagram.
@@ -346,6 +348,68 @@ public class DiagramUtil {
         String encImage = encoder.encode(buff.toByteArray());
 
         return encImage;
+    }
+    
+    /**
+     * This method exports a diagram as a JPEG image file.
+     * @param diagram  The diagram to be exported.
+     * @return the name of the diagram output file
+     */
+    public static String exportDiagramAsJPEG(ArgoDiagram diagram, String outputdir){
+        ByteArrayOutputStream buff = new ByteArrayOutputStream();
+        Editor ce = Globals.curEditor();
+        JComponent canvas = ce.getJComponent();
+
+        Layer diagLayer = diagram.getLayer();
+        Editor diagEditor = new Editor(diagram.getGraphModel(), canvas,
+                diagLayer);
+
+        Rectangle drawingArea = diagEditor.getLayerManager().getActiveLayer()
+                .calcDrawingArea();
+        
+        String outFile = null;
+        try {
+            // Create an offscreen image and render the diagram into it.
+            BufferedImage i = new BufferedImage(drawingArea.width,
+                    drawingArea.height, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = (Graphics2D) i.getGraphics();
+            // g.setColor(new Color(SavePNGAction.TRANSPARENT_BG_COLOR, true));
+
+            Composite c = g.getComposite();
+            g.setComposite(AlphaComposite.Src);
+            g.fillRect(0, 0, drawingArea.width, drawingArea.height);
+            g.setComposite(c);
+            // a little extra won't hurt
+            g.translate(-drawingArea.x, -drawingArea.y);
+            diagEditor.print(g);
+
+            JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(buff);
+            JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(i);
+
+            param.setQuality(1.0f, false);
+            encoder.setJPEGEncodeParam(param);
+            encoder.encode(i);
+            
+            outFile = createDiagramFileName(diagram.getName(), ".jpg");
+            File outputfile = new File(outputdir, outFile);
+            System.out.println(outputfile.getAbsolutePath());
+            ImageIO.write(i, "jpeg", outputfile);
+
+            g.dispose();
+            // force garbage collection, to prevent out of memory exceptions
+            g = null;
+            i = null;
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+        }
+
+        return outFile;
+    }
+    
+    private static String createDiagramFileName(String diagramName, String ext){
+        String name = diagramName.replace(" ","_");
+        name += ext;
+        return name;
     }
 
     /**

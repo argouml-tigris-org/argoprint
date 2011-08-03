@@ -64,6 +64,12 @@ public interface TemplateEngine {
      *         extension should not include the period.
      */
     public String[] getTemplateExtensions();
+    
+    /**
+     * This method sets the output directory
+     * @param outputdir  The output directory
+     */
+    public void setOutputDir(String outputdir);
 
     /**
      * This method takes the contents of a project and uses the templateFile to

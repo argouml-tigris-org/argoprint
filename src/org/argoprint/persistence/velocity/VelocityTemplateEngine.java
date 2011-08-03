@@ -49,6 +49,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URI;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -67,6 +68,10 @@ import org.argouml.kernel.Project;
  * 
  */
 public class VelocityTemplateEngine implements TemplateEngine {
+    
+    private String outputdir = null;
+    
+    
 
     /**
      * {@inheritDoc}
@@ -82,11 +87,10 @@ public class VelocityTemplateEngine implements TemplateEngine {
 
             context.put("project", project);
             context.put("DiagramUtil", new DiagramUtil());
+            context.put("outputdir", this.outputdir);
 
             Writer writer = new FileWriter(outputFile);
 
-            // evaluate( Context context, Writer writer, String logTag,
-            // InputStream instream )
             Velocity.evaluate(context, writer, "VELOCITY", new FileReader(
                     templateFile));
 
@@ -135,7 +139,9 @@ public class VelocityTemplateEngine implements TemplateEngine {
             VelocityContext context = new VelocityContext();
 
             context.put("project", project);
+            
             context.put("DiagramUtil", new DiagramUtil());
+            context.put("outputdir", this.outputdir);
 
             Writer writer = new OutputStreamWriter(outputFile);
 
@@ -155,5 +161,12 @@ public class VelocityTemplateEngine implements TemplateEngine {
             throw new TemplateEngineException(e);
         }
     }
+
+    
+    public void setOutputDir(String outputdir) {
+        this.outputdir = outputdir;
+    }
+    
+   
 
 }

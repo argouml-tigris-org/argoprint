@@ -38,8 +38,8 @@ public class TemplatePreviewerDialog extends JDialog {
             .getLogger(TemplatePreviewerDialog.class);
 
     /**
-     * 
-     * @param template
+     * Constructor
+     * @param template  The template metafile 
      */
     public TemplatePreviewerDialog(TemplateMetaFile template) {
         init(template);
