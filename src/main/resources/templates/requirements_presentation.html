@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>$project.getName()</title>
+<style type="text/css">
+body{
+	background-color: #748fa9;
+}
+div#toc{
+	flush:left;
+	width: 200px;
+	height: 90%;
+	background-color: white;
+	border: 1px solid #eee;
+}
+
+div.slide{
+	width: 100%;
+	height: 90%;
+	
+}
+
+div.diagram{
+	visibility: hidden;
+}
+
+div#diagram{
+	height:900px;
+	width: 100%;
+}
+div#comments{
+	height: 100px;
+	width: 100%;
+}
+
+.textcontents{
+	margin: 10px;
+}
+
+h1.title{
+	font-family: Helvetica, Verdana;
+	font-size: 48pt;
+	font-weight: bold;
+}
+
+div.header{
+	padding: 20px;
+	border: 1px #eee solid;
+}
+div.body{
+	padding: 20px;
+	border: 1px #eee solid;
+}
+</style>
+
+<script language="javascript" type="text/javascript">
+
+	function hideAll(){
+
+	}
+
+	function showSlide(var slideId){
+		hideAll();
+		
+	}
+
+
+</script>
+</head>
+<body>
+
+#foreach( $diagram in $DiagramUtil.getUseCaseDiagrams($project))
+<div class="slide" id="$diagram.getItemUID().toString()">
+	<div class="header">$diagram.getName()</div>
+	<div class="contents">
+	$DiagramUtil.getDiagramAsSVG($diagram)
+	</div>
+	<div class="footer">
+		<p>$diagram.getDescription()</p>
+	</div>
+</div>
+#end
+
+
+#foreach ($diagram in $DiagramUtil.getClassDiagrams($project))
+<div class="slide" id="$diagram.getItemUID().toString()">
+	<div class="header">$diagram.getName()</div>
+	<div class="contents">
+	$DiagramUtil.getDiagramAsSVG($diagram)
+	</div>
+	<div class="footer">
+		<p>$diagram.getDescription()</p>
+	</div>
+</div>
+#end
+
+<div class="slide" id="titleSlide">
+	<h1 class="title">$project.getName() </h1>
+</div>
+
+<div class="slide" id="introSlide">
+	<div class="header">
+		$project.getName()
+	</div>
+	
+	<div class="body">
+		#project.getDescription()
+	</div>
+	
+</div>
+
+<!--  The Table of Contents for the Presentation -->
+<div id="toc">
+
+<ul>
+<li><a href="javascript:showTitleSlide('titleSlide')">Title</a></li>
+<li><a href="javascript:showTextSlide('introSlide')">Introduction</a></li>
+
+<li>Use Cases</li>
+<ul>
+#foreach( $diagram in $DiagramUtil.getUseCaseDiagrams($project))
+	<li><a href="javascript:showDiagram('$diagram.getItemUID().toString()')">$diagram.getName()</a></li>
+#end
+</ul>
+
+<li>Classes</li>
+<ul>
+#foreach ($diagram in $DiagramUtil.getClassDiagrams($project))
+	<li><a href="javascript:showDiagram('$diagram.getItemUID().toString()')">$diagram.getName()</a></li>
+#end
+</ul>
+
+</ul>
+
+</div>
+
+
+
+</body>
+</html>

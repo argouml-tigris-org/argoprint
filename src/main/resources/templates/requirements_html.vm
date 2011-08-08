@@ -1,0 +1,61 @@
+#*
+ This template creates a requirements document in HTML.
+
+*#
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<title>$project.getName()</title>
+	<style type="text/css">
+	<!--
+	h1{font-family: Verdana, Helvetica; font-weight: bold; font-size:24pt; }
+	h2{font-family: Verdana, Helvetica; font-weight: bold; font-size:20pt; }
+	h3{font-family: Verdana, Helvetica; font-weight: bold; font-size:16pt; }
+	h4{font-family: Verdana, Helvetica; font-weight: bold;  margin-bottom:-15px}
+	th{font-weight:bold; background-color: #E5EECC; text-align:left}
+	td{cell-padding: 2px; vertical-align:top;}
+	table{border: 1px solid  #C3C3C3; margin-left: 20px;}
+	dt{font-weight:bold; margin-left:5px}
+	-->
+	</style>
+</head>
+<body>
+<h1>Introduction</h1>
+<p>
+$project.getDescription()
+</p>
+
+<h1>Business Process</h1>
+#foreach( $diagram in $DiagramUtil.getStateDiagrams($project))
+  <h3>$diagram.getName() </h3>
+  $DiagramUtil.getDiagramAsSVG($diagram)
+  
+  #foreach($state in $DiagramUtil.getUseCases($diagram))
+  <h4>$state.getName()</h4>
+  <p>
+  $DiagramUtil.getMemberDescription($state)
+  </p>
+  #end
+  
+#end
+
+
+<h2>Use Cases</h2>
+#foreach( $diagram in $DiagramUtil.getUseCaseDiagrams($project))
+  <h3>$diagram.getName() </h3>
+  $DiagramUtil.getDiagramAsSVG($diagram)
+  
+  #foreach($usecase in $DiagramUtil.getUseCases($diagram))
+  <h4>$usecase.getName()</h4>
+  <p>
+  $DiagramUtil.getMemberDescription($usecase)
+  </p>
+  #end
+  
+#end
+
+
+</body>
+</html>
