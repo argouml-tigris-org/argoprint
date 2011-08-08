@@ -87,6 +87,14 @@
 			<version>1.5</version>
 		</dependency>
 
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
+			<optional>true</optional>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.argouml</groupId>
@@ -112,8 +120,8 @@
 	</dependencies>
 
 	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<testSourceDirectory>tests</testSourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<outputDirectory>target/classes</outputDirectory>
 		<testOutputDirectory>target/test-classes</testOutputDirectory>
 		<resources>
@@ -163,8 +171,8 @@
 							<goal>testCompile</goal>
 						</goals>
 						<configuration>
-							<source>1.5</source>
-							<target>1.5</target>
+							<source>1.6</source>
+							<target>1.6</target>
 							<showDeprecation>true</showDeprecation>
 							<showWarnings>true</showWarnings>
 						</configuration>
@@ -176,16 +184,16 @@
 							<goal>compile</goal>
 						</goals>
 						<configuration>
-							<source>1.5</source>
-							<target>1.5</target>
+							<source>1.6</source>
+							<target>1.6</target>
 							<showDeprecation>true</showDeprecation>
 							<showWarnings>true</showWarnings>
 						</configuration>
 					</execution>
 				</executions>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
 				</configuration>
@@ -298,7 +306,7 @@
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.1</version>
-				
+
 				<executions>
 					<execution>
 						<id>default-jar</id>
