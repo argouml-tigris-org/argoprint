@@ -16,6 +16,7 @@ package org.argoprint.ui.edit;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,7 +30,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import org.apache.log4j.Logger;
 import org.argoprint.persistence.PostProcessor;
@@ -40,7 +40,6 @@ import org.argoprint.persistence.TemplateEngineException;
 import org.argoprint.persistence.TemplateEngineFactory;
 import org.argoprint.persistence.TemplateEngineNotFoundException;
 import org.argoprint.persistence.TemplateMetaFile;
-import org.argoprint.ui.ArgoPrintDialog;
 import org.argoprint.util.FileUtil;
 import org.argouml.i18n.Translator;
 import org.argouml.kernel.Project;
@@ -60,7 +59,8 @@ public class TemplateEditorDialog extends JDialog {
     /**
      * Constructor
      * 
-     * @param template
+     * @param parent  The ArgoPrintDialog instance
+     * @param template  The template metafile which describes the template you are editing.
      */
     public TemplateEditorDialog(Component parent, TemplateMetaFile template) {
         this.setLocationRelativeTo(parent);
@@ -68,6 +68,7 @@ public class TemplateEditorDialog extends JDialog {
     }
 
     private void init(final TemplateMetaFile template) {
+        this.setPreferredSize(new Dimension(700, 600));
         this.setTitle("Template Editor");
         Container contentPane = this.getContentPane();
         contentPane.setLayout(new BorderLayout());
@@ -79,7 +80,6 @@ public class TemplateEditorDialog extends JDialog {
         try {
             final TemplateEditor editor = TemplateEditorFactory
                     .getTemplateEditor(template);
-            System.out.println("editor: "+editor);
             if (editor != null) {
                 
                 contentPane.add(editor.getEditorComponent(),
