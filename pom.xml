@@ -20,7 +20,7 @@
 			<groupId>org.tigris.gef</groupId>
 			<artifactId>gef</artifactId>
 			<version>0.13.7</version>
-			<scope>compile</scope>
+
 			<type>jar</type>
 		</dependency>
 
@@ -78,7 +78,7 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.6-6</version>
 			<type>jar</type>
-			<scope>compile</scope>
+
 		</dependency>
 
 		<dependency>
@@ -101,22 +101,85 @@
 			<artifactId>argouml-core-model</artifactId>
 			<version>0.2-SNAPSHOT</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<!--<scope>compile</scope> -->
 		</dependency>
+
+		<dependency>
+			<groupId>org.argouml</groupId>
+			<artifactId>argouml-core-model-mdr</artifactId>
+			<version>0.2-SNAPSHOT</version>
+			<type>jar</type>
+			<!--<scope>compile</scope> -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.argouml</groupId>
+			<artifactId>argouml-core-model-euml</artifactId>
+			<version>0.2-SNAPSHOT</version>
+			<type>jar</type>
+			<!--<scope>compile</scope> -->
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.argouml</groupId>
+			<artifactId>argouml-core-notation</artifactId>
+			<version>0.2-SNAPSHOT</version>
+			<type>jar</type>
+			<!--<scope>compile</scope> -->
+		</dependency>
+
+
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-app</artifactId>
 			<version>0.2-SNAPSHOT</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<!-- <scope>compile</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-core-diagrams-sequence2</artifactId>
 			<version>0.2-SNAPSHOT</version>
 			<type>jar</type>
-			<scope>compile</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.argouml</groupId>
+			<artifactId>argouml-core-diagrams-activity2</artifactId>
+			<version>0.2-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.argouml</groupId>
+			<artifactId>argouml-core-diagrams-class2</artifactId>
+			<version>0.2-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.argouml</groupId>
+			<artifactId>argouml-core-diagrams-deployment2</artifactId>
+			<version>0.2-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.argouml</groupId>
+			<artifactId>argouml-core-diagrams-state2</artifactId>
+			<version>0.2-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.argouml</groupId>
+			<artifactId>argouml-core-diagrams-structure2</artifactId>
+			<version>0.2-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
@@ -223,6 +286,10 @@
 									<name>log4j.configuration</name>
 									<value>org/argouml/resource/default_console.lcf</value>
 								</property>
+								<property>
+									<name>argouml.model.implementation</name>
+									<value>org.argouml.model.mdr.MDRModelImplementation</value>
+								</property>
 							</systemProperties>
 						</configuration>
 					</execution>
@@ -241,6 +308,10 @@
 						<property>
 							<name>log4j.configuration</name>
 							<value>org/argouml/resource/default_console.lcf</value>
+						</property>
+						<property>
+							<name>argouml.model.implementation</name>
+							<value>org.argouml.model.mdr.MDRModelImplementation</value>
 						</property>
 					</systemProperties>
 				</configuration>
