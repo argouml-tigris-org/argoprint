@@ -15,8 +15,8 @@ package org.argoprint.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
@@ -59,12 +59,16 @@ public class DiagramUtilTest {
     private static final String DEFAULT_MODEL_IMPLEMENTATION = "org.argouml.model.mdr.MDRModelImplementation";
 
     @BeforeClass
-    public static void setup() {
+    public static void setup() throws Exception{
 
+        System.out.println("Initializing Model");
         String className = System.getProperty("argouml.model.implementation",
                 DEFAULT_MODEL_IMPLEMENTATION);
         Throwable ret = Model.initialise(className);
-
+        if (ret != null){
+            ret.printStackTrace();
+        }
+        LOG.info("Initializing");
         (new InitNotation()).init();
         (new InitNotationUml()).init();
         (new InitNotationJava()).init();
@@ -77,9 +81,16 @@ public class DiagramUtilTest {
         (new InitUseCaseDiagram()).init();
         (new InitProfileSubsystem()).init();
 
+        LOG.info("Reading file");
         PersistenceManager mgr = PersistenceManager.getInstance();
 
         URL url = DiagramUtilTest.class.getResource("/library.zargo");
+        if (url == null){
+            System.out.println("Unable to resolve file");
+            throw new Exception("Unable to resolve library.zargo");
+        }
+        assertNotNull("Unable to resolve: library.zargo", url);
+        
         String name = url.getFile();
         AbstractFilePersister persister = mgr.getPersisterFromFileName(name);
         try {
