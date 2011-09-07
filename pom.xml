@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.argouml</groupId>
 	<artifactId>argoprint</artifactId>
-	<version>2.0.1-SNAPSHOT</version>
+	<version>0.2-SNAPSHOT</version>
 	<name>argoprint</name>
 	<description>The ArgoPrint plugin is used to convert ArgoUML projects into documentation and presentations.</description>
 
@@ -13,7 +13,7 @@
 		<groupId>org.argouml</groupId>
 		<artifactId>argouml-core</artifactId>
 		<version>0.2-SNAPSHOT</version>
-		<relativePath>../argouml-app</relativePath>
+		<relativePath>../argouml-core/pom.xml</relativePath>
 	</parent>
 	<dependencies>
 		<dependency>
@@ -75,7 +75,7 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.2.6-6</version>
+			<version>1.2.6</version>
 			<type>jar</type>
 
 		</dependency>
@@ -86,19 +86,11 @@
 			<version>1.5</version>
 		</dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
-			<scope>test</scope>
-			<optional>true</optional>
-		</dependency>
-
 
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-core-model</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
@@ -106,78 +98,74 @@
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-core-model-mdr</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-core-model-euml</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>runtime</scope>
 		</dependency>
 
 
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-core-notation</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
 		</dependency>
 
 
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-app</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-core-diagrams-sequence2</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>jar</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-core-diagrams-activity2</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>jar</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-core-diagrams-class2</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>jar</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-core-diagrams-deployment2</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>jar</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-core-diagrams-state2</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>jar</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.argouml</groupId>
 			<artifactId>argouml-core-diagrams-structure2</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>jar</type>
 		</dependency>
-
+		
 
 	</dependencies>
 
@@ -202,7 +190,7 @@
 			</testResource>
 		</testResources>
 		<directory>target</directory>
-		<finalName>argoprint-${version}</finalName>
+		<finalName>argoprint-${project.version}</finalName>
 
 		<plugins>
 			<plugin>
@@ -226,4 +214,8 @@
 		</plugins>
 
 	</build>
+	<dependencyManagement>
+		<dependencies>
+		</dependencies>
+	</dependencyManagement>
 </project>
